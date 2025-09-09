@@ -1,0 +1,48 @@
+.mw-cat{
+  /* empuja debajo del header global */
+  --padding-top: calc(var(--mw-header-offset) + env(safe-area-inset-top));
+  --ion-background-color:#fff;
+
+  .container{ width:100%; max-width:1180px; margin:0 auto; padding:0 16px; }
+
+  /* CHIPS redondos centrados */
+  .chips{ padding:8px 0; }
+  .chips-scroll{ display:flex; justify-content:center; flex-wrap:wrap; gap:22px; padding:10px 16px; }
+  .chip{ background:transparent; border:0; display:flex; flex-direction:column; align-items:center; gap:6px; cursor:pointer; min-width:92px; }
+  .chip img{ width:64px; height:64px; border-radius:50%; background:#f2f3f5; object-fit:cover; box-shadow:0 2px 6px rgba(0,0,0,.1); }
+  .chip span{ font-size:14px; font-weight:500; color:#333; }
+
+  /* PILLBAR */
+  .pillbar{ display:grid; grid-template-columns:44px 1fr 44px; align-items:center; gap:10px; padding:8px 0 4px; }
+  .pillbar .arrow{ width:44px; height:36px; border-radius:8px; border:1px solid #e3e6e9; background:#fff; display:flex; align-items:center; justify-content:center; box-shadow:0 1px 2px rgba(0,0,0,.04); }
+  .pill-scroll{ display:flex; gap:12px; overflow-x:auto; padding:0 6px; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
+  .pill-scroll::-webkit-scrollbar{ display:none; }
+  .pill{ white-space:nowrap; padding:10px 14px; background:#fff; border:1px solid #d6dfe6; border-radius:12px; font-weight:700; color:#1a1f24; box-shadow:0 1px 2px rgba(0,0,0,.03); }
+  .pill.active{ background:#eef6ff; border-color:#2f72c9; color:#0e2a55; }
+  @media (max-width:640px){ .pillbar{ grid-template-columns:36px 1fr 36px; } .pill{ padding:9px 12px; } }
+
+  /* GRID productos */
+  .grid{ display:grid; gap:18px; padding:10px 16px 24px; grid-template-columns: repeat(2,1fr); }
+  @media (min-width:680px){ .grid{ grid-template-columns: repeat(3,1fr);} }
+  @media (min-width:980px){ .grid{ grid-template-columns: repeat(4,1fr);} }
+  @media (min-width:1260px){ .grid{ grid-template-columns: repeat(5,1fr);} }
+
+  .prod{ background:#fff; border:1px solid #eee; border-radius:12px; overflow:hidden; display:flex; flex-direction:column; box-shadow:0 1px 2px rgba(0,0,0,.04); }
+  .thumb{ position:relative; background:#f6f7f8; }
+  .thumb::before{ content:""; display:block; padding-top:100%; }
+  .thumb img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  .ribbon{ position:absolute; top:10px; left:10px; background:#0b5666; color:#fff; font-size:12px; padding:2px 6px; border-radius:6px; }
+  .discount{ position:absolute; top:10px; right:10px; background:#ff5a00; color:#fff; font-weight:700; font-size:12px; padding:2px 6px; border-radius:6px; }
+  .cart-mini{ position:absolute; right:10px; bottom:10px; width:36px; height:36px; border-radius:999px; border:0; background:#fff; box-shadow:0 2px 8px rgba(0,0,0,.15); display:flex; align-items:center; justify-content:center; }
+
+  .info{ padding:10px 12px 12px; }
+  .title{ font-size:14.5px; font-weight:700; line-height:1.2; height:2.5em; overflow:hidden; color:#222; margin:0 0 6px; }
+  .price-row{ display:flex; gap:8px; align-items:baseline; }
+  .price-now{ font-weight:800; font-size:18px; color:#111; }
+  .price-before{ color:#9aa2a8; text-decoration: line-through; font-size:13px; }
+  .promo{ color:#e66b00; font-size:13px; margin:2px 0 4px; font-weight:600; }
+  .meta{ display:flex; justify-content:space-between; align-items:center; color:#444; font-size:12.5px; }
+  .stars{ display:flex; align-items:center; gap:2px; color:#ff9900; }
+  .stars ion-icon{ font-size:14px; }
+  .stars .cnt{ color:#6a737a; margin-left:4px; }
+}

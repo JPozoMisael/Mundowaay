@@ -1,0 +1,64 @@
+/*
+ * App Global CSS
+ * ----------------------------------------------------------------------------
+ * Put style rules here that you want to apply globally. These styles are for
+ * the entire app and not just one component. Additionally, this file can be
+ * used as an entry point to import other CSS/Sass files to be included in the
+ * output CSS.
+ * For more information on global stylesheets, visit the documentation:
+ * https://ionicframework.com/docs/layout/global-stylesheets
+ */
+
+/* Core CSS required for Ionic components to work properly */
+@import "@ionic/angular/css/core.css";
+
+/* Basic CSS for apps built with Ionic */
+@import "@ionic/angular/css/normalize.css";
+@import "@ionic/angular/css/structure.css";
+@import "@ionic/angular/css/typography.css";
+@import "@ionic/angular/css/display.css";
+
+/* Optional CSS utils that can be commented out */
+@import "@ionic/angular/css/padding.css";
+@import "@ionic/angular/css/float-elements.css";
+@import "@ionic/angular/css/text-alignment.css";
+@import "@ionic/angular/css/text-transformation.css";
+@import "@ionic/angular/css/flex-utils.css";
+
+/**
+ * Ionic Dark Mode
+ * -----------------------------------------------------
+ * For more info, please see:
+ * https://ionicframework.com/docs/theming/dark-mode
+ */
+
+/* @import "@ionic/angular/css/palettes/dark.always.css"; */
+/* @import "@ionic/angular/css/palettes/dark.class.css"; */
+@import "@ionic/angular/css/palettes/dark.system.css";
+
+/* Fuerza modo claro en toda la app */
+/* Forzar modo claro y tipografía limpia */
+:root{ color-scheme: light; }
+html, body, ion-app, ion-content{ background:#fff !important; color:#111; }
+
+/* Reset suave */
+* { box-sizing: border-box; }
+img { display:block; max-width:100%; }
+
+/* Contenedor central tipo Wix */
+.container { width:100%; max-width:1180px; margin:0 auto; padding:0 16px; }
+/* Alturas del header global */
+:root{
+  --mw-top-h: 64px;   /* barra con logo + buscador */
+  --mw-cats-h: 46px;  /* barra teal de categorías */
+  --mw-header-offset: calc(var(--mw-top-h) + var(--mw-cats-h));
+}
+
+/* Variante móvil (si tu top es más bajo en mobile) */
+@media (max-width: 768px){
+  :root{
+    --mw-top-h: 56px;
+    --mw-cats-h: 44px;
+    --mw-header-offset: calc(var(--mw-top-h) + var(--mw-cats-h));
+  }
+}

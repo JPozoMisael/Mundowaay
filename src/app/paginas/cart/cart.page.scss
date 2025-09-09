@@ -1,0 +1,20 @@
+.mw-cart {
+  --padding-top: calc(var(--mw-header-offset) + env(safe-area-inset-top));
+  .container { width:100%; max-width:980px; margin:0 auto; padding: 0 16px 24px; }
+  h2 { font-size:22px; font-weight:800; margin: 10px 0 14px; }
+
+  .cart-list { background:#fff; border:1px solid #e6e9ec; border-radius:10px; }
+  .cart-item { --inner-padding-end: 8px; }
+  ion-thumbnail { --size: 72px; margin-right:10px; }
+  .price { color:#222; font-weight:700; margin:4px 0; }
+  .qty { display:flex; align-items:center; gap:10px; margin-top:6px; }
+  .line-total { font-weight:800; margin-left:8px; }
+
+  .summary {
+    margin-top: 16px; background:#fff; border:1px solid #e6e9ec; border-radius:10px; padding: 12px;
+    .row { display:flex; justify-content:space-between; margin-bottom:8px; }
+  }
+
+  .empty { text-align:center; padding: 40px 0; color:#556; }
+  .empty ion-icon { font-size:54px; color:#99a; margin-bottom:8px; }
+}

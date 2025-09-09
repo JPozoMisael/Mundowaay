@@ -1,0 +1,51 @@
+<ion-content class="mw-cart" [fullscreen]="true">
+  <section class="container">
+
+    <h2>Tu carrito</h2>
+
+    <ng-container *ngIf="(items$ | async) as items; else empty">
+      <ion-list lines="none" class="cart-list">
+        <ion-item *ngFor="let it of items" class="cart-item">
+          <ion-thumbnail slot="start">
+            <img [src]="it.image" [alt]="it.title" />
+          </ion-thumbnail>
+
+          <ion-label>
+            <h3>{{ it.title }}</h3>
+            <p class="price">{{ money(it.price) }}</p>
+            <div class="qty">
+              <ion-button size="small" fill="outline" (click)="dec(it.id)">−</ion-button>
+              <span>{{ it.qty }}</span>
+              <ion-button size="small" fill="outline" (click)="inc(it.id)">+</ion-button>
+            </div>
+          </ion-label>
+
+          <div class="line-total">{{ money(it.price * it.qty) }}</div>
+
+          <ion-button fill="clear" color="medium" slot="end" (click)="remove(it.id)" aria-label="Eliminar">
+            <ion-icon name="trash-outline"></ion-icon>
+          </ion-button>
+        </ion-item>
+      </ion-list>
+
+      <div class="summary">
+        <div class="row">
+          <span>Subtotal</span>
+          <strong>{{ (subtotal$ | async) | number:'1.2-2' | currency:'USD':'symbol':'1.2-2' }}</strong>
+        </div>
+        <!-- agrega impuestos/envío si aplica -->
+        <ion-button expand="block" color="success" routerLink="/checkout">Proceder al pago</ion-button>
+        <ion-button expand="block" fill="clear" color="medium" (click)="clear()">Vaciar carrito</ion-button>
+      </div>
+    </ng-container>
+
+    <ng-template #empty>
+      <div class="empty">
+        <ion-icon name="cart-outline"></ion-icon>
+        <h3>Tu carrito está vacío</h3>
+        <ion-button routerLink="/home">Explorar productos</ion-button>
+      </div>
+    </ng-template>
+
+  </section>
+</ion-content>

@@ -1,0 +1,59 @@
+<ion-header class="mw-header" mode="md">
+  <!-- Top bar -->
+  <ion-toolbar class="top">
+    <div class="container top-inner">
+      <!-- Logo -->
+      <a class="brand" routerLink="/">
+        <img src="assets/logo-way.svg" alt="Way" />
+      </a>
+
+      <!-- Buscador -->
+      <div class="search">
+        <ion-searchbar
+          placeholder="Buscar semillas, productos y más"
+          show-clear-button="focus"
+          (ionSearch)="onSearch($event)">
+        </ion-searchbar>
+      </div>
+
+      <!-- Acciones -->
+      <div class="actions">
+        <ion-button class="icon" fill="clear" size="small" aria-label="Ubicación">
+          <ion-icon name="location-outline"></ion-icon>
+        </ion-button>
+
+        <ion-button class="login" fill="clear" size="small" aria-label="Perfil">
+          <ion-icon name="person-circle-outline"></ion-icon>
+          <span>Iniciar sesión</span>
+        </ion-button>
+
+        <ion-button class="cart-btn" fill="clear" size="small" aria-label="Carrito" routerLink="/cart">
+          <ion-icon name="cart-outline"></ion-icon>
+          <ion-badge *ngIf="cartCount>0" class="cart-badge">{{ cartCount }}</ion-badge>
+        </ion-button>
+      </div>
+    </div>
+  </ion-toolbar>
+
+  <!-- Categorías -->
+  <ion-toolbar class="cats">
+    <div class="container cat-inner">
+      <button class="hamb" type="button" (click)="openMenu()">
+        <ion-icon name="menu-outline"></ion-icon>
+        <span>Todo</span>
+      </button>
+
+      <nav class="cat-nav">
+        <a routerLink="/home" class="active">Home</a>
+        <a routerLink="/semillas">Semillas</a>
+        <a routerLink="/insecticidas">Insecticidas</a>
+        <a routerLink="/herbicidas">Herbicidas</a>
+        <a routerLink="/nutricion">Nutrición</a>
+        <a routerLink="/maquinaria">Maquinaria y accesorios</a>
+        <!-- Añade más categorías aquí; el nav hace scroll horizontal -->
+        <!-- <a routerLink="/c/maquinaria">Maquinaria</a> -->
+        <!-- <a routerLink="/c/riego">Riego</a> -->
+      </nav>
+    </div>
+  </ion-toolbar>
+</ion-header>

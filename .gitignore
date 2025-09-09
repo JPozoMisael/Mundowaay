@@ -1,0 +1,22 @@
+# Dependencias
+node_modules/
+
+# Compilados / builds
+www/
+platforms/
+plugins/
+dist/
+build/
+
+# Configuración de IDEs
+.idea/
+.vscode/
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+
+# Archivos de ambiente
+.env
+# caches Angular
+.angular/

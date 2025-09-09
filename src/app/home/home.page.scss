@@ -1,0 +1,122 @@
+.mw-home {
+  --ion-background-color:#fff;
+
+  /* HERO amarillo tipo Wix */
+  .hero {
+    background:#f0f1f2; /* banda gris claro superior de Wix */
+    .hero-inner { position:relative; display:grid; grid-template-columns:48px 1fr 48px; align-items:center; min-height:260px; }
+    .hero-art {
+      position:relative; height:100%; border-radius:0; overflow:hidden;
+      .art-bg { background:#d9a320; height:220px; border-radius:0; } /* amarillo Wix */
+      h2 { position:absolute; left:10%; top:25%; color:#0b5666; font-weight:800; font-size: clamp(28px, 4vw, 48px); line-height:1.05; }
+    }
+    .arrow { background:transparent; border:0; color:#fff; width:44px; height:44px; display:flex; align-items:center; justify-content:center; }
+    .arrow ion-icon { font-size:28px; filter: drop-shadow(0 1px 2px rgba(0,0,0,.35)); }
+  }
+
+  /* Tarjetas como Wix */
+  .cards {
+    display:grid; gap:16px; padding:24px 16px;
+    grid-template-columns: repeat(12, 1fr);
+  }
+
+  .card {
+    background:#fff; border:1px solid #e8e8e8; border-radius:8px; padding:16px;
+    box-shadow: 0 1px 2px rgba(0,0,0,.03);
+    display:flex; flex-direction:column; gap:10px;
+
+    h3 { font-size:20px; margin:0; font-weight:800; color:#222; }
+    p  { margin:0; color:#60707a; font-size:14px; }
+    img { width:100%; height:auto; border-radius:6px; object-fit:cover; background:#f6f7f8; }
+  }
+
+  /* Layout como tu captura:
+     - 3 tarjetas grandes (3,3,3 columnas)
+     - 1 tarjeta alta con mosaico (3 columnas) */
+  .cards > .card:nth-child(1) { grid-column: span 3; }
+  .cards > .card:nth-child(2) { grid-column: span 3; }
+  .cards > .card:nth-child(3) { grid-column: span 3; }
+  .cards > .card:nth-child(4) { grid-column: span 3; }
+
+  .card-mini .mini-grid {
+    display:grid; grid-template-columns:repeat(2, 1fr); gap:8px;
+    img { width:100%; aspect-ratio:1; object-fit:cover; border-radius:6px; }
+  }
+
+  /* Responsivo */
+  @media (max-width: 1024px) {
+    .cards > .card { grid-column: span 6; }
+  }
+  @media (max-width: 640px) {
+    .hero .hero-inner { grid-template-columns: 32px 1fr 32px; min-height:200px; }
+    .cards { grid-template-columns: repeat(2, 1fr); }
+    .cards > .card { grid-column: auto; }
+  }
+    --padding-top: calc(var(--mw-header-offset) + env(safe-area-inset-top));
+
+}
+/* ========= AMAZON-LIKE SECTIONS ========= */
+.amz.container { width:100%; max-width:1180px; margin: 0 auto; padding: 0 16px; }
+
+/* 1) STRIP */
+.amz-strip{
+  margin-top: 24px;
+  background:#fff;
+  border:1px solid #e6e9ec;
+  border-radius: 10px;
+  padding: 12px 44px;            /* deja espacio para flechas */
+  position: relative;
+}
+.amz-head{
+  display:flex; align-items:center; justify-content:space-between;
+  padding: 4px 0 10px;
+}
+.amz-head h2{ margin:0; font-size:20px; font-weight:800; color:#222; }
+.amz-head .more{ font-weight:600; color:#2f72c9; text-decoration:none; }
+
+.amz-strip .strip{
+  display:flex; gap: 18px; overflow-x:auto; scroll-behavior:smooth; padding-bottom: 6px;
+  -webkit-overflow-scrolling: touch; scrollbar-width:none;
+}
+.amz-strip .strip::-webkit-scrollbar{ display:none; }
+
+.amz-strip .item{
+  min-width: 260px; /* tamaño de cartel por item */
+  background:#f6f7f8; border-radius: 8px; border:1px solid #eee;
+  display:flex; align-items:center; justify-content:center;
+}
+.amz-strip .item img{ width:100%; height: 180px; object-fit: cover; border-radius:8px; }
+
+.amz-strip .nav{
+  position:absolute; top:50%; transform: translateY(-50%);
+  width:40px; height:64px; border-radius: 8px; border:1px solid #e3e6e9; background:#fff;
+  display:flex; align-items:center; justify-content:center; box-shadow:0 2px 8px rgba(0,0,0,.08);
+}
+.amz-strip .nav.left{ left: 8px; }
+.amz-strip .nav.right{ right: 8px; }
+
+/* 2) TILES GRID */
+.amz-tiles{
+  display:grid; gap: 16px; margin-top: 16px;
+  grid-template-columns: repeat(4, 1fr);
+}
+@media (max-width: 1024px){ .amz-tiles{ grid-template-columns: repeat(2, 1fr);} }
+@media (max-width: 640px){ .amz-tiles{ grid-template-columns: 1fr; } }
+
+.tile{
+  background:#fff; border:1px solid #e6e9ec; border-radius: 10px;
+  padding: 12px; display:flex; flex-direction:column; gap:10px;
+}
+.tile header h3{ margin:0; font-size:18px; font-weight:800; color:#222; }
+.tile .quad{
+  display:grid; grid-template-columns: repeat(2, 1fr); gap: 10px;
+}
+.tile .quad a{
+  text-decoration:none; color:#222; display:grid; grid-template-rows: 1fr auto; gap:6px;
+}
+.tile .quad img{
+  width:100%; height: 120px; object-fit:cover; border-radius: 8px; background:#f2f3f5;
+}
+.tile .quad span{ font-size: 13px; }
+.tile footer{ margin-top: 4px; }
+.tile footer .more{ font-weight:600; color:#2f72c9; text-decoration:none; font-size: 14px; }
