@@ -1,0 +1,34 @@
+<ion-header translucent="true">
+  
+</ion-header>
+
+<ion-content class="mw-product">
+  <div class="product-container">
+    <!-- Columna izquierda: Imagen -->
+    <div class="gallery">
+      <img [src]="vm?.image" [alt]="vm?.title" />
+    </div>
+
+    <!-- Columna derecha: Info -->
+    <div class="product-info">
+      <h1>{{ vm?.title }}</h1>
+
+      <div class="rating">
+        <ion-icon *ngFor="let s of [1,2,3,4,5]" 
+                  [name]="s <= (vm?.rating || 0) ? 'star' : 'star-outline'">
+        </ion-icon>
+        <span>{{ vm?.reviews || 0 }} opiniones</span>
+      </div>
+
+      <div class="price">{{ money(vm?.price || 0) }}</div>
+      <p class="desc">{{ vm?.desc }}</p>
+
+      <div class="buybar">
+        <button class="add" (click)="addToCart()">AÑADIR AL CARRITO</button>
+        <button class="buy">COMPRAR AHORA</button>
+      </div>
+    </div>
+  </div>
+  <app-footer></app-footer>
+
+</ion-content>

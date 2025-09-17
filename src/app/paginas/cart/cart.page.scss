@@ -1,20 +1,126 @@
-.mw-cart {
-  --padding-top: calc(var(--mw-header-offset) + env(safe-area-inset-top));
-  .container { width:100%; max-width:980px; margin:0 auto; padding: 0 16px 24px; }
-  h2 { font-size:22px; font-weight:800; margin: 10px 0 14px; }
+.cart-page {
+  --ion-background-color: #f9f9f9;
 
-  .cart-list { background:#fff; border:1px solid #e6e9ec; border-radius:10px; }
-  .cart-item { --inner-padding-end: 8px; }
-  ion-thumbnail { --size: 72px; margin-right:10px; }
-  .price { color:#222; font-weight:700; margin:4px 0; }
-  .qty { display:flex; align-items:center; gap:10px; margin-top:6px; }
-  .line-total { font-weight:800; margin-left:8px; }
+  display: block;
+  padding: 20px 0;
 
-  .summary {
-    margin-top: 16px; background:#fff; border:1px solid #e6e9ec; border-radius:10px; padding: 12px;
-    .row { display:flex; justify-content:space-between; margin-bottom:8px; }
+  /* Contenedor principal */
+  .container {
+    width: 100%;
+    max-width: 1100px; /* límite de ancho */
+    margin: 0 auto;
+    padding: 0 16px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
   }
 
-  .empty { text-align:center; padding: 40px 0; color:#556; }
-  .empty ion-icon { font-size:54px; color:#99a; margin-bottom:8px; }
+  /* Sección principal -> dos columnas en desktop */
+  .content {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+
+    @media (min-width: 992px) {
+      flex-direction: row;
+      align-items: flex-start;
+    }
+  }
+
+  /* Lista de items */
+  .items {
+    flex: 2;
+  }
+
+  ion-list {
+    background: transparent;
+  }
+
+  ion-item {
+    --background: #fff;
+    --padding-start: 12px;
+    --inner-padding-end: 12px;
+    border: 1px solid #e9eef3;
+    border-radius: 14px;
+    margin-bottom: 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.08);
+  }
+
+  ion-thumbnail img {
+    border-radius: 10px;
+  }
+
+  ion-label h2 {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+
+  ion-label p {
+    font-size: 14px;
+    color: #444;
+    margin: 0;
+  }
+
+  /* Controles de cantidad */
+  .qty-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    ion-button {
+      --padding-start: 4px;
+      --padding-end: 4px;
+      --border-radius: 8px;
+    }
+  }
+
+  /* Resumen lateral */
+  .summary {
+    flex: 1;
+    background: #fff;
+    border: 1px solid #e9eef3;
+    border-radius: 14px;
+    padding: 20px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.08);
+
+    h3 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+
+    .total {
+      font-size: 18px;
+      font-weight: 700;
+      margin: 12px 0;
+    }
+
+    ion-button {
+      margin-top: 10px;
+      --border-radius: 10px;
+      --background: #0071e3;
+      font-weight: 600;
+    }
+
+    .note {
+      margin-top: 10px;
+      font-size: 13px;
+      color: #4caf50;
+    }
+  }
+
+  /* Acciones del carrito vacío */
+  .empty-actions {
+    text-align: center;
+    margin-top: 20px;
+
+    ion-button {
+      width: 100%;
+      max-width: 400px;
+      margin: 0 auto;
+      border-radius: 12px;
+    }
+  }
 }

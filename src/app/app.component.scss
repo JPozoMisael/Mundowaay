@@ -1,0 +1,19 @@
+.with-footer {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.page-container {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+ion-router-outlet {
+  flex: 1; /* llena todo el espacio */
+}
+
+app-footer {
+  margin-top: auto; /* se queda al final */
+}

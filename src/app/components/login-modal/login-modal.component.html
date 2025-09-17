@@ -1,0 +1,55 @@
+<ion-header translucent="true">
+  <ion-toolbar>
+    <ion-title>Crear cuenta</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismiss()">Cerrar</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="banner">
+    <h2>Creá tu cuenta y comprá con envíos gratis</h2>
+  </div>
+
+  <div class="login-container">
+    <form (ngSubmit)="submit()" #form="ngForm">
+      <ion-item>
+        <ion-label position="stacked">E-mail</ion-label>
+        <ion-input type="email" [(ngModel)]="email" name="email" required></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked">Teléfono</ion-label>
+        <ion-input type="tel" [(ngModel)]="phone" name="phone" placeholder="+593" required></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked">Nombre</ion-label>
+        <ion-input type="text" [(ngModel)]="name" name="name" required></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked">Contraseña</ion-label>
+        <ion-input type="password" [(ngModel)]="password" name="password" required></ion-input>
+      </ion-item>
+
+      <ion-item lines="none">
+        <ion-checkbox slot="start" [(ngModel)]="acceptSms" name="acceptSms"></ion-checkbox>
+        <ion-label>Acepto que me contacten por SMS y WhatsApp.</ion-label>
+      </ion-item>
+
+      <ion-item lines="none">
+        <ion-checkbox slot="start" [(ngModel)]="acceptTerms" name="acceptTerms" required></ion-checkbox>
+        <ion-label>
+          Acepto los <a href="#">Términos y condiciones</a> y autorizo el uso de mis datos de acuerdo a la
+          <a href="#">Declaración de privacidad</a>.
+        </ion-label>
+      </ion-item>
+
+      <ion-button expand="block" class="btn-primary" type="submit">
+        Continuar
+      </ion-button>
+    </form>
+  </div>
+</ion-content>

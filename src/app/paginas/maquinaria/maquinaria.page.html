@@ -1,6 +1,6 @@
 <ion-content [fullscreen]="true" class="mw-cat">
 
-  <!-- CHIPS redondos (centrados) -->
+  <!-- Chips circulares (subcategorías) -->
   <section class="chips container">
     <div class="chips-scroll">
       <button class="chip" *ngFor="let c of chips" (click)="filter(c.key)">
@@ -17,9 +17,11 @@
     </button>
 
     <div class="pill-scroll" #pillScroll>
-      <button class="pill" *ngFor="let t of pills"
-              [class.active]="activePill === t.key"
-              (click)="selectPill(t.key)">
+      <button
+        class="pill"
+        *ngFor="let t of pills"
+        [class.active]="activePill === t.key"
+        (click)="selectPill(t.key)">
         {{ t.label }}
       </button>
     </div>
@@ -29,20 +31,31 @@
     </button>
   </section>
 
-  <!-- GRID -->
+  <!-- Grid de productos -->
   <section class="container grid">
     <article class="prod" *ngFor="let p of list">
       <div class="thumb">
-        <img [src]="p.image" [alt]="p.title" loading="lazy" />
-        <div class="ribbon" *ngIf="p.badge">{{ p.badge }}</div>
-        <div class="discount" *ngIf="p.compareAt">{{ discount(p) }}</div>
-        <button class="cart-mini" (click)="addToCart(p)" aria-label="Añadir al carrito">
+        <!-- CLICK EN IMAGEN -> detalle -->
+        <a class="media" [routerLink]="['/producto', p.id]" aria-label="Ver producto">
+          <img [src]="p.image" [alt]="p.title" loading="lazy" />
+          <div class="ribbon" *ngIf="p.badge">{{ p.badge }}</div>
+          <div class="discount" *ngIf="p.compareAt">{{ discount(p) }}</div>
+        </a>
+
+        <!-- Botón carrito con stopPropagation -->
+        <button
+          class="cart-mini"
+          (click)="addToCart(p); $event.stopPropagation(); $event.preventDefault()"
+          aria-label="Añadir al carrito">
           <ion-icon name="cart-outline"></ion-icon>
         </button>
       </div>
 
       <div class="info">
-        <h3 class="title">{{ p.title }}</h3>
+        <!-- CLICK EN TÍTULO -> detalle -->
+        <a class="title-link" [routerLink]="['/producto', p.id]">
+          <h3 class="title">{{ p.title }}</h3>
+        </a>
 
         <div class="price-row">
           <div class="price-now">{{ money(p.price) }}</div>
@@ -53,7 +66,8 @@
 
         <div class="meta">
           <div class="stars">
-            <ion-icon *ngFor="let s of [1,2,3,4,5]" [name]="s<=p.rating ? 'star' : 'star-outline'"></ion-icon>
+            <ion-icon *ngFor="let s of [1,2,3,4,5]"
+                      [name]="s<=p.rating ? 'star' : 'star-outline'"></ion-icon>
             <span class="cnt">{{ p.reviews }}</span>
           </div>
           <div class="sold" *ngIf="p.sold">{{ p.sold }} ventas</div>
@@ -63,6 +77,11 @@
   </section>
 
   <ion-infinite-scroll (ionInfinite)="loadMore($event)">
-    <ion-infinite-scroll-content loadingSpinner="crescent" loadingText="Cargando…"></ion-infinite-scroll-content>
+    <ion-infinite-scroll-content
+      loadingSpinner="crescent"
+      loadingText="Cargando…">
+    </ion-infinite-scroll-content>
   </ion-infinite-scroll>
+<app-footer></app-footer>
+
 </ion-content>

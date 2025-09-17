@@ -1,0 +1,112 @@
+.mw-product {
+  --background: #fff;
+}
+
+.product-container {
+  display: flex;
+  flex-direction: column; /* Mobile first */
+  gap: 20px;
+  padding: 100px 16px 80px; /* Bajamos para que no tape el header */
+  background: #fff;
+}
+
+/* Imagen */
+.gallery {
+  text-align: center;
+}
+
+.gallery img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+
+/* Info */
+.product-info h1 {
+  font-size: 20px;
+  margin: 8px 0;
+  font-weight: 600;
+  color: #222;
+}
+
+.rating {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+  font-size: 14px;
+  color: #555;
+}
+
+.rating ion-icon {
+  color: #ffc107;
+}
+
+.price {
+  font-size: 22px;
+  font-weight: bold;
+  color: #e53935;
+  margin-bottom: 12px;
+}
+
+.desc {
+  font-size: 14px;
+  line-height: 1.5;
+  color: #444;
+  margin-bottom: 20px;
+}
+
+/* Botonera */
+.buybar {
+  display: flex;
+  gap: 12px;
+}
+
+.buybar button {
+  flex: 1;
+  padding: 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+}
+
+/* Botón Añadir al Carrito */
+.buybar .add {
+  background: #fff;
+  border: 1px solid #ccc;
+  color: #222;
+}
+
+/* Botón Comprar Ahora */
+.buybar .buy {
+  background: #ff4d2d;
+  color: #fff;
+}
+
+/* 📌 Desktop: lado a lado */
+@media (min-width: 768px) {
+  .product-container {
+    flex-direction: row;
+    align-items: flex-start;
+  }
+
+  .gallery {
+    flex: 1;
+    max-width: 50%;
+  }
+
+  .product-info {
+    flex: 1;
+    padding-left: 20px;
+  }
+
+  .product-info h1 {
+    font-size: 24px;
+  }
+
+  .price {
+    font-size: 26px;
+  }
+}

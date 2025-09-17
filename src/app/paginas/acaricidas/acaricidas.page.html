@@ -1,13 +1,72 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>Acaricidas</ion-title>
-  </ion-toolbar>
-</ion-header>
+<ion-content [fullscreen]="true" class="mw-cat">
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Acaricidas</ion-title>
-    </ion-toolbar>
-  </ion-header>
+  <!-- Chips circulares de subcategorías (scroll horizontal) -->
+  <section class="chips container">
+    <div class="chips-scroll">
+      <button class="chip" *ngFor="let c of chips" (click)="filter(c.key)">
+        <img [src]="c.icon" [alt]="c.label" />
+        <span>{{ c.label }}</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- PILLBAR (filtros destacados) -->
+  <section class="pillbar container">
+    <button class="arrow" (click)="scrollPills(-1)" aria-label="Anterior">
+      <ion-icon name="chevron-back-outline"></ion-icon>
+    </button>
+
+    <div class="pill-scroll" #pillScroll>
+      <button
+        class="pill"
+        *ngFor="let t of pills"
+        [class.active]="activePill === t.key"
+        (click)="selectPill(t.key)">
+        {{ t.label }}
+      </button>
+    </div>
+
+    <button class="arrow" (click)="scrollPills(1)" aria-label="Siguiente">
+      <ion-icon name="chevron-forward-outline"></ion-icon>
+    </button>
+  </section>
+
+  <!-- Grid de productos -->
+  <section class="container grid">
+    <article class="prod" *ngFor="let p of list">
+      <div class="thumb">
+        <img [src]="p.image" [alt]="p.title" loading="lazy" />
+        <div class="ribbon" *ngIf="p.badge">{{ p.badge }}</div>
+        <div class="discount" *ngIf="p.compareAt">{{ discount(p) }}</div>
+        <button class="cart-mini" (click)="addToCart(p)" aria-label="Añadir al carrito">
+          <ion-icon name="cart-outline"></ion-icon>
+        </button>
+      </div>
+
+      <div class="info">
+        <h3 class="title">{{ p.title }}</h3>
+
+        <div class="price-row">
+          <div class="price-now">{{ money(p.price) }}</div>
+          <div class="price-before" *ngIf="p.compareAt">{{ money(p.compareAt) }}</div>
+        </div>
+
+        <div class="promo" *ngIf="p.promo">{{ p.promo }}</div>
+
+        <div class="meta">
+          <div class="stars">
+            <ion-icon *ngFor="let s of [1,2,3,4,5]" [name]="s<=p.rating ? 'star' : 'star-outline'"></ion-icon>
+            <span class="cnt">{{ p.reviews }}</span>
+          </div>
+          <div class="sold" *ngIf="p.sold">{{ p.sold }} ventas</div>
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <ion-infinite-scroll (ionInfinite)="loadMore($event)">
+    <ion-infinite-scroll-content loadingSpinner="crescent" loadingText="Cargando…"></ion-infinite-scroll-content>
+  </ion-infinite-scroll>
+  <app-footer></app-footer>
+
 </ion-content>

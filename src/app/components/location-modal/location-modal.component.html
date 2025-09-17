@@ -1,0 +1,27 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Seleccionar ubicación</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismiss()">Cerrar</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-list>
+    <ion-item>
+      <ion-button expand="block" (click)="autoDetect()">
+        📍 Detectar ubicación automáticamente
+      </ion-button>
+    </ion-item>
+
+    <ion-item>
+      <ion-label>Provincia</ion-label>
+      <ion-select [(ngModel)]="province">
+        <ion-select-option *ngFor="let p of provincias" [value]="p">{{ p }}</ion-select-option>
+      </ion-select>
+    </ion-item>
+  </ion-list>
+
+  <ion-button expand="block" color="success" (click)="save()">Guardar</ion-button>
+</ion-content>

@@ -1,0 +1,65 @@
+:host {
+  display: block;
+}
+
+/* Header del modal */
+ion-header {
+  --background: #0b5666; /* tu color teal */
+  --color: #fff;
+  border-bottom: 1px solid #e6eaef;
+}
+
+ion-title {
+  font-weight: 700;
+  font-size: 17px;
+}
+
+/* Botones dentro del header */
+ion-toolbar ion-button {
+  --color: #fff;
+}
+
+/* Contenido */
+ion-content {
+  --background: #fff;
+}
+
+/* Lista general */
+ion-list {
+  margin: 0;
+  padding: 0;
+}
+
+/* Items */
+ion-item {
+  --inner-padding-end: 10px;
+  --padding-start: 12px;
+  --min-height: 56px;
+  font-size: 15px;
+}
+
+/* Botones grandes (autodetectar, guardar) */
+ion-button {
+  margin-top: 16px;
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+/* Select */
+ion-select {
+  --min-height: 44px;
+  --padding-start: 10px;
+  --placeholder-color: #6b7280;
+  font-size: 15px;
+}
+
+ion-select-option {
+  font-size: 15px;
+}
+
+/* Subtítulos o etiquetas */
+ion-label {
+  font-weight: 600;
+  font-size: 14px;
+  color: #333;
+}

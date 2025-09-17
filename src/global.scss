@@ -62,3 +62,16 @@ img { display:block; max-width:100%; }
     --mw-header-offset: calc(var(--mw-top-h) + var(--mw-cats-h));
   }
 }
+ion-app, ion-router-outlet {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* ocupa toda la pantalla */
+}
+
+ion-router-outlet {
+  flex: 1; /* el contenido crece */
+}
+
+app-footer {
+  flex-shrink: 0; /* el footer se mantiene abajo */
+}

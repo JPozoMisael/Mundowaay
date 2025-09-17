@@ -3,7 +3,8 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  production: false
+  production: false,
+  wixClientId: 'bcdf078a-b229-454b-bb76-a1ac613a3ef1'
 };
 
 /*

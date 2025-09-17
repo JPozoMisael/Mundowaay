@@ -12,8 +12,12 @@
 
       <!-- Encabezado del menú -->
       <div class="menu-header">
-        <div class="avatar"><ion-icon name="person-circle-outline"></ion-icon></div>
-        <div class="hello"><div class="hi">Hola, identifícate</div></div>
+        <div class="avatar">
+          <ion-icon name="person-circle-outline"></ion-icon>
+        </div>
+        <div class="hello">
+          <div class="hi">Hola, identifícate</div>
+        </div>
       </div>
 
       <!-- Enlaces principales -->
@@ -28,6 +32,7 @@
       <!-- Secciones en acordeón -->
       <ion-accordion-group expand="inset">
 
+        <!-- Catálogo -->
         <ion-accordion value="catalogo">
           <ion-item slot="header" class="section-title">
             <ion-label>Catálogo</ion-label>
@@ -35,26 +40,27 @@
           </ion-item>
           <div class="submenu" slot="content">
             <ion-menu-toggle auto-hide="true">
-              <ion-item button (click)="go('/c/semillas')"><ion-label>Semillas</ion-label></ion-item>
+              <ion-item button (click)="go('/semillas')"><ion-label>Semillas</ion-label></ion-item>
             </ion-menu-toggle>
             <ion-menu-toggle auto-hide="true">
-              <ion-item button (click)="go('/c/insecticidas')"><ion-label>Insecticidas</ion-label></ion-item>
+              <ion-item button (click)="go('/insecticidas')"><ion-label>Insecticidas</ion-label></ion-item>
             </ion-menu-toggle>
             <ion-menu-toggle auto-hide="true">
-              <ion-item button (click)="go('/c/herbicidas')"><ion-label>Herbicidas</ion-label></ion-item>
+              <ion-item button (click)="go('/herbicidas')"><ion-label>Herbicidas</ion-label></ion-item>
             </ion-menu-toggle>
             <ion-menu-toggle auto-hide="true">
-              <ion-item button (click)="go('/c/fungicidas')"><ion-label>Fungicidas</ion-label></ion-item>
+              <ion-item button (click)="go('/fungicidas')"><ion-label>Fungicidas</ion-label></ion-item>
             </ion-menu-toggle>
             <ion-menu-toggle auto-hide="true">
-              <ion-item button (click)="go('/c/acaricidas')"><ion-label>Acaricidas</ion-label></ion-item>
+              <ion-item button (click)="go('/acaricidas')"><ion-label>Acaricidas</ion-label></ion-item>
             </ion-menu-toggle>
             <ion-menu-toggle auto-hide="true">
-              <ion-item button (click)="go('/c/nutricion')"><ion-label>Nutrición Foliar</ion-label></ion-item>
+              <ion-item button (click)="go('/nutricion')"><ion-label>Nutrición Foliar</ion-label></ion-item>
             </ion-menu-toggle>
           </div>
         </ion-accordion>
 
+        <!-- Servicios -->
         <ion-accordion value="servicios">
           <ion-item slot="header" class="section-title">
             <ion-label>Información y servicios</ion-label>
@@ -76,6 +82,7 @@
           </div>
         </ion-accordion>
 
+        <!-- Corporativo -->
         <ion-accordion value="corporativo">
           <ion-item slot="header" class="section-title">
             <ion-label>Corporativo</ion-label>
@@ -94,6 +101,7 @@
           </div>
         </ion-accordion>
 
+        <!-- Contacto -->
         <ion-accordion value="contacto">
           <ion-item slot="header" class="section-title">
             <ion-label>Contactos</ion-label>
@@ -130,7 +138,12 @@
     (category)="onGlobalCat($event)">
   </app-header>
 
-  <!-- CONTENIDO PRINCIPAL: id coincide con contentId del menú -->
-  <ion-router-outlet id="main"></ion-router-outlet>
-
+  <!-- CONTENIDO PRINCIPAL: scroll + footer -->
+  <ion-content id="main" class="with-footer">
+    <div class="page-container">
+      <ion-router-outlet></ion-router-outlet>
+    </div>
+    
+  </ion-content>
 </ion-app>
+

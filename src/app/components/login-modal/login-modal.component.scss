@@ -1,0 +1,81 @@
+:host {
+  ion-content {
+    --background: #f5f5f5; // Fondo gris claro
+  }
+}
+
+/* Modal más grande */
+ion-modal {
+  --width: 600px;         /* más ancho */
+  --height: auto;
+  --max-height: 95vh;     /* ocupa casi toda la altura de la pantalla */
+  --border-radius: 12px;
+  --box-shadow: 0 6px 24px rgba(0, 0, 0, 0.2);
+  margin: auto;
+}
+
+/* Banner superior */
+.banner {
+  background: #ffc400;
+  padding: 2rem;          /* más alto */
+  text-align: center;
+  border-radius: 12px 12px 0 0;
+
+  h2 {
+    font-size: 1.6rem;    /* más grande */
+    font-weight: 600;
+    margin: 0;
+    color: #111;
+  }
+}
+
+/* Caja del formulario */
+.login-container {
+  background: #fff;
+  margin: 0 auto;
+  padding: 2.5rem;        /* más espacio interno */
+  border-radius: 0 0 12px 12px;
+
+  ion-item {
+    --background: #fff;
+    --border-color: #ccc;
+    --border-radius: 10px;
+    margin-bottom: 1.2rem;
+    border: 1px solid #ccc;
+    height: 56px;          /* inputs más altos */
+
+    ion-label {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: #444;
+    }
+
+    ion-input {
+      --color: #111;
+      font-size: 1rem;
+    }
+  }
+
+  .terms {
+    font-size: 0.85rem;
+    color: #555;
+    margin-top: 1rem;
+
+    ion-label a {
+      color: #3483fa;
+      text-decoration: none;
+      font-weight: 500;
+    }
+  }
+
+  .btn-primary {
+    margin-top: 2rem;
+    --background: #3483fa;
+    --background-hover: #2968c8;
+    --border-radius: 10px;
+    font-weight: 600;
+    height: 52px;
+    font-size: 1.05rem;
+    letter-spacing: 0.5px;
+  }
+}

@@ -1,0 +1,74 @@
+.mw-footer {
+  background: #1c1c1c;
+  color: #fff;
+  font-size: 14px;
+
+  .footer-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 2rem;
+    padding: 2rem;
+  }
+
+  .footer-col h4 {
+    font-weight: 600;
+    margin-bottom: 0.8rem;
+    font-size: 15px;
+  }
+
+  .footer-col ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .footer-col ul li {
+    margin: 0.4rem 0;
+  }
+  .footer-col ul li a {
+    color: #bbb;
+    text-decoration: none;
+  }
+  .footer-col ul li a:hover {
+    color: #fff;
+  }
+
+  .app-buttons img {
+    width: 120px;
+    margin: 0.3rem 0;
+  }
+
+  .social-icons {
+    display: flex;
+    gap: 0.6rem;
+    margin-top: 0.5rem;
+  }
+  .social-icons ion-icon {
+    font-size: 20px;
+    color: #fff;
+    cursor: pointer;
+  }
+
+  .footer-bottom {
+    border-top: 1px solid #333;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    font-size: 12px;
+    flex-wrap: wrap;
+  }
+  .payments img {
+    height: 20px;
+    margin-left: 10px;
+  }
+}
+
+:host {
+  display: block;
+  position: relative;
+  width: 100%;
+  background: #111; /* o tu color */
+  color: #fff;
+  padding: 2rem 1rem;
+  margin-top: 2rem; /* deja espacio con el contenido */
+}

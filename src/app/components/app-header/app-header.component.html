@@ -3,28 +3,58 @@
   <ion-toolbar class="top">
     <div class="container top-inner">
       <!-- Logo -->
-      <a class="brand" routerLink="/">
-        <img src="assets/logo-way.svg" alt="Way" />
+      <a class="brand" routerLink="/home">
+        <!-- Usa un asset dentro del proyecto -->
+        <img src="assets/img/Way.png" alt="" />
       </a>
 
       <!-- Buscador -->
       <div class="search">
         <ion-searchbar
+          [value]="query"
           placeholder="Buscar semillas, productos y más"
           show-clear-button="focus"
-          (ionSearch)="onSearch($event)">
+          (ionInput)="onInput($event)"
+          (keyup.enter)="submit()"
+          (ionClear)="clear()">
         </ion-searchbar>
+
+        <!-- Dropdown de sugerencias -->
+        <div class="suggest-panel" *ngIf="openSuggest && (suggest$ | async) as sug">
+          <div class="section" *ngIf="sug.recent.length">
+            <div class="title">Búsquedas recientes</div>
+            <button class="item" *ngFor="let r of sug.recent" (click)="pick(r)">
+              <ion-icon name="time-outline"></ion-icon> {{ r }}
+            </button>
+          </div>
+
+          <div class="section" *ngIf="sug.cats.length">
+            <div class="title">Categorías</div>
+            <button class="item" *ngFor="let c of sug.cats" (click)="goCat(c.key)">
+              <ion-icon name="albums-outline"></ion-icon> {{ c.label }}
+            </button>
+          </div>
+
+          <div class="section" *ngIf="sug.hits.length">
+            <div class="title">Sugerencias</div>
+            <button class="item" *ngFor="let h of sug.hits" (click)="pick(h)">
+              <ion-icon name="search-outline"></ion-icon> {{ h }}
+            </button>
+          </div>
+        </div>
       </div>
 
       <!-- Acciones -->
       <div class="actions">
-        <ion-button class="icon" fill="clear" size="small" aria-label="Ubicación">
+        <ion-button class="icon" fill="clear" size="small" aria-label="Ubicación" (click)="openLocation()">
           <ion-icon name="location-outline"></ion-icon>
+          <span *ngIf="userLocation"> {{ userLocation.province || 'Ecuador' }}</span>
         </ion-button>
 
-        <ion-button class="login" fill="clear" size="small" aria-label="Perfil">
+        <ion-button class="login" fill="clear" size="small" aria-label="Perfil" (click)="openLogin()">
           <ion-icon name="person-circle-outline"></ion-icon>
-          <span>Iniciar sesión</span>
+          <span *ngIf="!user">Iniciar sesión</span>
+          <span *ngIf="user">Hola, {{ user?.profile?.nickname || user?.email }}</span>
         </ion-button>
 
         <ion-button class="cart-btn" fill="clear" size="small" aria-label="Carrito" routerLink="/cart">
@@ -44,15 +74,14 @@
       </button>
 
       <nav class="cat-nav">
-        <a routerLink="/home" class="active">Home</a>
-        <a routerLink="/semillas">Semillas</a>
-        <a routerLink="/insecticidas">Insecticidas</a>
-        <a routerLink="/herbicidas">Herbicidas</a>
-        <a routerLink="/nutricion">Nutrición</a>
-        <a routerLink="/maquinaria">Maquinaria y accesorios</a>
-        <!-- Añade más categorías aquí; el nav hace scroll horizontal -->
-        <!-- <a routerLink="/c/maquinaria">Maquinaria</a> -->
-        <!-- <a routerLink="/c/riego">Riego</a> -->
+        <a routerLink="/home" routerLinkActive="active" [routerLinkActiveOptions]="{exact:true}">Home</a>
+        <a routerLink="/semillas" routerLinkActive="active">Semillas</a>
+        <a routerLink="/insecticidas" routerLinkActive="active">Insecticidas</a>
+        <a routerLink="/herbicidas" routerLinkActive="active">Herbicidas</a>
+        <a routerLink="/fungicidas" routerLinkActive="active">Fungicidas</a>
+        <a routerLink="/acaricidas" routerLinkActive="active">Acaricidas</a>
+        <a routerLink="/nutricion" routerLinkActive="active">Nutrición Foliar</a>
+        <a routerLink="/maquinaria" routerLinkActive="active">Maquinaria y accesorios</a>
       </nav>
     </div>
   </ion-toolbar>

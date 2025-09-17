@@ -1,51 +1,127 @@
-<ion-content class="mw-cart" [fullscreen]="true">
-  <section class="container">
+<ion-content class="cart-page">
 
-    <h2>Tu carrito</h2>
+  <!-- CONTENEDOR PRINCIPAL -->
+  <div class="container">
 
-    <ng-container *ngIf="(items$ | async) as items; else empty">
-      <ion-list lines="none" class="cart-list">
-        <ion-item *ngFor="let it of items" class="cart-item">
-          <ion-thumbnail slot="start">
-            <img [src]="it.image" [alt]="it.title" />
-          </ion-thumbnail>
+    <!-- AVISOS SUPERIORES (estilo Temu) -->
+    <div class="notices">
+      <div class="notice">
+        <ion-icon name="airplane-outline"></ion-icon>
+        <div>
+          <div class="t">Envío gratuito</div>
+          <div class="s">Excluye artículos enviados por almacenes locales</div>
+        </div>
+      </div>
+      <div class="notice green">
+        <ion-icon name="shield-checkmark-outline"></ion-icon>
+        <div>
+          <div class="t">Todos tus pagos están protegidos</div>
+          <div class="s">Cifrado SSL y revisiones de seguridad</div>
+        </div>
+      </div>
+    </div>
 
-          <ion-label>
-            <h3>{{ it.title }}</h3>
-            <p class="price">{{ money(it.price) }}</p>
-            <div class="qty">
-              <ion-button size="small" fill="outline" (click)="dec(it.id)">−</ion-button>
-              <span>{{ it.qty }}</span>
-              <ion-button size="small" fill="outline" (click)="inc(it.id)">+</ion-button>
+    <!-- GRID PRINCIPAL: ITEMS + RESUMEN -->
+    <div class="content" *ngIf="(items$ | async) as items; else emptyTpl">
+      <!-- IZQUIERDA: LISTA DE ITEMS -->
+      <section class="items">
+
+        <!-- Tarjeta por producto -->
+        <ion-list>
+          <ion-item *ngFor="let p of items">
+            <ion-thumbnail slot="start">
+              <img [src]="p.image" [alt]="p.title" />
+            </ion-thumbnail>
+
+            <ion-label>
+              <h2>{{ p.title }}</h2>
+              <p>{{ money(p.price) }} c/u</p>
+            </ion-label>
+
+            <div class="qty-controls" slot="end">
+              <ion-button size="small" fill="clear" (click)="dec(p.id)">
+                <ion-icon name="remove-outline"></ion-icon>
+              </ion-button>
+
+              <span>{{ p.qty || 1 }}</span>
+
+              <ion-button size="small" fill="clear" (click)="inc(p.id)">
+                <ion-icon name="add-outline"></ion-icon>
+              </ion-button>
+
+              <ion-button size="small" fill="clear" color="danger" (click)="remove(p.id)">
+                <ion-icon name="trash-outline"></ion-icon>
+              </ion-button>
             </div>
-          </ion-label>
+          </ion-item>
+        </ion-list>
 
-          <div class="line-total">{{ money(it.price * it.qty) }}</div>
-
-          <ion-button fill="clear" color="medium" slot="end" (click)="remove(it.id)" aria-label="Eliminar">
-            <ion-icon name="trash-outline"></ion-icon>
+        <!-- Acciones inferiores -->
+        <div class="empty-actions" *ngIf="items.length">
+          <ion-button fill="outline" (click)="clear()">
+            VACIAR CARRITO
           </ion-button>
-        </ion-item>
-      </ion-list>
+        </div>
+      </section>
 
-      <div class="summary">
+      <!-- DERECHA: RESUMEN DEL PEDIDO -->
+      <aside class="summary">
+        <h3>Resumen del pedido</h3>
+
         <div class="row">
           <span>Subtotal</span>
-          <strong>{{ (subtotal$ | async) | number:'1.2-2' | currency:'USD':'symbol':'1.2-2' }}</strong>
+          <strong>{{ money(((subtotal$ | async) ?? 0)) }}</strong>
         </div>
-        <!-- agrega impuestos/envío si aplica -->
-        <ion-button expand="block" color="success" routerLink="/checkout">Proceder al pago</ion-button>
-        <ion-button expand="block" fill="clear" color="medium" (click)="clear()">Vaciar carrito</ion-button>
-      </div>
-    </ng-container>
 
-    <ng-template #empty>
-      <div class="empty">
+        <div class="row small">
+          <span>Envío</span>
+          <span>Se calcula en la siguiente página</span>
+        </div>
+
+        <div class="row small">
+          <span>Impuestos</span>
+          <span>Se calculan al finalizar</span>
+        </div>
+
+        <div class="total">
+          Total estimado:
+          <strong>{{ money(((subtotal$ | async) ?? 0)) }}</strong>
+        </div>
+
+        <ion-button expand="block" color="warning"
+                    [disabled]="!items.length">
+          HACER PEDIDO ({{ items.length || 0 }})
+        </ion-button>
+
+        <div class="note">
+          <ion-icon name="lock-closed-outline"></ion-icon>
+          No se te cobrará hasta que revises este pedido en la página siguiente.
+        </div>
+
+        <div class="pay">
+          <div class="label">Opciones de pago seguro</div>
+          <div class="icons">
+            <ion-badge>VISA</ion-badge>
+            <ion-badge>Mastercard</ion-badge>
+            <ion-badge>Amex</ion-badge>
+            <ion-badge>PayPal</ion-badge>
+            <ion-badge>Apple&nbsp;Pay</ion-badge>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <!-- TEMPLATE VACÍO -->
+    <ng-template #emptyTpl>
+      <section class="empty-cart">
         <ion-icon name="cart-outline"></ion-icon>
         <h3>Tu carrito está vacío</h3>
-        <ion-button routerLink="/home">Explorar productos</ion-button>
-      </div>
+        <p>Agrega tus artículos favoritos para continuar.</p>
+        <ion-button routerLink="/home" color="warning">Comenzar a comprar</ion-button>
+      </section>
     </ng-template>
 
-  </section>
+  </div>
+  <app-footer></app-footer>
+
 </ion-content>

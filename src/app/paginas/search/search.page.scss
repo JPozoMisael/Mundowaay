@@ -1,0 +1,23 @@
+.mw-search {
+  .container { max-width: 1160px; margin: 0 auto; padding: 12px 16px 40px; }
+  .summary { display:flex; align-items:center; gap:12px; margin: 8px 0 16px;
+    h2 { font-size: 20px; font-weight: 700; margin: 0; small{font-weight:500; color:#667;} }
+    .clear { border:none; background:#eee; border-radius:999px; padding:6px 10px; cursor:pointer; }
+  }
+  .grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 14px; }
+  .item { cursor:pointer; transition: transform .12s ease, box-shadow .12s ease;
+    &:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0,0,0,.08); }
+    .thumb { position:relative; width:100%; height:160px; background-size:cover; background-position:center; border-radius: 10px 10px 0 0;
+      .badge.pct { position:absolute; top:8px; right:8px; background:#ff6a00; color:#fff; font-weight:700; font-size:12px; padding:4px 6px; border-radius:6px; }
+    }
+    ion-card-content { padding-top:10px; }
+    .chips { margin-bottom:6px; .chip{ background:#eef3ff; color:#335; font-size:11px; padding:2px 6px; border-radius:999px; } }
+    h4 { font-size:14px; line-height:1.25; min-height:36px; margin:0 0 6px; }
+    .price { display:flex; gap:8px; align-items:baseline;
+      .now { font-weight:800; }
+      .compare { text-decoration: line-through; opacity:.5; font-size:12px; }
+    }
+  }
+  .empty { text-align:center; padding:48px 0 64px; color:#556; ion-icon{font-size:48px; opacity:.5;} h3{margin:12px 0 4px;} }
+  .skeleton { border-radius:12px; overflow:hidden; }
+}

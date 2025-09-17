@@ -1,16 +1,17 @@
 /* Paleta Way */
 $teal: #0b5666;
 $blue-acc: #1d6fb4;
-$search-bg: #a8c7d2;  /* azul claro del input */
+$search-bg: #a8c7d2;
 $offwhite: #f7fbf9;
 
 .mw-header{
   position: sticky; top: 0; z-index: 100;
 
-  .top{
-    background: #fff;
-    border-bottom: 1px solid #e9eef1;
-    padding: 0;  /* usamos el container interno */
+  .top {
+  --background: #fff !important;   /* fuerza el fondo blanco */
+  --color: #000;                   /* color de texto por defecto */
+  background: #fff !important;
+  border-bottom: 1px solid #e9eef1;
   }
 
   .top-inner{
@@ -22,20 +23,45 @@ $offwhite: #f7fbf9;
 
   .brand img{ height: 36px; display:block; }
 
-  /* Buscador grande celeste */
+  /* Buscador */
+  .search{ position: relative; }
   .search ion-searchbar{
     --background: #{$search-bg};
     --color: #24343b;
     --placeholder-color: #24343bcc;
     --icon-color: #24343b;
     --clear-button-color: #24343b;
-    --border-radius: 6px;
+    --border-radius: 8px;
     --box-shadow: none;
     --height: 44px;
     width: 100%;
   }
 
-  /* Acciones a la derecha */
+  /* Panel de sugerencias */
+  .suggest-panel{
+    position: absolute;
+    left: 0; right: 0; top: calc(100% + 6px);
+    background: #fff;
+    border: 1px solid #e6eaef;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.08);
+    z-index: 1000;
+    padding: 10px;
+    max-height: 60vh;
+    overflow: auto;
+  }
+  .suggest-panel .section{ padding: 6px 0; }
+  .suggest-panel .title{
+    font-size: 12px; font-weight: 700; color:#6b7280; padding: 6px 8px;
+  }
+  .suggest-panel .item{
+    width: 100%; text-align: left; padding: 8px 10px; border-radius: 8px;
+    display: flex; align-items: center; gap: 8px; color:#111827; background: transparent; border: 0;
+    cursor: pointer;
+  }
+  .suggest-panel .item:hover{ background:#f6f8fa; }
+
+  /* Acciones */
   .actions{
     display:flex; justify-content:flex-end; align-items:center; gap: 10px;
     .icon ion-icon{ font-size: 20px; color: $blue-acc; }
@@ -84,11 +110,10 @@ $offwhite: #f7fbf9;
     }
   }
 
-  /* Fondo superior muy claro como en Wix */
   :host, ion-toolbar.top{ background: #fff; }
 }
 
-/* Container consistente con tu Home */
+/* Container general */
 .container{ width:100%; max-width:1180px; margin:0 auto; padding: 0 16px; }
 
 /* Responsivo */
@@ -97,5 +122,5 @@ $offwhite: #f7fbf9;
 }
 @media (max-width: 768px){
   .mw-header .top-inner{ grid-template-columns: 90px 1fr 120px; }
-  .mw-header .actions .login span{ display:none; } /* oculta el texto en móvil */
+  .mw-header .actions .login span{ display:none; }
 }
