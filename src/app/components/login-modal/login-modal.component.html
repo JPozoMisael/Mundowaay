@@ -1,55 +1,64 @@
-<ion-header translucent="true">
-  <ion-toolbar>
-    <ion-title>Crear cuenta</ion-title>
-    <ion-buttons slot="end">
-      <ion-button (click)="dismiss()">Cerrar</ion-button>
-    </ion-buttons>
-  </ion-toolbar>
-</ion-header>
-
-<ion-content>
-  <div class="banner">
-    <h2>Creá tu cuenta y comprá con envíos gratis</h2>
+<div class="login-modal">
+  <!-- Header -->
+  <div class="login-header">
+    <div class="title-group">
+      <h2>Iniciar sesión o Registrarse</h2>
+      <p>Accede a tu cuenta WAY para comprar con confianza</p>
+    </div>
+    <button class="close-btn" (click)="dismiss()">✕</button>
   </div>
 
-  <div class="login-container">
-    <form (ngSubmit)="submit()" #form="ngForm">
-      <ion-item>
-        <ion-label position="stacked">E-mail</ion-label>
-        <ion-input type="email" [(ngModel)]="email" name="email" required></ion-input>
-      </ion-item>
+  <!-- Contenido -->
+  <div class="login-body">
+    <!-- Columna izquierda -->
+    <div class="left">
+      <form (ngSubmit)="submit()">
+        <ion-item lines="none">
+          <ion-label position="floating">Email</ion-label>
+          <ion-input [(ngModel)]="email" name="email" type="email" required></ion-input>
+        </ion-item>
 
-      <ion-item>
-        <ion-label position="stacked">Teléfono</ion-label>
-        <ion-input type="tel" [(ngModel)]="phone" name="phone" placeholder="+593" required></ion-input>
-      </ion-item>
+        <ion-item lines="none">
+          <ion-label position="floating">Contraseña</ion-label>
+          <ion-input [(ngModel)]="password" name="password" type="password" required></ion-input>
+        </ion-item>
 
-      <ion-item>
-        <ion-label position="stacked">Nombre</ion-label>
-        <ion-input type="text" [(ngModel)]="name" name="name" required></ion-input>
-      </ion-item>
+        <ion-button expand="block" type="submit" class="btn-way">Continuar</ion-button>
+      </form>
+      <a class="link" href="#">¿Problemas al iniciar sesión?</a>
+    </div>
 
-      <ion-item>
-        <ion-label position="stacked">Contraseña</ion-label>
-        <ion-input type="password" [(ngModel)]="password" name="password" required></ion-input>
-      </ion-item>
+    <!-- Separador -->
+    <div class="divider">O</div>
 
-      <ion-item lines="none">
-        <ion-checkbox slot="start" [(ngModel)]="acceptSms" name="acceptSms"></ion-checkbox>
-        <ion-label>Acepto que me contacten por SMS y WhatsApp.</ion-label>
-      </ion-item>
-
-      <ion-item lines="none">
-        <ion-checkbox slot="start" [(ngModel)]="acceptTerms" name="acceptTerms" required></ion-checkbox>
-        <ion-label>
-          Acepto los <a href="#">Términos y condiciones</a> y autorizo el uso de mis datos de acuerdo a la
-          <a href="#">Declaración de privacidad</a>.
-        </ion-label>
-      </ion-item>
-
-      <ion-button expand="block" class="btn-primary" type="submit">
-        Continuar
+    <!-- Columna derecha -->
+    <div class="right">
+      <ion-button expand="block" class="social-btn google">
+        <ion-icon name="logo-google" slot="start"></ion-icon>
+        Continuar con Google
       </ion-button>
-    </form>
+
+      <ion-button expand="block" class="social-btn facebook">
+        <ion-icon name="logo-facebook" slot="start"></ion-icon>
+        Continuar con Facebook
+      </ion-button>
+
+      <ion-button expand="block" class="social-btn apple">
+        <ion-icon name="logo-apple" slot="start"></ion-icon>
+        Continuar con Apple
+      </ion-button>
+
+      <ion-button expand="block" class="social-btn phone">
+        <ion-icon name="call-outline" slot="start"></ion-icon>
+        Continuar con Teléfono
+      </ion-button>
+    </div>
   </div>
-</ion-content>
+
+  <!-- Footer -->
+  <div class="login-footer">
+    Al continuar, aceptas nuestros 
+    <a href="#">Términos de uso</a> y 
+    <a href="#">Política de privacidad</a>.
+  </div>
+</div>

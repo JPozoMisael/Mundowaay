@@ -1,13 +1,15 @@
 .mw-home {
   --ion-background-color:#fff;
+  --padding-top: 0; /* elimina el espacio extra */
 
   /* HERO amarillo tipo Wix */
   .hero {
-    background:#f0f1f2; /* banda gris claro superior de Wix */
+    margin-top: 0;
+    background:#f0f1f2;
     .hero-inner { position:relative; display:grid; grid-template-columns:48px 1fr 48px; align-items:center; min-height:260px; }
     .hero-art {
       position:relative; height:100%; border-radius:0; overflow:hidden;
-      .art-bg { background:#d9a320; height:220px; border-radius:0; } /* amarillo Wix */
+      .art-bg { background:#d9a320; height:220px; border-radius:0; }
       h2 { position:absolute; left:10%; top:25%; color:#0b5666; font-weight:800; font-size: clamp(28px, 4vw, 48px); line-height:1.05; }
     }
     .arrow { background:transparent; border:0; color:#fff; width:44px; height:44px; display:flex; align-items:center; justify-content:center; }
@@ -30,9 +32,6 @@
     img { width:100%; height:auto; border-radius:6px; object-fit:cover; background:#f6f7f8; }
   }
 
-  /* Layout como tu captura:
-     - 3 tarjetas grandes (3,3,3 columnas)
-     - 1 tarjeta alta con mosaico (3 columnas) */
   .cards > .card:nth-child(1) { grid-column: span 3; }
   .cards > .card:nth-child(2) { grid-column: span 3; }
   .cards > .card:nth-child(3) { grid-column: span 3; }
@@ -40,10 +39,23 @@
 
   .card-mini .mini-grid {
     display:grid; grid-template-columns:repeat(2, 1fr); gap:8px;
-    img { width:100%; aspect-ratio:1; object-fit:cover; border-radius:6px; }
   }
 
-  /* Responsivo */
+  .mini-item {
+    text-align:center;
+  }
+
+  .mini-item img {
+    width:100%; aspect-ratio:1; object-fit:cover; border-radius:6px;
+  }
+
+  .mini-item span {
+    display:block;
+    font-size:12px;
+    margin-top:4px;
+    color:#444;
+  }
+
   @media (max-width: 1024px) {
     .cards > .card { grid-column: span 6; }
   }
@@ -52,21 +64,22 @@
     .cards { grid-template-columns: repeat(2, 1fr); }
     .cards > .card { grid-column: auto; }
   }
-    --padding-top: calc(var(--mw-header-offset) + env(safe-area-inset-top));
-
 }
+
 /* ========= AMAZON-LIKE SECTIONS ========= */
 .amz.container { width:100%; max-width:1180px; margin: 0 auto; padding: 0 16px; }
 
 /* 1) STRIP */
-.amz-strip{
+.amz-strip {
   margin-top: 24px;
+  margin-bottom: 32px; 
   background:#fff;
   border:1px solid #e6e9ec;
   border-radius: 10px;
-  padding: 12px 44px;            /* deja espacio para flechas */
+  padding: 12px 44px;
   position: relative;
 }
+
 .amz-head{
   display:flex; align-items:center; justify-content:space-between;
   padding: 4px 0 10px;
@@ -81,11 +94,17 @@
 .amz-strip .strip::-webkit-scrollbar{ display:none; }
 
 .amz-strip .item{
-  min-width: 260px; /* tamaño de cartel por item */
+  min-width: 220px; /* más compacto */
+  max-width: 240px;
   background:#f6f7f8; border-radius: 8px; border:1px solid #eee;
   display:flex; align-items:center; justify-content:center;
 }
-.amz-strip .item img{ width:100%; height: 180px; object-fit: cover; border-radius:8px; }
+.amz-strip .item img{
+  width:100%;
+  height: 180px;     /* 👈 altura fija para evitar imágenes gigantes */
+  object-fit: cover; /* 👈 recorta en vez de deformar */
+  border-radius:8px;
+}
 
 .amz-strip .nav{
   position:absolute; top:50%; transform: translateY(-50%);

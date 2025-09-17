@@ -12,12 +12,19 @@ type Product = {
   reviews: number;
 };
 
-// --- tipo para las tiles ---
 type Tile = {
   title: string;
   link: string | any[];
   imgs: Array<{ src: string; alt: string }>;
   cta: string;
+};
+
+type TopCard = {
+  title: string;
+  img?: string;
+  imgs?: Array<{ src: string; alt: string }>;
+  desc?: string;
+  multi?: boolean;
 };
 
 @Component({
@@ -29,29 +36,31 @@ type Tile = {
 export class HomePage implements OnInit, OnDestroy {
   @ViewChild('stripEl', { static: false }) stripEl?: ElementRef<HTMLDivElement>;
 
-  banners = [
-    { img: 'assets/banners/maiz-1.jpg', title: 'Compra fácil y seguro', subtitle: 'Ofertas para productores' },
-    { img: 'assets/banners/maiz-2.jpg', title: 'Temporada de siembra', subtitle: 'Descuentos limitados' },
-  ];
-
   flashDeals: Product[] = [];
   products: Product[] = [];
-  private page = 0;
 
-  // 🔄 Tiles dinámicas
   tiles: Tile[] = [];
+  topCards: TopCard[] = [];
+  stripItems: Array<{ title: string; img: string }> = [];
 
-  // Config de secciones para tiles
-  private readonly tileCfg: Array<{ title: string; link: string | any[]; query: string; cta: string }> = [
-    { title: 'Semillas destacadas',     link: '/semillas',     query: 'semilla',                                      cta: 'Ver más' },
-    { title: 'Control de insectos',     link: '/insecticidas', query: 'insecticida',                                  cta: 'Ver más' },
-    { title: 'Herbicidas populares',    link: '/herbicidas',   query: 'herbicida',                                    cta: 'Ver más' },
-    { title: 'Nutrición foliar y más',  link: '/nutricion',    query: 'foliar bioestimulante macro micro quelatado', cta: 'Descubrir' },
-  ];
-
-  // ⏳ polling temporal hasta que el bus tenga datos
+  private page = 0;
   private pollId?: any;
   private pollCount = 0;
+  private usedIds = new Set<string>();
+
+  private readonly topCfg: Array<{ title: string; query: string; multi?: boolean; desc?: string }> = [
+    { title: 'Cosecha más eficiente', query: 'maquinaria', desc: 'Tecnología agrícola de alto rendimiento' },
+    { title: 'Nutrición Foliar', query: 'foliar', desc: 'Fertilizantes para un crecimiento rápido' },
+    { title: 'Comienza desde la raíz', query: 'semilla', desc: 'Protección contra plagas' },
+    { title: 'Productos esenciales para el agricultor', query: 'maquinaria accesorios', multi: true, desc: 'Productos esenciales para el agricultor' },
+  ];
+
+  private readonly tileCfg: Array<{ title: string; link: string | any[]; query: string; cta: string }> = [
+    { title: 'Semillas destacadas',     link: '/semillas',     query: 'semilla',        cta: 'Ver más' },
+    { title: 'Control de insectos',     link: '/insecticidas', query: 'insecticida',    cta: 'Ver más' },
+    { title: 'Herbicidas populares',    link: '/herbicidas',   query: 'herbicida',      cta: 'Ver más' },
+    { title: 'Nutrición foliar y más',  link: '/nutricion',    query: 'foliar',         cta: 'Descubrir' }, // 👈 corregido
+  ];
 
   constructor(private catalog: CatalogoBus) {}
 
@@ -62,7 +71,6 @@ export class HomePage implements OnInit, OnDestroy {
 
   ngOnDestroy() { this.stopPolling(); }
 
-  // ------- data --------
   private refreshFromBus() {
     const all = this.catalog.listAll();
 
@@ -81,14 +89,19 @@ export class HomePage implements OnInit, OnDestroy {
 
       this.flashDeals = deals;
       this.products = trending;
-      this.buildTiles(); // ya hay data
+
+      this.usedIds.clear();
+      this.buildTopCards();
+      this.buildStrip();
+      this.buildTiles();
       return;
     }
 
-    // 🔙 fallback temporal si aún no hay data de Wix
     this.flashDeals = this.mock(10);
     this.products  = this.mock(20);
-    this.buildTiles(); // se rellenan con placeholders
+    this.topCards  = this.mockTopCards();
+    this.stripItems = this.mockStrip(10);
+    this.buildTiles();
   }
 
   private view(p: CatalogItem): Product {
@@ -103,61 +116,58 @@ export class HomePage implements OnInit, OnDestroy {
     };
   }
 
-  // Helpers
-  money(n: number) { return `$${(n || 0).toFixed(2)}`; }
-  discount(p: Product) {
-    if (!p.compareAt || p.compareAt <= p.price) return '';
-    const pct = Math.round(((p.compareAt - p.price) / p.compareAt) * 100);
-    return `-${pct}%`;
-  }
-  private offPct(p: { price?: number; compareAt?: number }) {
-    if (!p.compareAt || !p.price || p.compareAt <= p.price) return 0;
-    return Math.round(((p.compareAt - p.price) / p.compareAt) * 100);
-  }
-  private score(p: CatalogItem) {
-    const base = (p.rating ?? 0) * 100 + (p.reviews ?? 0);
-    const hasDiscount = (p.compareAt ?? 0) > (p.price ?? 0);
-    return base + (hasDiscount ? 150 : 0);
+  private buildTopCards() {
+    const result: TopCard[] = [];
+
+    for (const cfg of this.topCfg) {
+      if (cfg.multi) {
+        const items = this.catalog.search(cfg.query, { limit: 20 }).items;
+        const imgs: Array<{ src: string; alt: string }> = [];
+
+        for (const p of items) {
+          if (!p.image || this.usedIds.has(p.id)) continue;
+          this.usedIds.add(p.id);
+          imgs.push({
+            src: this.thumb(p.image, 200, 200),
+            alt: this.creativeSubtitle(p.title)
+          });
+          if (imgs.length >= 4) break;
+        }
+
+        result.push({ title: cfg.title, imgs, desc: cfg.desc, multi: true });
+      } else {
+        const items = this.catalog.search(cfg.query, { limit: 20 }).items;
+        let img = '';
+
+        for (const p of items) {
+          if (!p.image || this.usedIds.has(p.id)) continue;
+          this.usedIds.add(p.id);
+          img = this.thumb(p.image, 480, 360);
+          break;
+        }
+
+        result.push({ title: cfg.title, img, desc: cfg.desc });
+      }
+    }
+
+    this.topCards = result;
   }
 
-  addToCart(p: Product) { console.log('ADD TO CART', p.id); }
+  private buildStrip() {
+    const all = this.catalog.listAll();
+    this.stripItems = [];
 
-  async loadMore(ev: Event) {
-    this.page++;
-    this.products = [...this.products, ...this.mock(12)];
-    (ev as InfiniteScrollCustomEvent).target.complete();
+    for (const p of all) {
+      if (!p.image || this.usedIds.has(p.id)) continue;
+      this.usedIds.add(p.id);
+      this.stripItems.push({
+        title: p.title,
+        img: this.thumb(p.image, 720, 540)
+      });
+      if (this.stripItems.length >= 10) break;
+    }
   }
 
-  // ------- fallback mock (se usa sólo si aún no hay data real) -------
-  private mock(n: number): Product[] {
-    return Array.from({ length: n }).map((_, i) => {
-      const id = `P${this.page}-${i}`;
-      const base = 2 + Math.random() * 50;
-      const hasCompare = Math.random() > 0.5;
-      return {
-        id,
-        title: ['Semilla Híbrida', 'Insecticida', 'Fertilizante', 'Herbicida', 'Maquinaria'][i % 5] + ' ' + (100 + i),
-        image: `https://picsum.photos/seed/${id}/480/480`,
-        price: Number(base.toFixed(2)),
-        compareAt: hasCompare ? Number((base + (Math.random()*10+3)).toFixed(2)) : undefined,
-        rating: Math.floor(Math.random() * 3) + 3,
-        reviews: Math.floor(Math.random() * 3000),
-      };
-    });
-  }
-
-  // Strip
-  stripItems = Array.from({ length: 10 }).map((_, i) => ({
-    title: 'Recomendado ' + (i + 1),
-    img: `https://picsum.photos/seed/strip-${i}/720/540`
-  }));
-  scrollStrip(dir: number) {
-    const el = this.stripEl?.nativeElement;
-    if (!el) return;
-    el.scrollBy({ left: dir * el.clientWidth * 0.9, behavior: 'smooth' });
-  }
-
-  // ------- Tiles dinámicas -------
   private buildTiles() {
     const gotData = this.catalog.listAll().length > 0;
     const result: Tile[] = [];
@@ -173,13 +183,11 @@ export class HomePage implements OnInit, OnDestroy {
   private pickImages(query: string, n = 4): Array<{ src: string; alt: string }> {
     const items = this.catalog.search(query, { limit: 60 }).items;
 
-    const seen = new Set<string>();
     const imgs: Array<{ src: string; alt: string }> = [];
     for (const p of items) {
-      const url = (p.image || '').trim();
-      if (!url || seen.has(url)) continue;
-      seen.add(url);
-      imgs.push({ src: this.thumb(url, 300, 220), alt: p.title });
+      if (!p.image || this.usedIds.has(p.id)) continue;
+      this.usedIds.add(p.id);
+      imgs.push({ src: this.thumb(p.image, 300, 220), alt: p.title });
       if (imgs.length >= n) break;
     }
 
@@ -189,7 +197,18 @@ export class HomePage implements OnInit, OnDestroy {
     return imgs;
   }
 
-  private thumb(url: string, w: number, h: number): string {
+  private creativeSubtitle(base: string): string {
+    const opciones = [
+      'Herramienta esencial',
+      'Máquina de alto rendimiento',
+      'Aliado del agricultor',
+      'Tecnología en acción',
+      'Equipo confiable'
+    ];
+    return opciones[Math.floor(Math.random() * opciones.length)];
+  }
+
+  private thumb(url: string | undefined, w: number, h: number): string {
     if (!url) return this.placeholder(w, h);
     const sep = url.includes('?') ? '&' : '?';
     return `${url}${sep}w=${w}&h=${h}&fit=crop&quality=85`;
@@ -206,7 +225,65 @@ export class HomePage implements OnInit, OnDestroy {
     }));
   }
 
-  // ⏳ polling simple para “esperar” a que CatalogoBus tenga datos
+  private mock(n: number): Product[] {
+    return Array.from({ length: n }).map((_, i) => {
+      const id = `P${this.page}-${i}`;
+      return {
+        id,
+        title: 'Producto ' + (i + 1),
+        image: `https://picsum.photos/seed/${id}/480/480`,
+        price: 10 + i,
+        rating: 4,
+        reviews: 100,
+      };
+    });
+  }
+
+  private mockTopCards(): TopCard[] {
+    return this.topCfg.map((cfg, i) => {
+      if (cfg.multi) {
+        return {
+          title: cfg.title,
+          imgs: Array.from({ length: 4 }).map((_, j) => ({
+            src: this.placeholder(200, 200, j),
+            alt: 'Demo'
+          })),
+          desc: cfg.desc,
+          multi: true,
+        };
+      }
+      return {
+        title: cfg.title,
+        img: this.placeholder(480, 360, i),
+        desc: cfg.desc,
+      };
+    });
+  }
+
+  private mockStrip(n: number) {
+    return Array.from({ length: n }).map((_, i) => ({
+      title: 'Strip ' + (i + 1),
+      img: `https://picsum.photos/seed/strip-${i}/720/540`
+    }));
+  }
+
+  private offPct(p: { price?: number; compareAt?: number }) {
+    if (!p.compareAt || !p.price || p.compareAt <= p.price) return 0;
+    return Math.round(((p.compareAt - p.price) / p.compareAt) * 100);
+  }
+
+  private score(p: CatalogItem) {
+    const base = (p.rating ?? 0) * 100 + (p.reviews ?? 0);
+    const hasDiscount = (p.compareAt ?? 0) > (p.price ?? 0);
+    return base + (hasDiscount ? 150 : 0);
+  }
+
+  scrollStrip(dir: number) {
+    const el = this.stripEl?.nativeElement;
+    if (!el) return;
+    el.scrollBy({ left: dir * el.clientWidth * 0.9, behavior: 'smooth' });
+  }
+
   private startPollingForBus() {
     this.stopPolling();
     this.pollCount = 0;
@@ -214,7 +291,7 @@ export class HomePage implements OnInit, OnDestroy {
       this.pollCount++;
       const had = this.catalog.listAll().length > 0;
       this.refreshFromBus();
-      if (had || this.pollCount >= 8) this.stopPolling(); // ~6–8s máx
+      if (had || this.pollCount >= 8) this.stopPolling();
     }, 800);
   }
   private stopPolling() {

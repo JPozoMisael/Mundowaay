@@ -75,3 +75,16 @@ ion-router-outlet {
 app-footer {
   flex-shrink: 0; /* el footer se mantiene abajo */
 }
+
+.login-modal::part(content) {
+  --min-width: 900px;
+  --max-width: 1000px;
+  --min-height: 500px;
+  background: #fff !important;
+  border-radius: 10px;
+  box-shadow: 0 8px 28px rgba(0,0,0,.12);
+}
+
+.login-modal::part(backdrop) {
+  background: rgba(0,0,0,0.25);
+}

@@ -184,7 +184,9 @@ export class AppHeaderComponent implements OnInit, OnDestroy {
 
   async openLogin(){
     const modal = await this.modalCtrl.create({
-      component: LoginModalComponent
+      component: LoginModalComponent,
+      cssClass: 'login-modal',
+      backdropDismiss: true
     });
     await modal.present();
   }

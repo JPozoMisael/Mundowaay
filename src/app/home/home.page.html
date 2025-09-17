@@ -1,5 +1,5 @@
-<ion-header [translucent]="true">
-</ion-header>
+<ion-header collapse="condense"></ion-header>
+
 <ion-content [fullscreen]="true" class="mw-home">
   <!-- Banner amarillo -->
   <section class="hero">
@@ -9,7 +9,6 @@
       </button>
 
       <div class="hero-art">
-        <!-- Usa tu imagen/banner amarillo; de momento color sólido -->
         <div class="art-bg"></div>
         <h2>Compra fácil y<br/>seguro</h2>
       </div>
@@ -20,80 +19,71 @@
     </div>
   </section>
 
-  <!-- Sección de tarjetas tipo Wix -->
+  <!-- 🔹 Sección de tarjetas dinámicas -->
   <section class="container cards">
-    <article class="card">
-      <h3>Cosecha mas eficiente</h3>
-      <img src="https://picsum.photos/seed/cosecha/480/360" alt="" />
-      <p>Tecnología agrícola de alto rendimiento</p>
-    </article>
+    <article class="card" *ngFor="let c of topCards" [class.card-mini]="c.multi">
+      <h3>{{ c.title }}</h3>
 
-    <article class="card">
-      <h3>Nutrición Foliar</h3>
-      <img src="https://picsum.photos/seed/nutricion/480/360" alt="" />
-      <p>Fertilizantes para un crecimiento rápido</p>
-    </article>
-
-    <article class="card">
-      <h3>Comienza desde la raíz</h3>
-      <img src="https://picsum.photos/seed/raiz/480/360" alt="" />
-      <p>Protección contra plagas</p>
-    </article>
-
-    <article class="card card-mini">
-      <h3>Productos esenciales para el agricultor</h3>
-      <div class="mini-grid">
-        <img src="https://picsum.photos/seed/a1/200/200" alt="">
-        <img src="https://picsum.photos/seed/a2/200/200" alt="">
-        <img src="https://picsum.photos/seed/a3/200/200" alt="">
-        <img src="https://picsum.photos/seed/a4/200/200" alt="">
+      <!-- caso mini-grid -->
+      <div *ngIf="c.multi; else singleCard" class="mini-grid">
+        <div class="mini-item" *ngFor="let i of c.imgs">
+          <img [src]="i.src" [alt]="i.alt" />
+          <span>{{ i.alt }}</span>
+        </div>
       </div>
+
+      <!-- caso normal -->
+      <ng-template #singleCard>
+        <img [src]="c.img" [alt]="c.title" />
+      </ng-template>
+
+      <p>{{ c.desc }}</p>
     </article>
   </section>
 
   <!-- ================= AMAZON-LIKE SECTIONS ================= -->
 
-<!-- 1) Tira horizontal -->
-<section class="amz container amz-strip">
-  <div class="amz-head">
-    <h2>Más artículos por considerar</h2>
-    <a class="more" routerLink="/recs">Ver más</a>
-  </div>
-
-  <button class="nav left" (click)="scrollStrip(-1)" aria-label="Anterior">
-    <ion-icon name="chevron-back-outline"></ion-icon>
-  </button>
-
-  <div class="strip" #stripEl>
-    <div class="item" *ngFor="let it of stripItems">
-      <img [src]="it.img" [alt]="it.title" loading="lazy" />
-    </div>
-  </div>
-
-  <button class="nav right" (click)="scrollStrip(1)" aria-label="Siguiente">
-    <ion-icon name="chevron-forward-outline"></ion-icon>
-  </button>
-</section>
-
-<!-- 2) Bloques mosaico (4 por fila) -->
-<section class="amz container amz-tiles">
-  <article class="tile" *ngFor="let s of tiles">
-    <header>
-      <h3>{{ s.title }}</h3>
-    </header>
-
-    <div class="quad">
-      <a *ngFor="let img of s.imgs" [routerLink]="s.link">
-        <img [src]="img.src" [alt]="img.alt" loading="lazy" />
-        <span>{{ img.alt }}</span>
-      </a>
+  <!-- 🔹 1) Tira horizontal -->
+  <section class="amz container amz-strip">
+    <div class="amz-head">
+      <h2>Más artículos por considerar</h2>
+      <a class="more" routerLink="/recs">Ver más</a>
     </div>
 
-    <footer>
-      <a class="more" [routerLink]="s.link">{{ s.cta || 'Ver más' }}</a>
-    </footer>
-  </article>
-</section>
-<app-footer></app-footer>
+    <button class="nav left" (click)="scrollStrip(-1)" aria-label="Anterior">
+      <ion-icon name="chevron-back-outline"></ion-icon>
+    </button>
 
+    <div class="strip" #stripEl>
+      <div class="item" *ngFor="let it of stripItems">
+        <img [src]="it.img" [alt]="it.title" loading="lazy" />
+      </div>
+    </div>
+
+    <button class="nav right" (click)="scrollStrip(1)" aria-label="Siguiente">
+      <ion-icon name="chevron-forward-outline"></ion-icon>
+    </button>
+  </section>
+
+  <!-- 🔹 2) Bloques mosaico -->
+  <section class="amz container amz-tiles">
+    <article class="tile" *ngFor="let s of tiles">
+      <header>
+        <h3>{{ s.title }}</h3>
+      </header>
+
+      <div class="quad">
+        <a *ngFor="let img of s.imgs" [routerLink]="s.link">
+          <img [src]="img.src" [alt]="img.alt" loading="lazy" />
+          <span>{{ img.alt }}</span>
+        </a>
+      </div>
+
+      <footer>
+        <a class="more" [routerLink]="s.link">{{ s.cta || 'Ver más' }}</a>
+      </footer>
+    </article>
+  </section>
+
+  <app-footer></app-footer>
 </ion-content>
