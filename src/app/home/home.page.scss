@@ -29,7 +29,7 @@
 
     h3 { font-size:20px; margin:0; font-weight:800; color:#222; }
     p  { margin:0; color:#60707a; font-size:14px; }
-    img { width:100%; height:auto; border-radius:6px; object-fit:cover; background:#f6f7f8; }
+    img { width:100%; height:200px; border-radius:6px; object-fit:cover; background:#f6f7f8; }
   }
 
   .cards > .card:nth-child(1) { grid-column: span 3; }
@@ -40,6 +40,13 @@
   .card-mini .mini-grid {
     display:grid; grid-template-columns:repeat(2, 1fr); gap:8px;
   }
+  .card-mini .mini-grid img {
+  width: 100%;
+  height: 100px;   /* más pequeñas solo aquí */
+  object-fit: cover;
+  border-radius: 6px;
+}
+
 
   .mini-item {
     text-align:center;

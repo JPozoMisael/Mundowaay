@@ -1,7 +1,7 @@
 <ion-header collapse="condense"></ion-header>
 
 <ion-content [fullscreen]="true" class="mw-home">
-  <!-- Banner amarillo -->
+  <!-- Banner amarillo / Slider -->
   <section class="hero">
     <div class="container hero-inner">
       <button class="arrow left" aria-label="Anterior">
@@ -19,31 +19,33 @@
     </div>
   </section>
 
-  <!-- 🔹 Sección de tarjetas dinámicas -->
+  <!-- 🔹 Tarjetas dinámicas -->
   <section class="container cards">
     <article class="card" *ngFor="let c of topCards" [class.card-mini]="c.multi">
       <h3>{{ c.title }}</h3>
 
-      <!-- caso mini-grid -->
+      <!-- Caso multi-grid -->
       <div *ngIf="c.multi; else singleCard" class="mini-grid">
-        <div class="mini-item" *ngFor="let i of c.imgs">
-          <img [src]="i.src" [alt]="i.alt" />
+        <div class="mini-item" *ngFor="let i of c.imgs" [routerLink]="c.link">
+          <img [src]="i.src" [alt]="i.alt"/>
           <span>{{ i.alt }}</span>
         </div>
       </div>
 
-      <!-- caso normal -->
+      <!-- Caso normal -->
       <ng-template #singleCard>
-        <img [src]="c.img" [alt]="c.title" />
+        <a [routerLink]="c.link">
+          <div class="card-img">
+            <img [src]="c.img" [alt]="c.title"/>
+          </div>
+        </a>
       </ng-template>
 
       <p>{{ c.desc }}</p>
     </article>
   </section>
 
-  <!-- ================= AMAZON-LIKE SECTIONS ================= -->
-
-  <!-- 🔹 1) Tira horizontal -->
+  <!-- 🔹 Tira horizontal -->
   <section class="amz container amz-strip">
     <div class="amz-head">
       <h2>Más artículos por considerar</h2>
@@ -65,7 +67,7 @@
     </button>
   </section>
 
-  <!-- 🔹 2) Bloques mosaico -->
+  <!-- 🔹 Bloques mosaico -->
   <section class="amz container amz-tiles">
     <article class="tile" *ngFor="let s of tiles">
       <header>

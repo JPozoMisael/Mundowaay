@@ -25,6 +25,7 @@ type TopCard = {
   imgs?: Array<{ src: string; alt: string }>;
   desc?: string;
   multi?: boolean;
+  link?: string | any[];
 };
 
 @Component({
@@ -48,18 +49,18 @@ export class HomePage implements OnInit, OnDestroy {
   private pollCount = 0;
   private usedIds = new Set<string>();
 
-  private readonly topCfg: Array<{ title: string; query: string; multi?: boolean; desc?: string }> = [
-    { title: 'Cosecha más eficiente', query: 'maquinaria', desc: 'Tecnología agrícola de alto rendimiento' },
-    { title: 'Nutrición Foliar', query: 'foliar', desc: 'Fertilizantes para un crecimiento rápido' },
-    { title: 'Comienza desde la raíz', query: 'semilla', desc: 'Protección contra plagas' },
-    { title: 'Productos esenciales para el agricultor', query: 'maquinaria accesorios', multi: true, desc: 'Productos esenciales para el agricultor' },
+  private readonly topCfg: Array<{ title: string; query: string; multi?: boolean; desc?: string; link?: string | any[] }> = [
+    { title: 'Cosecha más eficiente', query: 'maquinaria', desc: 'Tecnología agrícola de alto rendimiento', link: '/maquinaria'},
+    { title: 'Nutrición Foliar', query: 'foliar', desc: 'Fertilizantes para un crecimiento rápido' , link: '/nutricion'},
+    { title: 'Comienza desde la raíz', query: 'semilla', desc: 'Protección contra plagas' , link: '/semillas'},
+    { title: 'Productos esenciales para el agricultor', query: 'maquinaria', multi: true, desc: 'Explora todos los productos', link: '/maquinaria'},
   ];
 
   private readonly tileCfg: Array<{ title: string; link: string | any[]; query: string; cta: string }> = [
     { title: 'Semillas destacadas',     link: '/semillas',     query: 'semilla',        cta: 'Ver más' },
     { title: 'Control de insectos',     link: '/insecticidas', query: 'insecticida',    cta: 'Ver más' },
     { title: 'Herbicidas populares',    link: '/herbicidas',   query: 'herbicida',      cta: 'Ver más' },
-    { title: 'Nutrición foliar y más',  link: '/nutricion',    query: 'foliar',         cta: 'Descubrir' }, // 👈 corregido
+    { title: 'Nutrición foliar y más',  link: '/nutricion',    query: 'foliar',         cta: 'Descubrir' },
   ];
 
   constructor(private catalog: CatalogoBus) {}
@@ -116,6 +117,7 @@ export class HomePage implements OnInit, OnDestroy {
     };
   }
 
+  // 🔹 Uniforme y multi para productos esenciales
   private buildTopCards() {
     const result: TopCard[] = [];
 
@@ -128,13 +130,13 @@ export class HomePage implements OnInit, OnDestroy {
           if (!p.image || this.usedIds.has(p.id)) continue;
           this.usedIds.add(p.id);
           imgs.push({
-            src: this.thumb(p.image, 200, 200),
+            src: this.thumb(p.image, 300, 220), 
             alt: this.creativeSubtitle(p.title)
           });
           if (imgs.length >= 4) break;
         }
 
-        result.push({ title: cfg.title, imgs, desc: cfg.desc, multi: true });
+        result.push({ title: cfg.title, imgs, desc: cfg.desc, multi: true, link: cfg.link });
       } else {
         const items = this.catalog.search(cfg.query, { limit: 20 }).items;
         let img = '';
@@ -146,7 +148,7 @@ export class HomePage implements OnInit, OnDestroy {
           break;
         }
 
-        result.push({ title: cfg.title, img, desc: cfg.desc });
+        result.push({ title: cfg.title, img, desc: cfg.desc, link: cfg.link });
       }
     }
 
@@ -245,7 +247,7 @@ export class HomePage implements OnInit, OnDestroy {
         return {
           title: cfg.title,
           imgs: Array.from({ length: 4 }).map((_, j) => ({
-            src: this.placeholder(200, 200, j),
+            src: this.placeholder(300, 220, j), // 👈 tamaño uniforme
             alt: 'Demo'
           })),
           desc: cfg.desc,
