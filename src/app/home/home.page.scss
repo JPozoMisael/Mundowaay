@@ -79,12 +79,13 @@
 /* 1) STRIP */
 .amz-strip {
   margin-top: 24px;
-  margin-bottom: 32px; 
+  margin-bottom: 90px; 
   background:#fff;
   border:1px solid #e6e9ec;
   border-radius: 10px;
   padding: 12px 44px;
   position: relative;
+  padding-bottom: 40px;
 }
 
 .amz-head{
@@ -118,12 +119,13 @@
   width:40px; height:64px; border-radius: 8px; border:1px solid #e3e6e9; background:#fff;
   display:flex; align-items:center; justify-content:center; box-shadow:0 2px 8px rgba(0,0,0,.08);
 }
+
 .amz-strip .nav.left{ left: 8px; }
 .amz-strip .nav.right{ right: 8px; }
 
 /* 2) TILES GRID */
 .amz-tiles{
-  display:grid; gap: 16px; margin-top: 16px;
+  display:grid; gap: 16px; margin-top: 50px;
   grid-template-columns: repeat(4, 1fr);
 }
 @media (max-width: 1024px){ .amz-tiles{ grid-template-columns: repeat(2, 1fr);} }
