@@ -28,6 +28,13 @@ type TopCard = {
   link?: string | any[];
 };
 
+// 🔹 Nuevo tipo para la tira horizontal
+type StripItem = {
+  title: string;
+  img: string;
+  link: string;
+};
+
 @Component({
   selector: 'app-home',
   templateUrl: './home.page.html',
@@ -42,7 +49,7 @@ export class HomePage implements OnInit, OnDestroy {
 
   tiles: Tile[] = [];
   topCards: TopCard[] = [];
-  stripItems: Array<{ title: string; img: string }> = [];
+  stripItems: StripItem[] = [];   // 👈 ahora con link incluido
 
   private page = 0;
   private pollId?: any;
@@ -155,18 +162,37 @@ export class HomePage implements OnInit, OnDestroy {
     this.topCards = result;
   }
 
+  // 🔹 Tira horizontal con categorías variadas
   private buildStrip() {
-    const all = this.catalog.listAll();
     this.stripItems = [];
 
-    for (const p of all) {
-      if (!p.image || this.usedIds.has(p.id)) continue;
-      this.usedIds.add(p.id);
-      this.stripItems.push({
-        title: p.title,
-        img: this.thumb(p.image, 720, 540)
-      });
-      if (this.stripItems.length >= 10) break;
+    const categorias = [
+      { query: 'semilla', link: '/semillas' },
+      { query: 'insecticida', link: '/insecticidas' },
+      { query: 'herbicida', link: '/herbicidas' },
+      { query: 'foliar', link: '/nutricion' },
+      { query: 'maquinaria', link: '/maquinaria' }
+    ];
+
+    for (const cat of categorias) {
+      const items = this.catalog.search(cat.query, { limit: 20 }).items;
+      let count = 0;
+
+      for (const p of items) {
+        if (!p.image || this.usedIds.has(p.id)) continue;
+        this.usedIds.add(p.id);
+
+        this.stripItems.push({
+          title: p.title,
+          img: this.thumb(p.image, 720, 540),
+          link: cat.link   // 👈 ahora permitido
+        });
+
+        count++;
+        if (count >= 2) break;
+        //if (this.stripItems.length >= 10) break; 
+      }
+      //if (this.stripItems.length >= 10) break;
     }
   }
 
@@ -247,7 +273,7 @@ export class HomePage implements OnInit, OnDestroy {
         return {
           title: cfg.title,
           imgs: Array.from({ length: 4 }).map((_, j) => ({
-            src: this.placeholder(300, 220, j), // 👈 tamaño uniforme
+            src: this.placeholder(300, 220, j),
             alt: 'Demo'
           })),
           desc: cfg.desc,
@@ -262,10 +288,11 @@ export class HomePage implements OnInit, OnDestroy {
     });
   }
 
-  private mockStrip(n: number) {
+  private mockStrip(n: number): StripItem[] {
     return Array.from({ length: n }).map((_, i) => ({
       title: 'Strip ' + (i + 1),
-      img: `https://picsum.photos/seed/strip-${i}/720/540`
+      img: `https://picsum.photos/seed/strip-${i}/720/540`,
+      link: '/semillas'
     }));
   }
 

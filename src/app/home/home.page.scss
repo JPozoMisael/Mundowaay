@@ -45,6 +45,7 @@
   height: 100px;   /* más pequeñas solo aquí */
   object-fit: cover;
   border-radius: 6px;
+  cursor: pointer;
 }
 
 
@@ -106,6 +107,7 @@
   max-width: 240px;
   background:#f6f7f8; border-radius: 8px; border:1px solid #eee;
   display:flex; align-items:center; justify-content:center;
+  cursor: pointer;
 }
 .amz-strip .item img{
   width:100%;

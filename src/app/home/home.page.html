@@ -57,7 +57,7 @@
     </button>
 
     <div class="strip" #stripEl>
-      <div class="item" *ngFor="let it of stripItems">
+      <div class="item" *ngFor="let it of stripItems" [routerLink]="it.link">
         <img [src]="it.img" [alt]="it.title" loading="lazy" />
       </div>
     </div>
