@@ -1,19 +1,176 @@
-.with-footer {
+/* ===== MENÚ LATERAL ===== */
+.mw-menu {
+  --background: #0b1e3f;              /* Azul marino */
+  --ion-background-color: #0b1e3f;   /* Asegura fondo */
+  color: #fff;
+}
+
+/* 🔹 Fondo del contenido */
+.mw-menu ion-content {
+  --background: #0b1e3f !important;
+  --color: #fff !important;
+}
+
+/* 🔹 Encabezado */
+.mw-menu .menu-header ion-item.hello-item::part(native) {
+  background: #092035 !important;   /* Azul más oscuro */
+  color: #fff !important;
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.mw-menu .menu-header ion-item.hello-item ion-icon {
+  font-size: 32px;
+  color: #ffd200 !important;        /* Amarillo corporativo */
+}
+
+/* 🔹 Enlaces principales */
+.mw-menu .menu-list ion-item::part(native) {
+  background: transparent !important;
+  color: #fff !important;
+  font-weight: 500;
+}
+
+.mw-menu .menu-list ion-item::part(native):hover {
+  background: rgba(255,255,255,0.1) !important;
+}
+
+/* 🔹 Acordeones */
+.mw-menu .section-title::part(native) {
+  background: transparent !important;
+  color: #ffd200 !important;        /* Amarillo */
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.mw-menu .section-title ion-icon {
+  color: #4da3ff !important;        /* Azul claro */
+}
+
+.mw-menu .submenu ion-item::part(native) {
+  background: #0d264d !important;   /* Azul intermedio */
+  color: #dbe6ff !important;
+  font-size: 14px;
+}
+
+.mw-menu .submenu ion-item::part(native):hover {
+  background: rgba(255,255,255,0.15) !important;
+}
+
+/* 🔹 Redes sociales */
+.mw-menu .social {
   display: flex;
-  flex-direction: column;
-  height: 100%;
+  justify-content: center;
+  gap: 14px;
+  margin: 20px 0;
 }
 
-.page-container {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
+.mw-menu .social ion-icon {
+  font-size: 22px;
+  color: #4da3ff !important;
+  transition: 0.3s ease;
 }
 
-ion-router-outlet {
-  flex: 1; /* llena todo el espacio */
+.mw-menu .social ion-icon:hover {
+  color: #fff !important;
+}
+/* ===== Enlace Home ===== */
+.mw-menu .menu-list ion-item::part(native) {
+  background: #0b1e3f !important;   /* Azul marino */
+  color: #fff !important;
+  font-weight: 600;
+  border-radius: 6px;
+  margin: 4px 8px;
 }
 
-app-footer {
-  margin-top: auto; /* se queda al final */
+/* Hover Home */
+.mw-menu .menu-list ion-item::part(native):hover {
+  background: #092035 !important;   /* Azul más oscuro en hover */
+  color: #ffd200 !important;        /* Amarillo corporativo */
+}
+
+/* Ícono opcional en Home (si lo agregas después) */
+.mw-menu .menu-list ion-icon {
+  color: #4da3ff !important;        /* Azul claro */
+  font-size: 18px;
+}
+/* Quitar líneas por defecto en ion-item */
+.mw-menu ion-item {
+  --inner-border-width: 0 !important;
+  --border-width: 0 !important;
+  --inner-box-shadow: none !important;
+  --box-shadow: none !important;
+  border: none !important;
+}
+
+/* Quitar líneas en listas */
+.mw-menu ion-list {
+  --ion-item-border-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* Asegurar que el menú no tenga sombra */
+ion-menu::part(container) {
+  box-shadow: none !important;
+  border: none !important;
+}
+
+/* ===== Fix Home y cualquier item con borde negro ===== */
+.mw-menu ion-item {
+  --inner-border-width: 0 !important;
+  --border-width: 0 !important;
+  --inner-box-shadow: none !important;
+  --box-shadow: none !important;
+  border: none !important;
+
+  /* Quita el efecto "focus/active" negro */
+  --background-focused: transparent !important;
+  --background-activated: transparent !important;
+  --background-hover: transparent !important;
+}
+
+/* Home específico */
+.mw-menu .menu-list ion-item::part(native) {
+  background: #0b1e3f !important;   /* Azul marino fijo */
+  color: #fff !important;
+  font-weight: 600;
+  border-radius: 6px;
+  margin: 4px 8px;
+}
+
+/* Hover Home */
+.mw-menu .menu-list ion-item::part(native):hover {
+  background: #092035 !important;   /* Azul más oscuro */
+  color: #ffd200 !important;
+}
+
+/* Elimina borde/cuadro del contenedor ion-list */
+.mw-menu ion-list.menu-list {
+  --background: transparent !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* Quita cualquier borde en los ion-item dentro de esa lista */
+.mw-menu ion-list.menu-list ion-item {
+  --background: #0b1e3f !important;     /* Azul marino sólido */
+  --border-color: transparent !important;
+  --border-width: 0 !important;
+  --inner-border-width: 0 !important;
+  --inner-box-shadow: none !important;
+  --box-shadow: none !important;
+  border: none !important;
+  border-radius: 0 !important;          /* Quita esquinas redondeadas */
+  margin: 0 !important;
+  padding: 0 16px !important;           /* Ajuste de espacio */
+}
+
+/* Hover Home */
+.mw-menu ion-list.menu-list ion-item::part(native):hover {
+  background: #092035 !important;       /* Azul más oscuro */
+  color: #ffd200 !important;            /* Amarillo corporativo */
 }

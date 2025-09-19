@@ -8,91 +8,121 @@ $offwhite: #f7fbf9;
   position: sticky;
   top: 0;
   z-index: 100;
+}
 
-  /* ===== Top bar ===== */
-  .top {
-    --background: #fff !important;
-    background: #fff !important;
-    border-bottom: 1px solid #e9eef1;
+/* 🔹 Hola, identifícate */
+.menu-header ion-item.hello-item::part(native) {
+  background: #004aad !important;   /* azul marino */
+  color: #fff !important;
+  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.menu-header ion-item.hello-item::part(native):hover {
+  background: #00337a !important;   /* azul más oscuro en hover */
+}
+
+.menu-header ion-item.hello-item ion-icon {
+  font-size: 28px;
+  color: #ffd200; /* amarillo corporativo */
+}
+
+/* 🔹 Home */
+.menu-list ion-item::part(native) {
+  background: #004aad !important;   /* azul marino */
+  color: #fff !important;
+  font-weight: 600;
+}
+
+.menu-list ion-item::part(native):hover {
+  background: #00337a !important;   /* azul más oscuro en hover */
+}
+
+/* ===== Top bar ===== */
+.top {
+  --background: #fff !important;
+  background: #fff !important;
+  border-bottom: 1px solid #e9eef1;
+}
+
+.top-inner {
+  display: grid;
+  grid-template-columns: 140px 1fr 280px;
+  align-items: center;
+  gap: 16px;
+  min-height: 70px;
+}
+
+.brand img {
+  height: 42px;
+  display: block;
+}
+
+/* ===== Buscador ===== */
+.search ion-searchbar {
+  --background: $offwhite;
+  --border-radius: 8px;
+  --box-shadow: inset 0 0 0 1.5px #d6d6d6;
+  --color: #111;
+  --placeholder-color: $gray;
+  width: 100%;
+  transition: all 0.2s ease;
+}
+
+.search ion-searchbar:focus-within {
+  --box-shadow: inset 0 0 0 2px $blue;
+  --background: #fff;
+}
+
+/* ===== Acciones ===== */
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 20px; /* más espacio */
+
+  ion-button {
+    --background: transparent;
+    --box-shadow: none;
+    --padding-start: 4px;
+    --padding-end: 4px;
   }
 
-  .top-inner {
-    display: grid;
-    grid-template-columns: 140px 1fr 280px;
-    align-items: center;
-    gap: 16px;
-    min-height: 70px;
+  ion-icon {
+    font-size: 24px;
+    color: $blue;
+    transition: color 0.2s ease;
   }
 
-  .brand img {
-    height: 42px;
-    display: block;
+  ion-button:hover ion-icon {
+    color: darken($blue, 10%);
   }
 
-  /* ===== Buscador ===== */
-  .search ion-searchbar {
-    --background: $offwhite;
-    --border-radius: 8px;
-    --box-shadow: inset 0 0 0 1.5px #d6d6d6;
-    --color: #111;
-    --placeholder-color: $gray;
-    width: 100%;
-    transition: all 0.2s ease;
+  .login span {
+    margin-left: 6px;
+    font-weight: 600;
+    font-size: 15px;
+    color: $blue;
   }
 
-  .search ion-searchbar:focus-within {
-    --box-shadow: inset 0 0 0 2px $blue;
-    --background: #fff;
+  /* Badge carrito */
+  .cart-badge {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    background: $yellow;
+    color: $blue;
+    font-weight: 700;
+    font-size: 12px;
+    padding: 2px 6px;
+    border-radius: 12px;
+    border: 1px solid $blue;
   }
+}
 
-  /* ===== Acciones ===== */
-  .actions {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    gap: 20px; /* más espacio */
-
-    ion-button {
-      --background: transparent;
-      --box-shadow: none;
-      --padding-start: 4px;
-      --padding-end: 4px;
-    }
-
-    ion-icon {
-      font-size: 24px;
-      color: $blue;
-      transition: color 0.2s ease;
-    }
-
-    ion-button:hover ion-icon {
-      color: darken($blue, 10%);
-    }
-
-    .login span {
-      margin-left: 6px;
-      font-weight: 600;
-      font-size: 15px;
-      color: $blue;
-    }
-
-    /* Badge carrito */
-    .cart-badge {
-      position: absolute;
-      top: -6px;
-      right: -6px;
-      background: $yellow;
-      color: $blue;
-      font-weight: 700;
-      font-size: 12px;
-      padding: 2px 6px;
-      border-radius: 12px;
-      border: 1px solid $blue;
-    }
-  }
-
-  /* ===== Categorías ===== */
-  .cats {
+/* ===== Categorías ===== */
+.cats {
   --background: #004AAD; 
   background: #004AAD !important; 
   color: #fff;
@@ -100,63 +130,62 @@ $offwhite: #f7fbf9;
   box-shadow: 0 1px 0 rgba(0,0,0,.04);
 }
 
-
-  .cat-inner {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    min-height: 48px;
-  }
-
-  .hamb {
-    background: transparent;
-    border: 0;
-    color: #fff;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-weight: 700;
-    ion-icon { font-size: 22px; }
-  }
-
-  .cat-nav {
-    display: flex;
-    gap: 22px;
-    overflow: auto;
-    scrollbar-width: none;
-  }
-
-  .cat-nav a {
-    color: #ffffffcc;
-    text-decoration: none;
-    font-weight: 600;
-    white-space: nowrap;
-    transition: color 0.2s ease;
-    position: relative;
-  }
-
-  .cat-nav a:hover,
-  .cat-nav a.active {
-    color: $yellow;
-  }
-
-  .cat-nav a::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    bottom: -4px;
-    width: 100%;
-    height: 2px;
-    background: $yellow;
-    transform: scaleX(0);
-    transition: transform 0.3s ease;
-  }
-
-  .cat-nav a:hover::after,
-  .cat-nav a.active::after {
-    transform: scaleX(1);
-  }
+.cat-inner {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  min-height: 48px;
 }
+
+.hamb {
+  background: transparent;
+  border: 0;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 700;
+  ion-icon { font-size: 22px; }
+}
+
+.cat-nav {
+  display: flex;
+  gap: 22px;
+  overflow: auto;
+  scrollbar-width: none;
+}
+
+.cat-nav a {
+  color: #ffffffcc;
+  text-decoration: none;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: color 0.2s ease;
+  position: relative;
+}
+
+.cat-nav a:hover,
+.cat-nav a.active {
+  color: $yellow;
+}
+
+.cat-nav a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -4px;
+  width: 100%;
+  height: 2px;
+  background: $yellow;
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
+}
+
+.cat-nav a:hover::after,
+.cat-nav a.active::after {
+  transform: scaleX(1);
+}
+
 
 /* 📱 Responsivo */
 @media (max-width: 1024px) {

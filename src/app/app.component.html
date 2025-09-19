@@ -9,21 +9,21 @@
     menuId="mainMenu">
 
     <ion-content>
-
-      <!-- Encabezado del menú -->
+      
+      <!-- Hola, identifícate -->
       <div class="menu-header">
-        <div class="avatar">
-          <ion-icon name="person-circle-outline"></ion-icon>
-        </div>
-        <div class="hello">
-          <div class="hi">Hola, identifícate</div>
-        </div>
+        <ion-menu-toggle auto-hide="true">
+          <ion-item button (click)="go('/login')" class="hello-item custom-bg">
+            <ion-icon name="person-circle-outline" slot="start"></ion-icon>
+            <ion-label class="hi">Hola, identifícate</ion-label>
+          </ion-item>
+        </ion-menu-toggle>
       </div>
 
       <!-- Enlaces principales -->
       <ion-list class="menu-list" lines="none">
         <ion-menu-toggle auto-hide="true">
-          <ion-item button (click)="go('/home')">
+          <ion-item button (click)="go('/home')" class="custom-bg">
             <ion-label class="primary-link">Home</ion-label>
           </ion-item>
         </ion-menu-toggle>
@@ -138,12 +138,10 @@
     (category)="onGlobalCat($event)">
   </app-header>
 
-  <!-- CONTENIDO PRINCIPAL: scroll + footer -->
+  <!-- CONTENIDO PRINCIPAL -->
   <ion-content id="main" class="with-footer">
     <div class="page-container">
       <ion-router-outlet></ion-router-outlet>
     </div>
-    
   </ion-content>
 </ion-app>
-
