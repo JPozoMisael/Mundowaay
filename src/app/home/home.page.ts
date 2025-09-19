@@ -209,21 +209,35 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   private pickImages(query: string, n = 4): Array<{ src: string; alt: string }> {
-    const items = this.catalog.search(query, { limit: 60 }).items;
+  const items = this.catalog.search(query, { limit: 60 }).items;
 
-    const imgs: Array<{ src: string; alt: string }> = [];
-    for (const p of items) {
-      if (!p.image || this.usedIds.has(p.id)) continue;
-      this.usedIds.add(p.id);
-      imgs.push({ src: this.thumb(p.image, 300, 220), alt: p.title });
-      if (imgs.length >= n) break;
-    }
+  const seen = new Set<string>();
+  const imgs: Array<{ src: string; alt: string }> = [];
 
-    while (imgs.length < n) {
-      imgs.push({ src: this.placeholder(300, 220, imgs.length), alt: 'Imagen' });
-    }
-    return imgs;
+  for (const p of items) {
+    if (!p.image || seen.has(p.id)) continue;
+    seen.add(p.id);
+
+    imgs.push({
+      src: this.thumb(p.image, 300, 220),
+      alt: p.title
+    });
+
+    if (imgs.length >= n) break;
   }
+
+  // 🔹 Si hay menos de 4, rellenar con placeholders
+  while (imgs.length < n) {
+    imgs.push({
+      src: this.placeholder(300, 220, imgs.length),
+      alt: 'Imagen'
+    });
+  }
+
+  return imgs;
+}
+
+
 
   private creativeSubtitle(base: string): string {
     const opciones = [
