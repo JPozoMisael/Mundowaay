@@ -40,13 +40,13 @@ export class InsecticidasPage implements OnInit, OnDestroy {
 
   // Chips
   chips = [
-    { key: 'reco',      label: 'Recomendado',         icon: 'assets/chips/reco.svg' },
-    { key: 'marca_qsi', label: 'QSI',                 icon: 'assets/chips/qsi.svg' },
-    { key: 'marca_avg', label: 'AVGUST',              icon: 'assets/chips/avgust.svg' },
-    { key: 'contacto',  label: 'De contacto',         icon: 'assets/chips/contact.svg' },
-    { key: 'sistemico', label: 'Sistémicos',          icon: 'assets/chips/systemic.svg' },
-    { key: 'cebos',     label: 'Cebos',               icon: 'assets/chips/bait.svg' },
-    { key: 'biologico', label: 'Biológicos',          icon: 'assets/chips/bio.svg' },
+    { key: 'reco',      label: 'Recomendado',         icon: 'assets/img/recoins.png' },
+    { key: 'marca_qsi', label: 'QSI',                 icon: 'assets/img/qsi.png' },
+    { key: 'marca_avg', label: 'AVGUST',              icon: 'assets/img/avgust.png'},
+    { key: 'contacto',  label: 'De contacto',         icon: 'assets/img/contact.png' },
+    { key: 'sistemico', label: 'Sistémicos',          icon: 'assets/img/systemic.png' },
+    { key: 'cebos',     label: 'Cebos',               icon: 'assets/img/bait.png' },
+    { key: 'biologico', label: 'Biológicos',          icon: 'assets/img/bio.png' },
   ];
   active = 'reco';
 

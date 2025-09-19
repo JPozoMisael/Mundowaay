@@ -37,12 +37,12 @@ export class SemillasPage implements OnInit, OnDestroy {
   activePill: string = 'tendencia';
 
   chips = [
-    { key: 'reco',  label: 'Recomendado', icon: 'assets/chips/reco.svg' },
-    { key: 'maiz',  label: 'Maíz',        icon: 'assets/chips/maiz.svg' },
-    { key: 'arroz', label: 'Arroz',       icon: 'assets/chips/arroz.svg' },
-    { key: 'trigo', label: 'Trigo',       icon: 'assets/chips/trigo.svg' },
-    { key: 'soja',  label: 'Soja',        icon: 'assets/chips/soja.svg' },
-    { key: 'hort',  label: 'Hortalizas',  icon: 'assets/chips/hort.svg' },
+    { key: 'reco',  label: 'Recomendado', icon: 'assets/img/reco.png' },
+    { key: 'maiz',  label: 'Maíz',        icon: 'assets/img/maiz.png' },
+    { key: 'arroz', label: 'Arroz',       icon: 'assets/img/arroz.png' },
+    { key: 'trigo', label: 'Trigo',       icon: 'assets/img/trigo.png' },
+    { key: 'soja',  label: 'Soja',        icon: 'assets/img/soja.png' },
+    { key: 'hort',  label: 'Hortalizas',  icon: 'assets/img/hort.png' },
   ];
   active = 'reco';
 
