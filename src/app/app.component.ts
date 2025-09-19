@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { MenuController } from '@ionic/angular';
+import { MenuController, ModalController } from '@ionic/angular';  // 👈 importa ModalController
 import { CatalogBootstrapService } from './servicios/catalog-bootstrap';
+import { LoginModalComponent } from './components/login-modal/login-modal.component'; // 👈 importa tu modal
 
 @Component({
   selector: 'app-root',
@@ -14,7 +15,8 @@ export class AppComponent implements OnInit {
   constructor(
     private router: Router,
     private menu: MenuController,
-    private boot: CatalogBootstrapService, // Wix → CatalogoBus (idempotente)
+    private modalCtrl: ModalController,   // 👈 inyéctalo aquí
+    private boot: CatalogBootstrapService,
   ) {}
 
   ngOnInit(): void {
@@ -23,7 +25,22 @@ export class AppComponent implements OnInit {
     });
   }
 
-  /** Navega y cierra el menú lateral si está abierto */
+  /** 🔹 Abre el modal de login (igual que en el header) */
+  async openLogin() {
+    const modal = await this.modalCtrl.create({
+      component: LoginModalComponent,
+      cssClass: 'login-modal',
+      backdropDismiss: true
+    });
+    await modal.present();
+  }
+
+  get user() {
+    // Si tu auth ya está en el root
+    return null; // o usa this.auth.currentUser si lo tienes aquí también
+  }
+
+  /** Otros métodos que ya tenías **/
   go(path: string) {
     this.router.navigateByUrl(path).finally(() => {
       try { this.menu.close(); } catch {}
@@ -34,9 +51,7 @@ export class AppComponent implements OnInit {
     window.open('https://wa.me/593000000000', '_blank', 'noopener,noreferrer');
   }
 
-  // ===== Eventos emitidos por <app-header> =====
   onGlobalSearch(event: any) {
-    // Si el componente emite directamente un string:
     const query = (typeof event === 'string' ? event : event.detail?.value || '').trim();
     if (!query) return;
     this.router.navigate(['/search'], { queryParams: { q: query } });

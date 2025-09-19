@@ -7,6 +7,10 @@ const routes: Routes = [
     loadChildren: () => import('./home/home.module').then( m => m.HomePageModule)
   },
   {
+    path: 'login',
+    loadChildren: () => import('./components/login-modal/login-modal.component').then(m => m.LoginModalComponent)
+  },
+  {
     path: '',
     redirectTo: 'home',
     pathMatch: 'full'

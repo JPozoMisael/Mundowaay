@@ -9,21 +9,31 @@
     menuId="mainMenu">
 
     <ion-content>
-      
-      <!-- Hola, identifícate -->
-      <div class="menu-header">
-        <ion-menu-toggle auto-hide="true">
-          <ion-item button (click)="go('/login')" class="hello-item custom-bg">
-            <ion-icon name="person-circle-outline" slot="start"></ion-icon>
-            <ion-label class="hi">Hola, identifícate</ion-label>
-          </ion-item>
-        </ion-menu-toggle>
-      </div>
+
+  <div class="menu-header">
+  <ion-menu-toggle auto-hide="true">
+    <ion-item button (click)="openLogin()" class="hello-item">
+      <ion-icon name="person-circle-outline" slot="start"></ion-icon>
+      <ion-label class="hi">Hola, identifícate</ion-label>
+    </ion-item>
+  </ion-menu-toggle>
+</div>
+
+
+<!-----<div class="menu-header">
+  <ion-item button (click)="openLoginModal()" class="hello-item">
+    <ion-icon name="person-circle-outline" slot="start"></ion-icon>
+    <ion-label class="hi">Hola, identifícate</ion-label>
+  </ion-item>
+</div>-->
+
+
+
 
       <!-- Enlaces principales -->
       <ion-list class="menu-list" lines="none">
         <ion-menu-toggle auto-hide="true">
-          <ion-item button (click)="go('/home')" class="custom-bg">
+          <ion-item button (click)="go('/home')">
             <ion-label class="primary-link">Home</ion-label>
           </ion-item>
         </ion-menu-toggle>
@@ -138,10 +148,12 @@
     (category)="onGlobalCat($event)">
   </app-header>
 
-  <!-- CONTENIDO PRINCIPAL -->
+  <!-- CONTENIDO PRINCIPAL: scroll + footer -->
   <ion-content id="main" class="with-footer">
     <div class="page-container">
       <ion-router-outlet></ion-router-outlet>
     </div>
+    
   </ion-content>
 </ion-app>
+
