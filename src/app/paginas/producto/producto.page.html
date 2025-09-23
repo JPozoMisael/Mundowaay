@@ -1,34 +1,56 @@
-<ion-header translucent="true">
-  
-</ion-header>
+<ion-header translucent="true"></ion-header>
 
 <ion-content class="mw-product">
   <div class="product-container">
-    <!-- Columna izquierda: Imagen -->
+    
+    <!-- Galería de imágenes -->
     <div class="gallery">
-      <img [src]="vm?.image" [alt]="vm?.title" />
+      <div class="thumbs">
+        <img *ngFor="let g of vm?.gallery" 
+             [src]="g" 
+             (click)="setImage(g)"
+             [class.active]="g === currentImage" />
+      </div>
+      <div class="main-img">
+        <img [src]="currentImage" [alt]="vm?.title" />
+      </div>
     </div>
 
-    <!-- Columna derecha: Info -->
+    <!-- Info -->
     <div class="product-info">
+      <!-- Badge / Promo -->
+      <div class="badge" *ngIf="vm?.badge">{{ vm?.badge }}</div>
       <h1>{{ vm?.title }}</h1>
+      <p class="brand" *ngIf="vm?.brand">Marca: {{ vm?.brand }}</p>
 
+      <!-- Rating -->
       <div class="rating">
         <ion-icon *ngFor="let s of [1,2,3,4,5]" 
                   [name]="s <= (vm?.rating || 0) ? 'star' : 'star-outline'">
         </ion-icon>
         <span>{{ vm?.reviews || 0 }} opiniones</span>
+        <span class="sold" *ngIf="vm?.sold">{{ vm?.sold }} vendidos</span>
       </div>
 
-      <div class="price">{{ money(vm?.price || 0) }}</div>
+      <!-- Precio -->
+      <div class="pricebox">
+        <div class="price">{{ money(vm?.price || 0) }}</div>
+        <div class="compare" *ngIf="vm?.compareAt">
+          Antes: <span>{{ money(vm?.compareAt || 0) }}</span>
+        </div>
+        <div class="promo" *ngIf="vm?.promo">{{ vm?.promo }}</div>
+      </div>
+
+      <!-- Descripción -->
       <p class="desc">{{ vm?.desc }}</p>
 
+      <!-- Botones -->
       <div class="buybar">
-        <button class="add" (click)="addToCart()">AÑADIR AL CARRITO</button>
-        <button class="buy">COMPRAR AHORA</button>
+        <button class="add" (click)="addToCart()">Añadir al carrito</button>
+        <button class="buy">Comprar ahora</button>
       </div>
     </div>
   </div>
-  <app-footer></app-footer>
 
+  <app-footer></app-footer>
 </ion-content>

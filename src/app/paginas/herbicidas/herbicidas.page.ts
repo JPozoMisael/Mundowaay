@@ -40,15 +40,15 @@ export class HerbicidasPage {
 
   // ===== Chips =====
   chips = [
-    { key: 'reco',         label: 'Recomendado',     icon: 'assets/chips/reco.svg' },
-    { key: 'marca_qsi',    label: 'QSI',             icon: 'assets/chips/qsi.svg' },
-    { key: 'marca_avgust', label: 'AVGUST',          icon: 'assets/chips/avgust.svg' },
-    { key: 'pre',          label: 'Preemergente',    icon: 'assets/chips/pre.svg' },
-    { key: 'post',         label: 'Posemergente',    icon: 'assets/chips/post.svg' },
-    { key: 'no_selectivo', label: 'No selectivo',    icon: 'assets/chips/no-select.svg' },
-    { key: 'selectivo',    label: 'Selectivo',       icon: 'assets/chips/select.svg' },
-    { key: 'sistemico',    label: 'Sistémico',       icon: 'assets/chips/systemic.svg' },
-    { key: 'contacto',     label: 'De contacto',     icon: 'assets/chips/contact.svg' },
+    { key: 'reco',         label: 'Recomendado',     icon: 'assets/img/recoher.png' },
+    { key: 'marca_qsi',    label: 'QSI',             icon: 'assets/img/qsiher.png' },
+    { key: 'marca_avgust', label: 'AVGUST',          icon: 'assets/img/avgusther.png' },
+    { key: 'pre',          label: 'Preemergente',    icon: 'assets/img/pre.png' },
+    { key: 'post',         label: 'Posemergente',    icon: 'assets/img/post.png' },
+    { key: 'no_selectivo', label: 'No selectivo',    icon: 'assets/img/no-select.png' },
+    { key: 'selectivo',    label: 'Selectivo',       icon: 'assets/img/select.png' },
+    { key: 'sistemico',    label: 'Sistémico',       icon: 'assets/img/systemicher.png' },
+    { key: 'contacto',     label: 'De contacto',     icon: 'assets/img/contacther.png' },
   ];
   active = 'reco';
 

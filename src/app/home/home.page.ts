@@ -1,5 +1,4 @@
 import { Component, OnInit, OnDestroy, ElementRef, ViewChild } from '@angular/core';
-import { InfiniteScrollCustomEvent } from '@ionic/angular';
 import { CatalogoBus, CatalogItem } from 'src/app/servicios/catalogo-bus';
 
 type Product = {
@@ -28,7 +27,6 @@ type TopCard = {
   link?: string | any[];
 };
 
-// 🔹 Nuevo tipo para la tira horizontal
 type StripItem = {
   title: string;
   img: string;
@@ -46,24 +44,33 @@ export class HomePage implements OnInit, OnDestroy {
 
   flashDeals: Product[] = [];
   products: Product[] = [];
-
   tiles: Tile[] = [];
   topCards: TopCard[] = [];
-  stripItems: StripItem[] = [];   // 👈 ahora con link incluido
+  stripItems: StripItem[] = [];
+
+  // 🔹 Slider Hero
+  slides = [
+    { text: 'Compra fácil y seguro', color: '#d9a320' },   // amarillo
+    { text: 'Tecnología confiable', color: '#2f72c9' },    // azul
+    { text: 'Aliado del agricultor', color: '#16a085' },   // verde
+    { text: 'Productos de calidad', color: '#e74c3c' }     // rojo
+  ];
+  currentSlide = 0;
+  private slideInterval?: any;
 
   private page = 0;
   private pollId?: any;
   private pollCount = 0;
   private usedIds = new Set<string>();
 
-  private readonly topCfg: Array<{ title: string; query: string; multi?: boolean; desc?: string; link?: string | any[] }> = [
+  private readonly topCfg = [
     { title: 'Cosecha más eficiente', query: 'maquinaria', desc: 'Tecnología agrícola de alto rendimiento', link: '/maquinaria'},
     { title: 'Nutrición Foliar', query: 'foliar', desc: 'Fertilizantes para un crecimiento rápido' , link: '/nutricion'},
     { title: 'Comienza desde la raíz', query: 'semilla', desc: 'Protección contra plagas' , link: '/semillas'},
     { title: 'Productos esenciales para el agricultor', query: 'maquinaria', multi: true, desc: 'Explora todos los productos', link: '/maquinaria'},
   ];
 
-  private readonly tileCfg: Array<{ title: string; link: string | any[]; query: string; cta: string }> = [
+  private readonly tileCfg = [
     { title: 'Semillas destacadas',     link: '/semillas',     query: 'semilla',        cta: 'Ver más' },
     { title: 'Control de insectos',     link: '/insecticidas', query: 'insecticida',    cta: 'Ver más' },
     { title: 'Herbicidas populares',    link: '/herbicidas',   query: 'herbicida',      cta: 'Ver más' },
@@ -75,10 +82,44 @@ export class HomePage implements OnInit, OnDestroy {
   ngOnInit() {
     this.refreshFromBus();
     this.startPollingForBus();
+
+    // 🔹 Iniciar autoplay del slider
+    this.startAutoSlide();
   }
 
-  ngOnDestroy() { this.stopPolling(); }
+  ngOnDestroy() { 
+    this.stopPolling(); 
+    this.stopAutoSlide();
+  }
 
+  // ======================
+  // 🎞️ HERO SLIDER
+  // ======================
+  nextSlide() {
+    this.currentSlide = (this.currentSlide + 1) % this.slides.length;
+  }
+
+  prevSlide() {
+    this.currentSlide = (this.currentSlide - 1 + this.slides.length) % this.slides.length;
+  }
+
+  startAutoSlide() {
+    this.stopAutoSlide();
+    this.slideInterval = setInterval(() => {
+      this.nextSlide();
+    }, 5000); // cada 5 segundos
+  }
+
+  stopAutoSlide() {
+    if (this.slideInterval) {
+      clearInterval(this.slideInterval);
+      this.slideInterval = undefined;
+    }
+  }
+
+  // ======================
+  // 📦 REFRESH Y DATA
+  // ======================
   private refreshFromBus() {
     const all = this.catalog.listAll();
 
@@ -96,7 +137,7 @@ export class HomePage implements OnInit, OnDestroy {
         .map(p => this.view(p));
 
       this.flashDeals = deals;
-      this.products = trending;
+      this.products  = trending;
 
       this.usedIds.clear();
       this.buildTopCards();
@@ -105,6 +146,7 @@ export class HomePage implements OnInit, OnDestroy {
       return;
     }
 
+    // Mock si no hay data
     this.flashDeals = this.mock(10);
     this.products  = this.mock(20);
     this.topCards  = this.mockTopCards();
@@ -124,7 +166,9 @@ export class HomePage implements OnInit, OnDestroy {
     };
   }
 
-  // 🔹 Uniforme y multi para productos esenciales
+  // ======================
+  // 🔹 TOP CARDS
+  // ======================
   private buildTopCards() {
     const result: TopCard[] = [];
 
@@ -162,7 +206,9 @@ export class HomePage implements OnInit, OnDestroy {
     this.topCards = result;
   }
 
-  // 🔹 Tira horizontal con categorías variadas
+  // ======================
+  // 🔹 STRIP ITEMS
+  // ======================
   private buildStrip() {
     this.stripItems = [];
 
@@ -185,17 +231,18 @@ export class HomePage implements OnInit, OnDestroy {
         this.stripItems.push({
           title: p.title,
           img: this.thumb(p.image, 720, 540),
-          link: cat.link   // 👈 ahora permitido
+          link: cat.link
         });
 
         count++;
         if (count >= 2) break;
-        //if (this.stripItems.length >= 10) break; 
       }
-      //if (this.stripItems.length >= 10) break;
     }
   }
 
+  // ======================
+  // 🔹 TILES
+  // ======================
   private buildTiles() {
     const gotData = this.catalog.listAll().length > 0;
     const result: Tile[] = [];
@@ -209,36 +256,35 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   private pickImages(query: string, n = 4): Array<{ src: string; alt: string }> {
-  const items = this.catalog.search(query, { limit: 60 }).items;
+    const items = this.catalog.search(query, { limit: 60 }).items;
+    const seen = new Set<string>();
+    const imgs: Array<{ src: string; alt: string }> = [];
 
-  const seen = new Set<string>();
-  const imgs: Array<{ src: string; alt: string }> = [];
+    for (const p of items) {
+      if (!p.image || seen.has(p.id)) continue;
+      seen.add(p.id);
 
-  for (const p of items) {
-    if (!p.image || seen.has(p.id)) continue;
-    seen.add(p.id);
+      imgs.push({
+        src: this.thumb(p.image, 300, 220),
+        alt: p.title
+      });
 
-    imgs.push({
-      src: this.thumb(p.image, 300, 220),
-      alt: p.title
-    });
+      if (imgs.length >= n) break;
+    }
 
-    if (imgs.length >= n) break;
+    while (imgs.length < n) {
+      imgs.push({
+        src: this.placeholder(300, 220, imgs.length),
+        alt: 'Imagen'
+      });
+    }
+
+    return imgs;
   }
 
-  // 🔹 Si hay menos de 4, rellenar con placeholders
-  while (imgs.length < n) {
-    imgs.push({
-      src: this.placeholder(300, 220, imgs.length),
-      alt: 'Imagen'
-    });
-  }
-
-  return imgs;
-}
-
-
-
+  // ======================
+  // 🎨 HELPERS
+  // ======================
   private creativeSubtitle(base: string): string {
     const opciones = [
       'Herramienta esencial',
@@ -260,7 +306,7 @@ export class HomePage implements OnInit, OnDestroy {
     return `https://picsum.photos/seed/fallback-${seed}/${w}/${h}`;
   }
 
-  private fallbackPicsum(n = 4): Array<{ src: string; alt: string }> {
+  private fallbackPicsum(n: number): Array<{ src: string; alt: string }> {
     return Array.from({ length: n }).map((_, i) => ({
       src: this.placeholder(300, 220, i + 1),
       alt: 'Placeholder'
@@ -327,6 +373,9 @@ export class HomePage implements OnInit, OnDestroy {
     el.scrollBy({ left: dir * el.clientWidth * 0.9, behavior: 'smooth' });
   }
 
+  // ======================
+  // 🔄 POLLING
+  // ======================
   private startPollingForBus() {
     this.stopPolling();
     this.pollCount = 0;
@@ -337,6 +386,7 @@ export class HomePage implements OnInit, OnDestroy {
       if (had || this.pollCount >= 8) this.stopPolling();
     }, 800);
   }
+
   private stopPolling() {
     if (this.pollId) {
       clearInterval(this.pollId);

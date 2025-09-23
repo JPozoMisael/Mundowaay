@@ -3,34 +3,45 @@ import { Injectable } from '@angular/core';
 export type CatalogItem = {
   id: string;
   title: string;
-  category: string;          // 'semillas' | 'insecticidas' | ...
+  category: string;
   image?: string;
-  price?: number;
-  compareAt?: number;
-  brand?: string;            // 👈 NUEVO
+  price?: number;           // precio actual (con descuento si aplica)
+  compareAt?: number;       // precio original (tachado)
+  brand?: string;
   tags?: string[];
   desc?: string;
   rating?: number;
   reviews?: number;
   link?: string | any[];
-  gallery?: string[];        // 👈 NUEVO
-  sold?: string;             // 👈 NUEVO
-  promo?: string;            // 👈 NUEVO
-  badge?: string;            // 👈 NUEVO
-  __search?: string;         // interno del índice
+  gallery?: string[];
+  sold?: string;
+  promo?: string;
+  badge?: string;
+  __search?: string;
 };
 
-// 👉 Permite venir con image o imageUrl
 type Incoming = Partial<CatalogItem> & {
   id: string;
   title: string;
   imageUrl?: string;
   image?: string;
   brand?: string;
-  gallery?: string[];        // 👈 NUEVO
-  sold?: string;             // 👈 NUEVO
-  promo?: string;            // 👈 NUEVO
-  badge?: string;            // 👈 NUEVO
+  gallery?: string[];
+  sold?: string;
+  promo?: string;
+  badge?: string;
+
+  // Campos de Wix
+  priceData?: {
+    price?: number;              // precio base
+    compareAtPrice?: number;     // precio tachado original (si existe)
+    discountedPrice?: number;    // precio ya calculado con descuento
+  };
+  discount?: {
+    type: 'PERCENT' | 'AMOUNT';
+    value: number;
+  };
+  price?: number;                // fallback
 };
 
 @Injectable({ providedIn: 'root' })
@@ -44,10 +55,11 @@ export class CatalogoBus {
     } catch {}
   }
 
-  /** Reemplaza los productos de una categoría */
   publish(category: string, list: Incoming[]) {
     const cat = this.norm(category);
     this.items = this.items.filter(p => this.norm(p.category) !== cat);
+
+    console.log("[CatalogoBus] Incoming wix product FULL:", JSON.stringify(list, null, 2));
 
     const mapped = list.map(p =>
       this.index({
@@ -55,8 +67,7 @@ export class CatalogoBus {
         title: p.title!,
         category,
         image: p.image ?? p.imageUrl,
-        price: p.price,
-        compareAt: p.compareAt,
+        ...this.resolvePrice(p),   // 🔥 precios mapeados bien
         brand: p.brand,
         tags: p.tags ?? [],
         desc: p.desc ?? '',
@@ -74,7 +85,6 @@ export class CatalogoBus {
     this.persist();
   }
 
-  /** Agrega más ítems a la categoría (para infinite scroll) */
   append(category: string, list: Incoming[]) {
     const mapped = list.map(p =>
       this.index({
@@ -82,8 +92,7 @@ export class CatalogoBus {
         title: p.title!,
         category,
         image: p.image ?? p.imageUrl,
-        price: p.price,
-        compareAt: p.compareAt,
+        ...this.resolvePrice(p),   
         brand: p.brand,
         tags: p.tags ?? [],
         desc: p.desc ?? '',
@@ -101,7 +110,6 @@ export class CatalogoBus {
     this.persist();
   }
 
-  /** Búsqueda tolerante (acentos, plurales, prefijos) */
   search(q: string, opts?: { cat?: string; limit?: number }) {
     const limit = opts?.limit ?? 120;
     const cat = opts?.cat ? this.norm(opts.cat) : '';
@@ -129,7 +137,7 @@ export class CatalogoBus {
       return { p, score };
     }).filter(Boolean) as { p: CatalogItem; score: number }[];
 
-    scored.sort((a,b) => b.score - a.score || a.p.title.localeCompare(b.p.title));
+    scored.sort((a, b) => b.score - a.score || a.p.title.localeCompare(b.p.title));
     const items = scored.slice(0, limit).map(s => s.p);
     return { items, total: scored.length };
   }
@@ -140,13 +148,12 @@ export class CatalogoBus {
     return this.items.find(p => p.id === id);
   }
 
-  // ============ helpers ============
   private index(p: CatalogItem): CatalogItem {
     const blob = [
       p.title,
       p.category,
       p.brand || '',
-      (p.tags||[]).join(' '),
+      (p.tags || []).join(' '),
       p.desc || ''
     ].map(x => this.expandSynonyms(x || '')).join(' ');
     return { ...p, __search: this.tokens(blob).join(' ') };
@@ -165,7 +172,7 @@ export class CatalogoBus {
     const out = new Set<string>();
     for (const w of base) {
       out.add(w);
-      if (w.length >= 4) out.add(w.slice(0, w.length - 1)); // prefijo parcial
+      if (w.length >= 4) out.add(w.slice(0, w.length - 1));
     }
     return Array.from(out);
   }
@@ -193,5 +200,33 @@ export class CatalogoBus {
 
   private persist() {
     try { localStorage.setItem('mw_catalog_v1', JSON.stringify(this.items)); } catch {}
+  }
+
+  private resolvePrice(p: any): { price: number; compareAt?: number } {
+    let price = p?.priceData?.price ?? p?.price ?? 0;
+    let compareAt: number | undefined;
+
+    // Caso Wix con `discountedPrice`
+    if (p?.priceData?.discountedPrice && p.priceData.discountedPrice < price) {
+      compareAt = p.priceData.price ?? price;
+      price = p.priceData.discountedPrice;
+    }
+
+    // Caso Wix con `compareAtPrice`
+    if (p?.priceData?.compareAtPrice && p.priceData.compareAtPrice > price) {
+      compareAt = p.priceData.compareAtPrice;
+    }
+
+    // Caso descuentos manuales (discount.value)
+    if (p?.discount?.value) {
+      compareAt = compareAt ?? price;
+      if (p.discount.type === 'PERCENT') {
+        price = price - (price * p.discount.value) / 100;
+      } else if (p.discount.type === 'AMOUNT') {
+        price = price - p.discount.value;
+      }
+    }
+
+    return { price, compareAt };
   }
 }

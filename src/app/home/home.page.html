@@ -1,19 +1,21 @@
 <ion-header collapse="condense"></ion-header>
 
 <ion-content [fullscreen]="true" class="mw-home">
-  <!-- Banner amarillo / Slider -->
+  <!-- 🔹 HERO / SLIDER -->
   <section class="hero">
     <div class="container hero-inner">
-      <button class="arrow left" aria-label="Anterior">
+      <!-- Botón anterior -->
+      <button class="arrow left" aria-label="Anterior" (click)="prevSlide()">
         <ion-icon name="chevron-back-outline"></ion-icon>
       </button>
 
-      <div class="hero-art">
-        <div class="art-bg"></div>
-        <h2>Compra fácil y<br/>seguro</h2>
+      <!-- Contenido dinámico -->
+      <div class="hero-art" [style.background]="slides[currentSlide].color">
+        <h2>{{ slides[currentSlide].text }}</h2>
       </div>
 
-      <button class="arrow right" aria-label="Siguiente">
+      <!-- Botón siguiente -->
+      <button class="arrow right" aria-label="Siguiente" (click)="nextSlide()">
         <ion-icon name="chevron-forward-outline"></ion-icon>
       </button>
     </div>
@@ -66,7 +68,8 @@
       <ion-icon name="chevron-forward-outline"></ion-icon>
     </button>
   </section>
-<div style="height:28px;"></div>
+
+  <div style="height:28px;"></div>
 
   <!-- 🔹 Bloques mosaico -->
   <section class="amz container amz-tiles">

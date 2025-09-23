@@ -27,11 +27,11 @@ type Product = {
 export class AcaricidasPage {
   // Chips circulares de subcategorías
   chips = [
-    { key: 'reco',      label: 'Recomendado',  icon: 'assets/chips/reco.svg' },
-    { key: 'citricos',  label: 'Cítricos',     icon: 'assets/chips/citricos.svg' },
-    { key: 'frutales',  label: 'Frutales',     icon: 'assets/chips/frutales.svg' },
-    { key: 'hort',      label: 'Hortalizas',   icon: 'assets/chips/hort.svg' },
-    { key: 'orn',       label: 'Ornamentales', icon: 'assets/chips/orn.svg' },
+    { key: 'reco',      label: 'Recomendado',  icon: 'assets/img/recoacar.png' },
+    { key: 'citricos',  label: 'Cítricos',     icon: 'assets/img/citricos.png' },
+    { key: 'frutales',  label: 'Frutales',     icon: 'assets/img/frutales.png' },
+    { key: 'hort',      label: 'Hortalizas',   icon: 'assets/img/hortacar.png' },
+    { key: 'orn',       label: 'Ornamentales', icon: 'assets/img/orn.png' },
   ];
   active = 'reco';
 

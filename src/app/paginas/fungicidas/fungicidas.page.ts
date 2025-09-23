@@ -46,17 +46,17 @@ export class FungicidasPage {
 
   // Chips
   chips = [
-    { key: 'reco',           label: 'Recomendado',      icon: 'assets/chips/reco.svg' },
-    { key: 'marca_qsi',      label: 'QSI',              icon: 'assets/chips/qsi.svg' },
-    { key: 'marca_avgust',   label: 'AVGUST',           icon: 'assets/chips/avgust.svg' },
-    { key: 'triazol',        label: 'Triazoles',        icon: 'assets/chips/triazol.svg' },
-    { key: 'estrobilurina',  label: 'Estrobilurinas',   icon: 'assets/chips/estro.svg' },
-    { key: 'sdhi',           label: 'SDHI',             icon: 'assets/chips/sdhi.svg' },
-    { key: 'cobre',          label: 'Cobre',            icon: 'assets/chips/copper.svg' },
-    { key: 'sistemico',      label: 'Sistémicos',       icon: 'assets/chips/systemic.svg' },
-    { key: 'contacto',       label: 'De contacto',      icon: 'assets/chips/contact.svg' },
-    { key: 'biologico',      label: 'Biológicos',       icon: 'assets/chips/bio.svg' },
-    { key: 'mezcla',         label: 'Mezclas',          icon: 'assets/chips/mix.svg' },
+    { key: 'reco',           label: 'Recomendado',      icon: 'assets/img/recofung.png' },
+    { key: 'marca_qsi',      label: 'QSI',              icon: 'assets/img/qsifung.png' },
+    { key: 'marca_avgust',   label: 'AVGUST',           icon: 'assets/img/avgustfung.png' },
+    { key: 'triazol',        label: 'Triazoles',        icon: 'assets/img/triazol.png' },
+    { key: 'estrobilurina',  label: 'Estrobilurinas',   icon: 'assets/img/estro.png' },
+    { key: 'sdhi',           label: 'SDHI',             icon: 'assets/img/sdhi.png' },
+    { key: 'cobre',          label: 'Cobre',            icon: 'assets/img/copper.png' },
+    { key: 'sistemico',      label: 'Sistémicos',       icon: 'assets/img/systemicfung.png'},
+    { key: 'contacto',       label: 'De contacto',      icon: 'assets/img/contactfung.png' },
+    { key: 'biologico',      label: 'Biológicos',       icon: 'assets/img/biofung.png' },
+    { key: 'mezcla',         label: 'Mezclas',          icon: 'assets/img/mix.png' },
   ];
   active = 'reco';
 

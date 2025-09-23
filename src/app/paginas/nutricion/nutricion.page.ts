@@ -38,15 +38,15 @@ export class NutricionPage implements OnInit, OnDestroy {
   activePill: string = 'tendencia';
 
   chips = [
-    { key: 'reco',         label: 'Recomendado',      icon: 'assets/chips/reco.svg' },
-    { key: 'macro',        label: 'Macronutrientes',  icon: 'assets/chips/macro.svg' },
-    { key: 'micro',        label: 'Micronutrientes',  icon: 'assets/chips/micro.svg' },
-    { key: 'quelatado',    label: 'Quelatados',       icon: 'assets/chips/chelate.svg' },
-    { key: 'aminoacidos',  label: 'Aminoácidos',      icon: 'assets/chips/amino.svg' },
-    { key: 'algas',        label: 'Algas/Extractos',  icon: 'assets/chips/seaweed.svg' },
-    { key: 'calcio_boro',  label: 'Calcio-Boro',      icon: 'assets/chips/ca-b.svg' },
-    { key: 'k_h',          label: 'K-H (maduración)', icon: 'assets/chips/k-h.svg' },
-    { key: 'bioestimulante', label: 'Bioestimulantes', icon: 'assets/chips/bio.svg' },
+    { key: 'reco',         label: 'Recomendado',      icon: 'assets/img/reconutri.png' },
+    { key: 'macro',        label: 'Macronutrientes',  icon: 'assets/img/macro.png' },
+    { key: 'micro',        label: 'Micronutrientes',  icon: 'assets/img/micro.png' },
+    { key: 'quelatado',    label: 'Quelatados',       icon: 'assets/img/chelate.png' },
+    { key: 'aminoacidos',  label: 'Aminoácidos',      icon: 'assets/img/amino.png' },
+    { key: 'algas',        label: 'Algas/Extractos',  icon: 'assets/img/seaweed.png' },
+    { key: 'calcio_boro',  label: 'Calcio-Boro',      icon: 'assets/img/ca-b.png' },
+    { key: 'k_h',          label: 'K-H (maduración)', icon: 'assets/img/k-h.png' },
+    { key: 'bioestimulante', label: 'Bioestimulantes', icon: 'assets/img/bionutri.png' },
   ];
   active = 'reco';
 

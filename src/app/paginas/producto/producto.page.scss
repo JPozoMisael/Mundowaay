@@ -4,36 +4,83 @@
 
 .product-container {
   display: flex;
-  flex-direction: column; /* Mobile first */
+  flex-direction: column;
   gap: 20px;
-  padding: 100px 16px 80px; /* Bajamos para que no tape el header */
+  padding: 100px 16px 80px;
   background: #fff;
 }
 
-/* Imagen */
+/* Galería */
 .gallery {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.gallery .thumbs {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.gallery .thumbs img {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border: 2px solid transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.gallery .thumbs img.active {
+  border-color: #ff4d2d;
+}
+
+.gallery .main-img {
+  flex: 1;
   text-align: center;
 }
 
-.gallery img {
+.gallery .main-img img {
   max-width: 100%;
-  height: auto;
   border-radius: 8px;
 }
 
 /* Info */
+.product-info {
+  flex: 1;
+}
+
 .product-info h1 {
-  font-size: 20px;
+  font-size: 22px;
   margin: 8px 0;
   font-weight: 600;
   color: #222;
+}
+
+.product-info .brand {
+  font-size: 14px;
+  color: #777;
+  margin-bottom: 6px;
+}
+
+.badge {
+  background: #ff4d2d;
+  color: #fff;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 4px 8px;
+  border-radius: 4px;
+  display: inline-block;
+  margin-bottom: 6px;
 }
 
 .rating {
   display: flex;
   align-items: center;
   gap: 6px;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
   font-size: 14px;
   color: #555;
 }
@@ -42,13 +89,39 @@
   color: #ffc107;
 }
 
-.price {
-  font-size: 22px;
-  font-weight: bold;
-  color: #e53935;
+.rating .sold {
+  color: #888;
+  margin-left: 12px;
+}
+
+/* Precio */
+.pricebox {
   margin-bottom: 12px;
 }
 
+.pricebox .price {
+  font-size: 26px;
+  font-weight: bold;
+  color: #e53935;
+}
+
+.pricebox .compare {
+  font-size: 14px;
+  color: #777;
+}
+
+.pricebox .compare span {
+  text-decoration: line-through;
+}
+
+.pricebox .promo {
+  font-size: 13px;
+  color: #ff4d2d;
+  font-weight: 500;
+  margin-top: 4px;
+}
+
+/* Descripción */
 .desc {
   font-size: 14px;
   line-height: 1.5;
@@ -64,28 +137,26 @@
 
 .buybar button {
   flex: 1;
-  padding: 12px;
+  padding: 14px;
   border-radius: 6px;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 600;
   border: none;
   cursor: pointer;
 }
 
-/* Botón Añadir al Carrito */
 .buybar .add {
   background: #fff;
   border: 1px solid #ccc;
   color: #222;
 }
 
-/* Botón Comprar Ahora */
 .buybar .buy {
   background: #ff4d2d;
   color: #fff;
 }
 
-/* 📌 Desktop: lado a lado */
+/* Desktop */
 @media (min-width: 768px) {
   .product-container {
     flex-direction: row;
@@ -103,10 +174,6 @@
   }
 
   .product-info h1 {
-    font-size: 24px;
-  }
-
-  .price {
     font-size: 26px;
   }
 }

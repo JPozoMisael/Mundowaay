@@ -73,22 +73,36 @@ export class SemillasPage implements OnInit, OnDestroy {
 
   private pullFromBus() {
     const { items } = this.catalog.search('', { cat: 'semillas', limit: 300 });
+
+    // 🔎 Debug detallado
+    console.log('🌽 [SemillasPage] Items crudos del CatalogoBus:');
+    items.forEach(p => {
+      console.log({
+        id: p.id,
+        title: p.title,
+        price: p.price,
+        compareAt: p.compareAt,
+      });
+    });
+
     if (items.length) {
       this.usingBus = true;
       this.all = items.map((p: CatalogItem) => ({
         id: p.id,
         title: p.title,
         image: p.image || 'assets/img/placeholder.png',
-        price: p.price ?? 0,
-        compareAt: p.compareAt,
+        price: p.price ?? 0,                  // precio final (oferta si aplica)
+        compareAt: p.compareAt ?? undefined,  // precio original (tachado)
         rating: p.rating ?? 4,
         reviews: p.reviews ?? 0,
-        sold: '',
-        promo: '',
-        badge: '',
+        sold: p.sold,
+        promo: p.promo,
+        badge: p.badge,
         category: p.category ?? 'semillas',
         tags: p.tags ?? [],
       }));
+
+      console.log('✅ [SemillasPage] Items mapeados a this.all:', this.all);
     } else if (!this.all.length) {
       this.all = this.mock(12);
     }

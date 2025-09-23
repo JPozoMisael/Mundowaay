@@ -40,14 +40,14 @@ export class MaquinariaPage implements OnInit, OnDestroy {
 
   // ====== CHIPS ======
   chips = [
-    { key: 'reco',   label: 'Recomendado',            icon: 'assets/chips/reco.svg' },
-    { key: 'tractor',label: 'Tractores',              icon: 'assets/chips/tractor.svg' },
-    { key: 'riego',  label: 'Riego',                  icon: 'assets/chips/riego.svg' },
-    { key: 'dron',   label: 'Drones agrícolas',       icon: 'assets/chips/dron.svg' },
-    { key: 'fumi',   label: 'Fumigación / Mochilas',  icon: 'assets/chips/fumi.svg' },
-    { key: 'herra',  label: 'Herramientas',           icon: 'assets/chips/tools.svg' },
-    { key: 'repu',   label: 'Repuestos',              icon: 'assets/chips/rep.svg' },
-    { key: 'seg',    label: 'Seguridad',              icon: 'assets/chips/seg.svg' },
+    { key: 'reco',   label: 'Recomendado',            icon: 'assets/img/recomaq.png' },
+    { key: 'tractor',label: 'Tractores',              icon: 'assets/img/tractor.png' },
+    { key: 'riego',  label: 'Riego',                  icon: 'assets/img/riego.png' },
+    { key: 'dron',   label: 'Drones agrícolas',       icon: 'assets/img/dron.png' },
+    { key: 'fumi',   label: 'Fumigación / Mochilas',  icon: 'assets/img/fumi.png' },
+    { key: 'herra',  label: 'Herramientas',           icon: 'assets/img/tools.png' },
+    { key: 'repu',   label: 'Repuestos',              icon: 'assets/img/rep.png' },
+    { key: 'seg',    label: 'Seguridad',              icon: 'assets/img/seg.png' },
   ];
   active = 'reco';
 

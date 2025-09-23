@@ -51,10 +51,7 @@
 
       <div class="info">
         <!-- CLICK EN TÍTULO -> detalle -->
-        <a class="title-link" [routerLink]="['/producto', p.id]">
-          <h3 class="title">{{ p.title }}</h3>
-        </a>
-
+        <h3 class="title">{{ p.title }}</h3>
         <div class="price-row">
           <div class="price-now">{{ money(p.price) }}</div>
           <div class="price-before" *ngIf="p.compareAt">{{ money(p.compareAt) }}</div>
