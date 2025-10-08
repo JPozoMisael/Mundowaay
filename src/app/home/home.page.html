@@ -1,95 +1,125 @@
 <ion-header collapse="condense"></ion-header>
 
 <ion-content [fullscreen]="true" class="mw-home">
-  <!-- 🔹 HERO / SLIDER -->
-  <section class="hero">
-    <div class="container hero-inner">
-      <!-- Botón anterior -->
-      <button class="arrow left" aria-label="Anterior" (click)="prevSlide()">
+
+  <!-- ========================= -->
+  <!-- 🌀 ESTADOS DE CARGA / ERROR -->
+  <!-- ========================= -->
+
+  <!-- Spinner mientras carga -->
+  <div class="loading-container" *ngIf="loading && !error">
+    <ion-spinner name="crescent" color="primary"></ion-spinner>
+    <p>Cargando productos...</p>
+  </div>
+
+  <!-- Mensaje de error -->
+  <div class="error-container" *ngIf="error">
+    <ion-icon name="warning-outline" color="danger" size="large"></ion-icon>
+    <p>No se pudieron cargar los productos.</p>
+    <ion-button fill="outline" color="primary" (click)="refreshProducts()">Reintentar</ion-button>
+  </div>
+
+  <!-- ========================= -->
+  <!-- 🖼️ CONTENIDO PRINCIPAL -->
+  <!-- ========================= -->
+
+  <ng-container *ngIf="!loading && !error">
+    
+    <!-- Caso sin productos -->
+    <div class="empty-container" *ngIf="!products?.length">
+      <ion-icon name="cube-outline" color="medium" size="large"></ion-icon>
+      <p>No hay productos disponibles por el momento.</p>
+      <ion-button fill="outline" color="primary" (click)="refreshProducts()">Actualizar</ion-button>
+    </div>
+
+    <!-- HERO / SLIDER -->
+    <section class="hero" *ngIf="products?.length">
+      <div class="container hero-inner">
+        <button class="arrow left" aria-label="Anterior" (click)="prevSlide()">
+          <ion-icon name="chevron-back-outline"></ion-icon>
+        </button>
+
+        <div class="hero-art" [style.background]="slides[currentSlide].color">
+          <h2>{{ slides[currentSlide].text }}</h2>
+        </div>
+
+        <button class="arrow right" aria-label="Siguiente" (click)="nextSlide()">
+          <ion-icon name="chevron-forward-outline"></ion-icon>
+        </button>
+      </div>
+    </section>
+
+    <!-- 🔹 Tarjetas dinámicas -->
+    <section class="container cards" *ngIf="topCards?.length">
+      <article class="card" *ngFor="let c of topCards" [class.card-mini]="c.multi">
+        <h3>{{ c.title }}</h3>
+
+        <!-- Caso multi-grid -->
+        <div *ngIf="c.multi; else singleCard" class="mini-grid">
+          <div class="mini-item" *ngFor="let i of c.imgs" [routerLink]="c.link">
+            <img *ngIf="i.src" [src]="i.src" [alt]="i.alt || 'Imagen'" loading="lazy" />
+            <span>{{ i.alt }}</span>
+          </div>
+        </div>
+
+        <!-- Caso normal -->
+        <ng-template #singleCard>
+          <a [routerLink]="c.link">
+            <div class="card-img">
+              <img *ngIf="c.img" [src]="c.img" [alt]="c.title" loading="lazy" />
+            </div>
+          </a>
+        </ng-template>
+
+        <p>{{ c.desc }}</p>
+      </article>
+    </section>
+
+    <!-- 🔹 Tira horizontal -->
+    <section class="amz container amz-strip" *ngIf="stripItems?.length">
+      <div class="amz-head">
+        <h2>Más artículos por considerar</h2>
+        <a class="more" routerLink="/recs">Ver más</a>
+      </div>
+
+      <button class="nav left" (click)="scrollStrip(-1)" aria-label="Anterior">
         <ion-icon name="chevron-back-outline"></ion-icon>
       </button>
 
-      <!-- Contenido dinámico -->
-      <div class="hero-art" [style.background]="slides[currentSlide].color">
-        <h2>{{ slides[currentSlide].text }}</h2>
-      </div>
-
-      <!-- Botón siguiente -->
-      <button class="arrow right" aria-label="Siguiente" (click)="nextSlide()">
-        <ion-icon name="chevron-forward-outline"></ion-icon>
-      </button>
-    </div>
-  </section>
-
-  <!-- 🔹 Tarjetas dinámicas -->
-  <section class="container cards">
-    <article class="card" *ngFor="let c of topCards" [class.card-mini]="c.multi">
-      <h3>{{ c.title }}</h3>
-
-      <!-- Caso multi-grid -->
-      <div *ngIf="c.multi; else singleCard" class="mini-grid">
-        <div class="mini-item" *ngFor="let i of c.imgs" [routerLink]="c.link">
-          <img [src]="i.src" [alt]="i.alt"/>
-          <span>{{ i.alt }}</span>
+      <div class="strip" #stripEl>
+        <div class="item" *ngFor="let it of stripItems" [routerLink]="it.link">
+          <img *ngIf="it.img" [src]="it.img" [alt]="it.title" loading="lazy" />
+          <p>{{ it.title }}</p>
         </div>
       </div>
 
-      <!-- Caso normal -->
-      <ng-template #singleCard>
-        <a [routerLink]="c.link">
-          <div class="card-img">
-            <img [src]="c.img" [alt]="c.title"/>
-          </div>
-        </a>
-      </ng-template>
+      <button class="nav right" (click)="scrollStrip(1)" aria-label="Siguiente">
+        <ion-icon name="chevron-forward-outline"></ion-icon>
+      </button>
+    </section>
 
-      <p>{{ c.desc }}</p>
-    </article>
-  </section>
+    <div style="height:28px;"></div>
 
-  <!-- 🔹 Tira horizontal -->
-  <section class="amz container amz-strip">
-    <div class="amz-head">
-      <h2>Más artículos por considerar</h2>
-      <a class="more" routerLink="/recs">Ver más</a>
-    </div>
+    <!-- 🔹 Bloques mosaico -->
+    <section class="amz container amz-tiles" *ngIf="tiles?.length">
+      <article class="tile" *ngFor="let s of tiles">
+        <header>
+          <h3>{{ s.title }}</h3>
+        </header>
 
-    <button class="nav left" (click)="scrollStrip(-1)" aria-label="Anterior">
-      <ion-icon name="chevron-back-outline"></ion-icon>
-    </button>
+        <div class="quad">
+          <a *ngFor="let img of s.imgs" [routerLink]="s.link">
+            <img *ngIf="img.src" [src]="img.src" [alt]="img.alt || 'Imagen'" loading="lazy" />
+            <span>{{ img.alt }}</span>
+          </a>
+        </div>
 
-    <div class="strip" #stripEl>
-      <div class="item" *ngFor="let it of stripItems" [routerLink]="it.link">
-        <img [src]="it.img" [alt]="it.title" loading="lazy" />
-      </div>
-    </div>
+        <footer>
+          <a class="more" [routerLink]="s.link">{{ s.cta || 'Ver más' }}</a>
+        </footer>
+      </article>
+    </section>
 
-    <button class="nav right" (click)="scrollStrip(1)" aria-label="Siguiente">
-      <ion-icon name="chevron-forward-outline"></ion-icon>
-    </button>
-  </section>
-
-  <div style="height:28px;"></div>
-
-  <!-- 🔹 Bloques mosaico -->
-  <section class="amz container amz-tiles">
-    <article class="tile" *ngFor="let s of tiles">
-      <header>
-        <h3>{{ s.title }}</h3>
-      </header>
-
-      <div class="quad">
-        <a *ngFor="let img of s.imgs" [routerLink]="s.link">
-          <img [src]="img.src" [alt]="img.alt" loading="lazy" />
-          <span>{{ img.alt }}</span>
-        </a>
-      </div>
-
-      <footer>
-        <a class="more" [routerLink]="s.link">{{ s.cta || 'Ver más' }}</a>
-      </footer>
-    </article>
-  </section>
-
-  <app-footer></app-footer>
+    <app-footer></app-footer>
+  </ng-container>
 </ion-content>

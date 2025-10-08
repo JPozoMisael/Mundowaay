@@ -1,0 +1,57 @@
+.mw-faq {
+  --ion-background-color: #f6f7f8;
+
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 24px 16px;
+  }
+
+  h1 {
+    font-size: 22px;
+    font-weight: 700;
+    color: #222;
+    margin: 0 0 24px;
+    text-align: center;
+  }
+
+  ion-accordion-group {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  ion-accordion {
+    border-radius: 10px;
+    border: 1px solid #eee;
+    overflow: hidden;
+    background: #fff;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+
+    ion-item {
+      --background: #fff;
+      --color: #222;
+      font-weight: 600;
+
+      ion-icon {
+        color: #ff4d2d;
+        margin-right: 8px;
+      }
+    }
+
+    .content {
+      padding: 16px;
+      font-size: 14px;
+      color: #555;
+      background: #fff;
+    }
+  }
+
+  ion-accordion::part(header) {
+    transition: background 0.2s;
+  }
+
+  ion-accordion[expanded]::part(header) {
+    background: #fff1ef;
+  }
+}

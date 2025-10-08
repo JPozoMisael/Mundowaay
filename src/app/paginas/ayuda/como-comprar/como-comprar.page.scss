@@ -1,0 +1,97 @@
+.mw-como-comprar {
+  --ion-background-color: #f6f7f8;
+
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 24px 16px;
+  }
+
+  /* Título */
+  h1 {
+    font-size: 22px;
+    font-weight: 700;
+    color: #222;
+    margin: 0 0 24px;
+    text-align: center;
+  }
+
+  /* Lista de pasos */
+  .steps {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .step {
+    background: #fff;
+    border-radius: 10px;
+    padding: 18px;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+    border: 1px solid #eee;
+    transition: transform 0.2s;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+
+    ion-icon {
+      font-size: 24px;
+      color: #ff4d2d;
+      background: #fff1ef;
+      padding: 10px;
+      border-radius: 8px;
+      flex-shrink: 0;
+    }
+
+    .text {
+      flex: 1;
+
+      h2 {
+        font-size: 16px;
+        font-weight: 600;
+        margin: 0 0 6px;
+        color: #222;
+      }
+
+      p {
+        margin: 0;
+        font-size: 14px;
+        color: #555;
+      }
+    }
+  }
+
+  /* Nota final */
+  .note {
+    margin-top: 24px;
+    font-size: 13px;
+    text-align: center;
+    color: #666;
+
+    strong {
+      color: #222;
+    }
+
+    a {
+      color: #ff4d2d;
+      font-weight: 600;
+      text-decoration: none;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .steps {
+      flex-direction: row;
+      flex-wrap: wrap;
+    }
+
+    .step {
+      width: calc(50% - 8px);
+    }
+  }
+}

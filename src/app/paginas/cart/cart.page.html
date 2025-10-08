@@ -39,13 +39,13 @@
             </ion-label>
 
             <div class="qty-controls" slot="end">
-              <ion-button size="small" fill="clear" (click)="dec(p.id)">
+              <ion-button size="small" fill="clear" (click)="dec(p.id, p.qty)">
                 <ion-icon name="remove-outline"></ion-icon>
               </ion-button>
 
               <span>{{ p.qty || 1 }}</span>
 
-              <ion-button size="small" fill="clear" (click)="inc(p.id)">
+              <ion-button size="small" fill="clear" (click)="inc(p.id, p.qty)">
                 <ion-icon name="add-outline"></ion-icon>
               </ion-button>
 

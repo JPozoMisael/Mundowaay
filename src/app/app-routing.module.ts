@@ -55,6 +55,74 @@ const routes: Routes = [
     path: 'producto/:id',
     loadChildren: () => import('./paginas/producto/producto.module').then( m => m.ProductoPageModule)
   },
+  {
+    path: 'quienes-somos',
+    loadChildren: () => import('./paginas/corp/quienes-somos/quienes-somos.module').then( m => m.QuienesSomosPageModule)
+  },
+  {
+    path: 'mision-vision',
+    loadChildren: () => import('./paginas/corp/mision-vision/mision-vision.module').then( m => m.MisionVisionPageModule)
+  },
+  {
+    path: 'iyd',
+    loadChildren: () => import('./paginas/corp/iyd/iyd.module').then( m => m.IydPageModule)
+  },
+  {
+    path: 'sostenibilidad',
+    loadChildren: () => import('./paginas/corp/sostenibilidad/sostenibilidad.module').then( m => m.SostenibilidadPageModule)
+  },
+  {
+    path: 'prensa',
+    loadChildren: () => import('./paginas/corp/prensa/prensa.module').then( m => m.PrensaPageModule)
+  },
+  {
+    path: 'como-comprar',
+    loadChildren: () => import('./paginas/ayuda/como-comprar/como-comprar.module').then( m => m.ComoComprarPageModule)
+  },
+  {
+    path: 'metodos-de-pago',
+    loadChildren: () => import('./paginas/ayuda/metodos-de-pago/metodos-de-pago.module').then( m => m.MetodosDePagoPageModule)
+  },
+  {
+    path: 'envios',
+    loadChildren: () => import('./paginas/ayuda/envios/envios.module').then( m => m.EnviosPageModule)
+  },
+  {
+    path: 'garantia',
+    loadChildren: () => import('./paginas/ayuda/garantia/garantia.module').then( m => m.GarantiaPageModule)
+  },
+  {
+    path: 'politica-devoluciones',
+    loadChildren: () => import('./paginas/ayuda/politica-devoluciones/politica-devoluciones.module').then( m => m.PoliticaDevolucionesPageModule)
+  },
+  {
+    path: 'faq',
+    loadChildren: () => import('./paginas/ayuda/faq/faq.module').then( m => m.FaqPageModule)
+  },
+  {
+    path: 'terminos-condiciones',
+    loadChildren: () => import('./paginas/ayuda/terminos-condiciones/terminos-condiciones.module').then( m => m.TerminosCondicionesPageModule)
+  },
+  {
+    path: 'politica-privacidad',
+    loadChildren: () => import('./paginas/ayuda/politica-privacidad/politica-privacidad.module').then( m => m.PoliticaPrivacidadPageModule)
+  },
+  {
+    path: 'formulario',
+    loadChildren: () => import('./paginas/contacto/formulario/formulario.module').then( m => m.FormularioPageModule)
+  },
+  {
+    path: 'sucursales',
+    loadChildren: () => import('./paginas/contacto/sucursales/sucursales.module').then( m => m.SucursalesPageModule)
+  },
+  {
+    path: 'soporte',
+    loadChildren: () => import('./paginas/contacto/soporte/soporte.module').then( m => m.SoportePageModule)
+  },
+  {
+    path: 'login',
+    loadChildren: () => import('./paginas/login/login.module').then( m => m.LoginPageModule)
+  },
   
 ];
 

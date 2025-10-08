@@ -1,14 +1,21 @@
 <ion-header collapse="condense">
-  <ion-toolbar><ion-title>Resultados</ion-title></ion-toolbar>
+  <ion-toolbar>
+    <ion-title>Resultados</ion-title>
+  </ion-toolbar>
 </ion-header>
 
 <ion-content class="mw-search">
   <div class="container">
+    <!-- Resumen -->
     <div class="summary">
-      <h2>Resultados para “{{ q || '...' }}” <small *ngIf="cat">en {{ cat }}</small></h2>
+      <h2>
+        Resultados para “{{ q || '...' }}”
+        <small *ngIf="cat">en {{ cat }}</small>
+      </h2>
       <button *ngIf="q || cat" class="clear" (click)="clear()">Limpiar</button>
     </div>
 
+    <!-- Skeleton loading -->
     <div *ngIf="loading" class="grid">
       <ion-card class="skeleton" *ngFor="let i of [1,2,3,4,5,6,7,8]">
         <ion-skeleton-text animated style="width:100%; height:140px;"></ion-skeleton-text>
@@ -19,23 +26,34 @@
       </ion-card>
     </div>
 
+    <!-- Sin resultados -->
     <div *ngIf="!loading && total===0" class="empty">
       <ion-icon name="search-outline"></ion-icon>
       <h3>Sin coincidencias</h3>
       <p>Prueba con términos generales: “semilla”, “maíz”, “foliar”…</p>
     </div>
 
+    <!-- Resultados -->
     <div *ngIf="!loading && total>0" class="grid">
       <ion-card class="item" *ngFor="let p of results" (click)="open(p)">
-        <div class="thumb" [style.backgroundImage]="'url(' + (p.image || 'assets/placeholder.png') + ')'">
+        <div class="thumb" 
+             [style.backgroundImage]="'url(' + (p.imageUrl || 'assets/img/placeholder.png') + ')'">
           <div class="badge pct" *ngIf="hasDiscount(p)">-{{ pct(p) }}%</div>
         </div>
+
         <ion-card-content>
-          <div class="chips"><span class="chip">{{ p.category }}</span></div>
+          <div class="chips">
+            <span class="chip">{{ p.category || 'General' }}</span>
+          </div>
           <h4 [innerHTML]="p.title"></h4>
+
           <div class="price">
-            <span class="now" *ngIf="p.price != null">{{ p.price | currency:'USD':'symbol':'1.2-2' }}</span>
-            <span class="compare" *ngIf="hasDiscount(p)">{{ p.compareAt | currency:'USD':'symbol':'1.2-2' }}</span>
+            <span class="now" *ngIf="p.price != null">
+              {{ p.price | currency:'USD':'symbol':'1.2-2' }}
+            </span>
+            <span class="compare" *ngIf="hasDiscount(p)">
+              {{ p.compareAt | currency:'USD':'symbol':'1.2-2' }}
+            </span>
           </div>
         </ion-card-content>
       </ion-card>

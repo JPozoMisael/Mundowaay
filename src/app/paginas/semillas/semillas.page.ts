@@ -1,16 +1,13 @@
-import { Component, ViewChild, ElementRef, OnInit, OnDestroy } from '@angular/core';
+import { Component, ViewChild, ElementRef, OnInit } from '@angular/core';
 import { InfiniteScrollCustomEvent, ToastController } from '@ionic/angular';
 import { CartService } from 'src/app/servicios/cart';
-import { CatalogoBus, CatalogItem } from 'src/app/servicios/catalogo-bus';
+import { ProductsService, Product } from 'src/app/servicios/products';
 
-type Product = {
-  id: string;
-  title: string;
-  image: string;
-  price: number;
+// Extiende Product con campos visuales
+type LocalProduct = Product & {
   compareAt?: number;
-  rating: number;
-  reviews: number;
+  rating?: number;
+  reviews?: number;
   sold?: string;
   promo?: string;
   badge?: string;
@@ -24,196 +21,240 @@ type Product = {
   styleUrls: ['./semillas.page.scss'],
   standalone: false,
 })
-export class SemillasPage implements OnInit, OnDestroy {
+export class SemillasPage implements OnInit {
+  // ===== Pills =====
   pills = [
-    { key: 'tendencia',  label: 'Ofertas de tendencia' },
-    { key: 'relampago',  label: 'Ofertas relámpago' },
-    { key: 'favoritos',  label: 'Favoritos de los clientes' },
-    { key: 'rendimiento',label: 'Alto rendimiento' },
-    { key: 'organico',   label: 'Orgánico' },
-    { key: 'trazabilidad',label:'Trazabilidad certificada' },
-    { key: 'nueva',      label: 'Nuevas variedades' },
+    { key: 'tendencia', label: 'Ofertas de tendencia' },
+    { key: 'relampago', label: 'Ofertas relámpago' },
+    { key: 'favoritos', label: 'Favoritos de los clientes' },
+    { key: 'rendimiento', label: 'Alto rendimiento' },
+    { key: 'organico', label: 'Orgánico' },
+    { key: 'trazabilidad', label: 'Trazabilidad certificada' },
+    { key: 'nueva', label: 'Nuevas variedades' },
   ];
-  activePill: string = 'tendencia';
+  activePill = 'tendencia';
 
+  // ===== Chips =====
   chips = [
-    { key: 'reco',  label: 'Recomendado', icon: 'assets/img/reco.png' },
-    { key: 'maiz',  label: 'Maíz',        icon: 'assets/img/maiz.png' },
-    { key: 'arroz', label: 'Arroz',       icon: 'assets/img/arroz.png' },
-    { key: 'trigo', label: 'Trigo',       icon: 'assets/img/trigo.png' },
-    { key: 'soja',  label: 'Soja',        icon: 'assets/img/soja.png' },
-    { key: 'hort',  label: 'Hortalizas',  icon: 'assets/img/hort.png' },
+    { key: 'reco', label: 'Recomendado', icon: 'assets/img/reco.png' },
+    { key: 'maiz', label: 'Maíz', icon: 'assets/img/maiz.png' },
+    { key: 'arroz', label: 'Arroz', icon: 'assets/img/arroz.png' },
+    { key: 'trigo', label: 'Trigo', icon: 'assets/img/trigo.png' },
+    { key: 'soja', label: 'Soja', icon: 'assets/img/soja.png' },
+    { key: 'hort', label: 'Hortalizas', icon: 'assets/img/hort.png' },
   ];
   active = 'reco';
 
   @ViewChild('pillScroll', { static: false }) pillScroll?: ElementRef<HTMLDivElement>;
 
-  private usingBus = false;
   private firstPage = 20;
-  private pageSize  = 18;
+  private pageSize = 18;
 
-  all: Product[] = [];
-  private sorted: Product[] = [];
-  list: Product[] = [];
-
-  private pollId?: any;
-  private pollCount = 0;
+  all: LocalProduct[] = [];
+  private sorted: LocalProduct[] = [];
+  list: LocalProduct[] = [];
 
   constructor(
     private cartSvc: CartService,
     private toastCtrl: ToastController,
-    private catalog: CatalogoBus
+    private productsSvc: ProductsService
   ) {}
 
   ngOnInit() {
-    this.pullFromBus();
-    this.startPollingForBus();
+    console.log('[SemillasPage] Iniciando carga de productos...');
+    this.loadProducts();
   }
-  ngOnDestroy() { this.stopPolling(); }
 
-  private pullFromBus() {
-    const { items } = this.catalog.search('', { cat: 'semillas', limit: 300 });
+  // 🚀 Cargar productos desde backend
+  private loadProducts() {
+    console.log('[SemillasPage] Solicitando colección "semillas" desde API...');
 
-    // 🔎 Debug detallado
-    console.log('🌽 [SemillasPage] Items crudos del CatalogoBus:');
-    items.forEach(p => {
-      console.log({
-        id: p.id,
-        title: p.title,
-        price: p.price,
-        compareAt: p.compareAt,
-      });
+    this.productsSvc.getByCollection('semillas').subscribe({
+      next: (items) => {
+        console.log(`[SemillasPage] Productos recibidos de la colección SEMILLAS: ${items.length}`);
+
+        this.all = items
+          .filter((p) => p.imageUrl && !p.imageUrl.includes('placeholder'))
+          .map((p) => this.mapToLocal(p));
+
+        if (!this.all.length) {
+          console.warn('⚠️ No se encontraron productos en la colección SEMILLAS. Se usa mock temporal.');
+          this.all = this.mock(12);
+        }
+
+        this.rebuildSortedAndSlice();
+      },
+      error: (err) => {
+        console.error('[SemillasPage] Error cargando colección SEMILLAS:', err);
+        this.all = this.mock(12);
+        this.rebuildSortedAndSlice();
+      },
     });
-
-    if (items.length) {
-      this.usingBus = true;
-      this.all = items.map((p: CatalogItem) => ({
-        id: p.id,
-        title: p.title,
-        image: p.image || 'assets/img/placeholder.png',
-        price: p.price ?? 0,                  // precio final (oferta si aplica)
-        compareAt: p.compareAt ?? undefined,  // precio original (tachado)
-        rating: p.rating ?? 4,
-        reviews: p.reviews ?? 0,
-        sold: p.sold,
-        promo: p.promo,
-        badge: p.badge,
-        category: p.category ?? 'semillas',
-        tags: p.tags ?? [],
-      }));
-
-      console.log('✅ [SemillasPage] Items mapeados a this.all:', this.all);
-    } else if (!this.all.length) {
-      this.all = this.mock(12);
-    }
-    this.rebuildSortedAndSlice();
   }
 
+  // 🧩 Adaptar producto al modelo local
+  private mapToLocal(p: Product): LocalProduct {
+    return {
+      ...p,
+      price: p.price ?? 0,
+      compareAt: p.compareAt,
+      rating: Math.floor(Math.random() * 2) + 4,
+      reviews: Math.floor(Math.random() * 500),
+      sold: '',
+      promo: '',
+      badge: '',
+      category: 'semillas',
+      tags: p.tags || [],
+    };
+  }
+
+  // ===== Orden y slice =====
   private rebuildSortedAndSlice() {
-    const base = this.active === 'reco' ? [...this.all] : this.all.filter(p => p.category === this.active);
+    const base =
+      this.active === 'reco'
+        ? [...this.all]
+        : this.all.filter((p) => (p.category ?? '').toLowerCase().includes(this.active));
+
     let src = [...base];
 
     switch (this.activePill) {
       case 'relampago':
-        src = src.filter(p => !!p.compareAt);
-        src.sort((a,b) => (this.offPct(b) - this.offPct(a)) || a.title.localeCompare(b.title) || a.id.localeCompare(b.id));
+        src = src.filter((p) => !!p.compareAt);
         break;
       case 'favoritos':
-        src.sort((a,b) => (b.reviews - a.reviews) || (b.rating - a.rating) || a.title.localeCompare(b.title) || a.id.localeCompare(b.id));
+        src.sort((a, b) => (b.reviews! - a.reviews!) || (b.rating! - a.rating!));
         break;
       case 'tendencia':
-        src.sort((a,b) => (this.score(b) - this.score(a)) || a.title.localeCompare(b.title) || a.id.localeCompare(b.id));
+        src.sort((a, b) => this.score(b) - this.score(a));
         break;
-      case 'organico':      src = src.filter(p => (p.tags||[]).includes('organico')); break;
-      case 'rendimiento':   src = src.filter(p => (p.tags||[]).includes('rendimiento')); break;
-      case 'trazabilidad':  src = src.filter(p => (p.tags||[]).includes('trazabilidad')); break;
-      case 'nueva':         src = src.filter(p => (p.tags||[]).includes('nuevo')); break;
+      case 'organico':
+        src = src.filter((p) => (p.tags || []).includes('organico'));
+        break;
+      case 'rendimiento':
+        src = src.filter((p) => (p.tags || []).includes('rendimiento'));
+        break;
+      case 'trazabilidad':
+        src = src.filter((p) => (p.tags || []).includes('trazabilidad'));
+        break;
+      case 'nueva':
+        src = src.filter((p) => (p.tags || []).includes('nuevo'));
+        break;
     }
 
     if (!src.length && base.length) {
-      src = base.slice().sort((a,b) => (this.score(b) - this.score(a)) || a.title.localeCompare(b.title) || a.id.localeCompare(b.id));
+      src = base.slice().sort((a, b) => this.score(b) - this.score(a));
     }
 
     this.sorted = src;
     this.list = this.sorted.slice(0, this.firstPage);
+    console.log(`[SemillasPage] Mostrando ${this.list.length}/${this.sorted.length} productos.`);
   }
 
-  selectPill(key: string) { this.activePill = key; this.rebuildSortedAndSlice(); }
-  filter(key: string) { this.active = key; this.rebuildSortedAndSlice(); }
+  // ===== UI =====
+  selectPill(key: string) {
+    this.activePill = key;
+    this.rebuildSortedAndSlice();
+  }
+
+  filter(key: string) {
+    this.active = key;
+    this.rebuildSortedAndSlice();
+  }
 
   scrollPills(dir: number) {
-    const el = this.pillScroll?.nativeElement; if (!el) return;
+    const el = this.pillScroll?.nativeElement;
+    if (!el) return;
     el.scrollBy({ left: dir * el.clientWidth * 0.8, behavior: 'smooth' });
   }
 
+  // ===== Infinite Scroll =====
   loadMore(ev: Event) {
-    if (this.usingBus) {
-      const nextLen = Math.min(this.sorted.length, this.list.length + this.pageSize);
-      this.list = this.sorted.slice(0, nextLen);
-      const target = (ev as InfiniteScrollCustomEvent).target as any;
-      if (this.list.length >= this.sorted.length) target.disabled = true;
-      (ev as InfiniteScrollCustomEvent).target.complete();
-      return;
-    }
-
-    const extra = this.mock(this.pageSize);
-    this.all = [...this.all, ...extra];
-    this.sorted = [...this.sorted, ...extra];
-    this.list = this.sorted.slice(0, this.list.length + this.pageSize);
-    (ev as InfiniteScrollCustomEvent).target.complete();
+    const nextLen = Math.min(this.sorted.length, this.list.length + this.pageSize);
+    this.list = this.sorted.slice(0, nextLen);
+    const target = (ev as InfiniteScrollCustomEvent).target as any;
+    if (this.list.length >= this.sorted.length) target.disabled = true;
+    target.complete();
   }
 
-  money(n: number) { return `$${(n || 0).toFixed(2)}`; }
-  offPct(p: Product) { if (!p.compareAt || p.compareAt <= p.price) return 0; return Math.round(((p.compareAt - p.price) / p.compareAt) * 100); }
-  discount(p: Product) { const pct = this.offPct(p); return pct > 0 ? `-${pct}%` : ''; }
-  score(p: Product) { const rr = p.rating * 100 + p.reviews; const hasDiscount = !!p.compareAt && p.compareAt > p.price; return rr + (hasDiscount ? 150 : 0); }
+  // ===== Helpers =====
+  money(n: number) {
+    return `$${(n || 0).toFixed(2)}`;
+  }
 
-  async addToCart(p: Product) {
-    this.cartSvc.add({ id: p.id, title: p.title, price: p.price, image: p.image }, 1);
-    const t = await this.toastCtrl.create({ message: 'Añadido al carrito', duration: 1200, color: 'success', position: 'top', icon: 'cart-outline' });
+  offPct(p: LocalProduct) {
+    if (!p.compareAt || p.compareAt <= (p.price ?? 0)) return 0;
+    return Math.round(((p.compareAt - (p.price ?? 0)) / p.compareAt) * 100);
+  }
+
+  discount(p: LocalProduct) {
+    const pct = this.offPct(p);
+    return pct > 0 ? `-${pct}%` : '';
+  }
+
+  score(p: LocalProduct) {
+    const rr = (p.rating ?? 0) * 100 + (p.reviews ?? 0);
+    const hasDiscount = !!p.compareAt && p.compareAt > (p.price ?? 0);
+    return rr + (hasDiscount ? 150 : 0);
+  }
+
+  // ===== Carrito =====
+  async addToCart(p: LocalProduct) {
+    this.cartSvc
+      .add(
+        {
+          id: p.id,
+          title: p.title,
+          price: p.price ?? 0,
+          image: p.imageUrl || 'assets/img/placeholder.png',
+        },
+        1
+      )
+      .subscribe();
+
+    const t = await this.toastCtrl.create({
+      message: 'Semilla añadida al carrito',
+      duration: 1200,
+      color: 'success',
+      position: 'top',
+      icon: 'cart-outline',
+    });
     await t.present();
   }
 
-  private mock(n: number): Product[] {
-    const cats = ['maiz','arroz','trigo','soja','hort'];
-    const tagsPool = ['organico','rendimiento','trazabilidad','nuevo'];
+  trackById(index: number, item: any): string {
+    return item?.id || index.toString();
+  }
+
+  // ===== Mock temporal =====
+  private mock(n: number): LocalProduct[] {
+    const cats = ['maiz', 'arroz', 'trigo', 'soja', 'hort'];
+    const tagsPool = ['organico', 'rendimiento', 'trazabilidad', 'nuevo'];
     const promos = ['Tiempo limitado', 'Últimos 2 días', ''];
+
     return Array.from({ length: n }).map((_, i) => {
       const id = `S-${Date.now()}-${i}`;
       const base = 5 + Math.random() * 60;
       const hasCompare = Math.random() > 0.25;
-      const rating = Math.floor(Math.random()*2) + 4;
-      const sold = Math.random() > 0.5 ? `${(Math.floor(Math.random()*19)+1)}K+` : '';
-      const tcount = Math.random()>0.6 ? 2 : 1;
-      const tsel = Array.from({length:tcount}).map(() => tagsPool[Math.floor(Math.random()*tagsPool.length)]);
+
       return {
         id,
-        title: ['Semilla Híbrida', 'Semilla Certificada', 'Semilla Tratada'][i%3] + ' ' + (100 + i),
-        image: `https://picsum.photos/seed/${id}/640/640`,
+        title:
+          ['Semilla Híbrida', 'Semilla Certificada', 'Semilla Tratada'][i % 3] +
+          ' ' +
+          (100 + i),
+        imageUrl: `https://picsum.photos/seed/${id}/640/640`,
         price: Number(base.toFixed(2)),
-        compareAt: hasCompare ? Number((base + (Math.random()*15+6)).toFixed(2)) : undefined,
-        rating,
-        reviews: Math.floor(Math.random()*5000),
-        sold,
+        compareAt: hasCompare
+          ? Number((base + (Math.random() * 15 + 6)).toFixed(2))
+          : undefined,
+        rating: Math.floor(Math.random() * 2) + 4,
+        reviews: Math.floor(Math.random() * 5000),
+        sold: Math.random() > 0.5 ? `${Math.floor(Math.random() * 19) + 1}K+` : '',
         promo: promos[i % promos.length],
-        badge: Math.random() > 0.7 ? 'Orgánico' : (Math.random() > 0.7 ? 'Local' : ''),
+        badge: Math.random() > 0.7 ? 'Orgánico' : '',
         category: cats[i % cats.length],
-        tags: tsel,
+        tags: [tagsPool[Math.floor(Math.random() * tagsPool.length)]],
       };
     });
-  }
-
-  private startPollingForBus() {
-    this.stopPolling();
-    this.pollCount = 0;
-    this.pollId = setInterval(() => {
-      this.pollCount++;
-      const had = this.catalog.listAll().length > 0;
-      this.pullFromBus();
-      if (had || this.pollCount >= 8) this.stopPolling();
-    }, 800);
-  }
-  private stopPolling() {
-    if (this.pollId) { clearInterval(this.pollId); this.pollId = undefined; }
   }
 }

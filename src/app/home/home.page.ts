@@ -1,15 +1,7 @@
 import { Component, OnInit, OnDestroy, ElementRef, ViewChild } from '@angular/core';
-import { CatalogoBus, CatalogItem } from 'src/app/servicios/catalogo-bus';
-
-type Product = {
-  id: string;
-  title: string;
-  image: string;
-  price: number;
-  compareAt?: number;
-  rating: number;
-  reviews: number;
-};
+import { ProductsService, Product } from '../servicios/products';
+import { CartService } from '../servicios/cart';
+import { Subscription } from 'rxjs';
 
 type Tile = {
   title: string;
@@ -48,52 +40,57 @@ export class HomePage implements OnInit, OnDestroy {
   topCards: TopCard[] = [];
   stripItems: StripItem[] = [];
 
-  // 🔹 Slider Hero
-  slides = [
-    { text: 'Compra fácil y seguro', color: '#d9a320' },   // amarillo
-    { text: 'Tecnología confiable', color: '#2f72c9' },    // azul
-    { text: 'Aliado del agricultor', color: '#16a085' },   // verde
-    { text: 'Productos de calidad', color: '#e74c3c' }     // rojo
-  ];
-  currentSlide = 0;
-  private slideInterval?: any;
-
-  private page = 0;
-  private pollId?: any;
-  private pollCount = 0;
+  loading = false;
+  error = false;
+  private subs: Subscription[] = [];
   private usedIds = new Set<string>();
+  private slideInterval?: any;
+  currentSlide = 0;
 
+  // 🎞️ Slider Hero
+  slides = [
+    { text: 'Compra fácil y seguro', color: '#d9a320' },
+    { text: 'Tecnología confiable', color: '#2f72c9' },
+    { text: 'Aliado del agricultor', color: '#16a085' },
+    { text: 'Productos de calidad', color: '#e74c3c' }
+  ];
+
+  // Configuraciones de secciones
   private readonly topCfg = [
-    { title: 'Cosecha más eficiente', query: 'maquinaria', desc: 'Tecnología agrícola de alto rendimiento', link: '/maquinaria'},
-    { title: 'Nutrición Foliar', query: 'foliar', desc: 'Fertilizantes para un crecimiento rápido' , link: '/nutricion'},
-    { title: 'Comienza desde la raíz', query: 'semilla', desc: 'Protección contra plagas' , link: '/semillas'},
-    { title: 'Productos esenciales para el agricultor', query: 'maquinaria', multi: true, desc: 'Explora todos los productos', link: '/maquinaria'},
+    { title: 'Cosecha más eficiente', query: 'maquinaria', desc: 'Tecnología agrícola de alto rendimiento', link: '/maquinaria' },
+    { title: 'Nutrición Foliar', query: 'foliar', desc: 'Fertilizantes para un crecimiento rápido', link: '/nutricion' },
+    { title: 'Comienza desde la raíz', query: 'semilla', desc: 'Protección contra plagas', link: '/semillas' },
+    { title: 'Productos esenciales para el agricultor', query: 'maquinaria', multi: true, desc: 'Explora todos los productos', link: '/maquinaria' },
   ];
 
   private readonly tileCfg = [
-    { title: 'Semillas destacadas',     link: '/semillas',     query: 'semilla',        cta: 'Ver más' },
-    { title: 'Control de insectos',     link: '/insecticidas', query: 'insecticida',    cta: 'Ver más' },
-    { title: 'Herbicidas populares',    link: '/herbicidas',   query: 'herbicida',      cta: 'Ver más' },
-    { title: 'Nutrición foliar y más',  link: '/nutricion',    query: 'foliar',         cta: 'Descubrir' },
+    { title: 'Semillas destacadas', link: '/semillas', query: 'semilla', cta: 'Ver más' },
+    { title: 'Control de insectos', link: '/insecticidas', query: 'insecticida', cta: 'Ver más' },
+    { title: 'Herbicidas populares', link: '/herbicidas', query: 'herbicida', cta: 'Ver más' },
+    { title: 'Nutrición foliar y más', link: '/nutricion', query: 'foliar', cta: 'Descubrir' },
   ];
 
-  constructor(private catalog: CatalogoBus) {}
+  constructor(
+    private productsService: ProductsService,
+    private cartService: CartService
+  ) {}
 
+  // ======================
+  // 🌅 Ciclo de vida
+  // ======================
   ngOnInit() {
-    this.refreshFromBus();
-    this.startPollingForBus();
-
-    // 🔹 Iniciar autoplay del slider
+    console.log('[HomePage] Solicitando productos desde el servicio...');
+    this.refreshProducts();
     this.startAutoSlide();
   }
 
-  ngOnDestroy() { 
-    this.stopPolling(); 
+  ngOnDestroy() {
     this.stopAutoSlide();
+    this.subs.forEach(s => s.unsubscribe());
   }
 
   // ======================
-  // 🎞️ HERO SLIDER
+  // 🎞️ Hero Slider
   // ======================
   nextSlide() {
     this.currentSlide = (this.currentSlide + 1) % this.slides.length;
@@ -105,9 +102,7 @@ export class HomePage implements OnInit, OnDestroy {
 
   startAutoSlide() {
     this.stopAutoSlide();
-    this.slideInterval = setInterval(() => {
-      this.nextSlide();
-    }, 5000); // cada 5 segundos
+    this.slideInterval = setInterval(() => this.nextSlide(), 5000);
   }
 
   stopAutoSlide() {
@@ -118,88 +113,112 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   // ======================
-  // 📦 REFRESH Y DATA
+  // 📦 Cargar productos
   // ======================
-  private refreshFromBus() {
-    const all = this.catalog.listAll();
+  refreshProducts() {
+    this.loading = true;
+    this.error = false;
 
-    if (all.length) {
-      const deals = all
-        .filter(p => (p.compareAt ?? 0) > (p.price ?? 0))
-        .sort((a, b) => this.offPct(b) - this.offPct(a))
-        .slice(0, 10)
-        .map(p => this.view(p));
+    const sub = this.productsService.listAll().subscribe({
+      next: all => {
+        this.loading = false;
 
-      const trending = all
-        .slice()
-        .sort((a, b) => this.score(b) - this.score(a))
-        .slice(0, 20)
-        .map(p => this.view(p));
+        if (!all?.length) {
+          this.error = true;
+          console.warn('⚠️ No se recibieron productos desde la API.');
+          return;
+        }
 
-      this.flashDeals = deals;
-      this.products  = trending;
+        console.log(`[HomePage] Productos recibidos: ${all.length}`);
 
-      this.usedIds.clear();
-      this.buildTopCards();
-      this.buildStrip();
-      this.buildTiles();
-      return;
-    }
+        // Filtrar solo productos con imagen real
+        const validProducts = all.filter(p => p.imageUrl && !p.imageUrl.includes('placeholder'));
 
-    // Mock si no hay data
-    this.flashDeals = this.mock(10);
-    this.products  = this.mock(20);
-    this.topCards  = this.mockTopCards();
-    this.stripItems = this.mockStrip(10);
-    this.buildTiles();
+        const deals = validProducts
+          .filter(p => (p.compareAt ?? 0) > (p.price ?? 0))
+          .sort((a, b) => this.offPct(b) - this.offPct(a))
+          .slice(0, 10);
+
+        const trending = validProducts
+          .slice()
+          .sort((a, b) => this.score(b) - this.score(a))
+          .slice(0, 20);
+
+        this.flashDeals = deals;
+        this.products = trending;
+        this.usedIds.clear();
+
+        this.buildTopCards(validProducts);
+        this.buildStrip(validProducts);
+        this.buildTiles(validProducts);
+
+        console.log(`[HomePage] Estructuras generadas: 
+          - TopCards: ${this.topCards.length} 
+          - StripItems: ${this.stripItems.length} 
+          - Tiles: ${this.tiles.length}`);
+      },
+      error: err => {
+        this.loading = false;
+        this.error = true;
+        console.error('❌ Error cargando productos:', err);
+      }
+    });
+
+    this.subs.push(sub);
   }
 
-  private view(p: CatalogItem): Product {
-    return {
-      id: p.id,
-      title: p.title,
-      image: p.image || 'assets/img/placeholder.png',
-      price: p.price ?? 0,
-      compareAt: p.compareAt,
-      rating: p.rating ?? 4,
-      reviews: p.reviews ?? 0,
+  // ======================
+  // 🛒 Añadir al carrito
+  // ======================
+  addToCart(product: Product) {
+    if (!product?.id) return;
+
+    const item = {
+      id: product.id,
+      title: product.title,
+      price: product.price ?? 0,
+      image: product.imageUrl ?? 'assets/img/placeholder.png',
+      qty: 1
     };
+
+    this.cartService.add(item).subscribe({
+      next: () => console.log(`🛒 Producto añadido: ${product.title}`),
+      error: err => console.error('❌ Error al añadir al carrito:', err)
+    });
   }
 
   // ======================
-  // 🔹 TOP CARDS
+  // 🔹 Top Cards
   // ======================
-  private buildTopCards() {
+  private buildTopCards(all: Product[]) {
     const result: TopCard[] = [];
 
     for (const cfg of this.topCfg) {
+      const items = all.filter(p => {
+        const q = cfg.query.toLowerCase();
+        return (
+          (p.title ?? '').toLowerCase().includes(q) ||
+          (p.tags || []).some(t => t.toLowerCase().includes(q)) ||
+          (p.category ?? '').toLowerCase().includes(q)
+        );
+      });
+
+      const valid = items.filter(p => p.imageUrl && !p.imageUrl.includes('placeholder'));
+
       if (cfg.multi) {
-        const items = this.catalog.search(cfg.query, { limit: 20 }).items;
-        const imgs: Array<{ src: string; alt: string }> = [];
-
-        for (const p of items) {
-          if (!p.image || this.usedIds.has(p.id)) continue;
-          this.usedIds.add(p.id);
-          imgs.push({
-            src: this.thumb(p.image, 300, 220), 
-            alt: this.creativeSubtitle(p.title)
-          });
-          if (imgs.length >= 4) break;
-        }
-
+        const imgs = valid.slice(0, 4).map(p => ({
+          src: p.imageUrl!,
+          alt: this.creativeSubtitle(p.title)
+        }));
         result.push({ title: cfg.title, imgs, desc: cfg.desc, multi: true, link: cfg.link });
       } else {
-        const items = this.catalog.search(cfg.query, { limit: 20 }).items;
-        let img = '';
-
-        for (const p of items) {
-          if (!p.image || this.usedIds.has(p.id)) continue;
-          this.usedIds.add(p.id);
-          img = this.thumb(p.image, 480, 360);
-          break;
-        }
-
-        result.push({ title: cfg.title, img, desc: cfg.desc, link: cfg.link });
+        const first = valid[0];
+        result.push({
+          title: cfg.title,
+          img: first?.imageUrl || this.placeholder(480, 360),
+          desc: cfg.desc,
+          link: cfg.link
+        });
       }
     }
 
@@ -207,11 +226,10 @@ export class HomePage implements OnInit, OnDestroy {
   }
 
   // ======================
-  // 🔹 STRIP ITEMS
+  // 🔹 Strip horizontal
   // ======================
-  private buildStrip() {
+  private buildStrip(all: Product[]) {
     this.stripItems = [];
-
     const categorias = [
       { query: 'semilla', link: '/semillas' },
       { query: 'insecticida', link: '/insecticidas' },
@@ -221,69 +239,59 @@ export class HomePage implements OnInit, OnDestroy {
     ];
 
     for (const cat of categorias) {
-      const items = this.catalog.search(cat.query, { limit: 20 }).items;
-      let count = 0;
+      const items = all.filter(p =>
+        (p.title ?? '').toLowerCase().includes(cat.query) ||
+        (p.tags || []).some(t => t.toLowerCase().includes(cat.query)) ||
+        (p.category ?? '').toLowerCase().includes(cat.query)
+      );
 
-      for (const p of items) {
-        if (!p.image || this.usedIds.has(p.id)) continue;
+      const valid = items.filter(p => p.imageUrl && !p.imageUrl.includes('placeholder'));
+
+      for (const p of valid.slice(0, 2)) {
+        if (this.usedIds.has(p.id)) continue;
         this.usedIds.add(p.id);
 
         this.stripItems.push({
           title: p.title,
-          img: this.thumb(p.image, 720, 540),
+          img: this.thumb(p.imageUrl, 720, 540),
           link: cat.link
         });
-
-        count++;
-        if (count >= 2) break;
       }
     }
   }
 
   // ======================
-  // 🔹 TILES
+  // 🔹 Tiles (bloques de 4)
   // ======================
-  private buildTiles() {
-    const gotData = this.catalog.listAll().length > 0;
+  private buildTiles(all: Product[] = []) {
     const result: Tile[] = [];
 
     for (const cfg of this.tileCfg) {
-      const imgs = gotData ? this.pickImages(cfg.query, 4) : this.fallbackPicsum(4);
+      const items = all.filter(p =>
+        (p.title ?? '').toLowerCase().includes(cfg.query) ||
+        (p.tags || []).some(t => t.toLowerCase().includes(cfg.query)) ||
+        (p.category ?? '').toLowerCase().includes(cfg.query)
+      );
+
+      const valid = items.filter(p => p.imageUrl && !p.imageUrl.includes('placeholder'));
+
+      const imgs = valid.slice(0, 4).map(p => ({
+        src: p.imageUrl!,
+        alt: p.title
+      }));
+
+      while (imgs.length < 4) {
+        imgs.push({ src: this.placeholder(300, 220, imgs.length), alt: 'Imagen' });
+      }
+
       result.push({ title: cfg.title, link: cfg.link, imgs, cta: cfg.cta });
     }
 
     this.tiles = result;
   }
 
-  private pickImages(query: string, n = 4): Array<{ src: string; alt: string }> {
-    const items = this.catalog.search(query, { limit: 60 }).items;
-    const seen = new Set<string>();
-    const imgs: Array<{ src: string; alt: string }> = [];
-
-    for (const p of items) {
-      if (!p.image || seen.has(p.id)) continue;
-      seen.add(p.id);
-
-      imgs.push({
-        src: this.thumb(p.image, 300, 220),
-        alt: p.title
-      });
-
-      if (imgs.length >= n) break;
-    }
-
-    while (imgs.length < n) {
-      imgs.push({
-        src: this.placeholder(300, 220, imgs.length),
-        alt: 'Imagen'
-      });
-    }
-
-    return imgs;
-  }
-
   // ======================
-  // 🎨 HELPERS
+  // 🎨 Utilitarios
   // ======================
   private creativeSubtitle(base: string): string {
     const opciones = [
@@ -306,63 +314,15 @@ export class HomePage implements OnInit, OnDestroy {
     return `https://picsum.photos/seed/fallback-${seed}/${w}/${h}`;
   }
 
-  private fallbackPicsum(n: number): Array<{ src: string; alt: string }> {
-    return Array.from({ length: n }).map((_, i) => ({
-      src: this.placeholder(300, 220, i + 1),
-      alt: 'Placeholder'
-    }));
+  private offPct(p: { price?: number | null; compareAt?: number | null }) {
+    const price = p.price ?? 0;
+    const compareAt = p.compareAt ?? 0;
+    if (compareAt <= price) return 0;
+    return Math.round(((compareAt - price) / compareAt) * 100);
   }
 
-  private mock(n: number): Product[] {
-    return Array.from({ length: n }).map((_, i) => {
-      const id = `P${this.page}-${i}`;
-      return {
-        id,
-        title: 'Producto ' + (i + 1),
-        image: `https://picsum.photos/seed/${id}/480/480`,
-        price: 10 + i,
-        rating: 4,
-        reviews: 100,
-      };
-    });
-  }
-
-  private mockTopCards(): TopCard[] {
-    return this.topCfg.map((cfg, i) => {
-      if (cfg.multi) {
-        return {
-          title: cfg.title,
-          imgs: Array.from({ length: 4 }).map((_, j) => ({
-            src: this.placeholder(300, 220, j),
-            alt: 'Demo'
-          })),
-          desc: cfg.desc,
-          multi: true,
-        };
-      }
-      return {
-        title: cfg.title,
-        img: this.placeholder(480, 360, i),
-        desc: cfg.desc,
-      };
-    });
-  }
-
-  private mockStrip(n: number): StripItem[] {
-    return Array.from({ length: n }).map((_, i) => ({
-      title: 'Strip ' + (i + 1),
-      img: `https://picsum.photos/seed/strip-${i}/720/540`,
-      link: '/semillas'
-    }));
-  }
-
-  private offPct(p: { price?: number; compareAt?: number }) {
-    if (!p.compareAt || !p.price || p.compareAt <= p.price) return 0;
-    return Math.round(((p.compareAt - p.price) / p.compareAt) * 100);
-  }
-
-  private score(p: CatalogItem) {
-    const base = (p.rating ?? 0) * 100 + (p.reviews ?? 0);
+  private score(p: Product) {
+    const base = ((p as any).rating ?? 0) * 100 + ((p as any).reviews ?? 0);
     const hasDiscount = (p.compareAt ?? 0) > (p.price ?? 0);
     return base + (hasDiscount ? 150 : 0);
   }
@@ -371,26 +331,5 @@ export class HomePage implements OnInit, OnDestroy {
     const el = this.stripEl?.nativeElement;
     if (!el) return;
     el.scrollBy({ left: dir * el.clientWidth * 0.9, behavior: 'smooth' });
-  }
-
-  // ======================
-  // 🔄 POLLING
-  // ======================
-  private startPollingForBus() {
-    this.stopPolling();
-    this.pollCount = 0;
-    this.pollId = setInterval(() => {
-      this.pollCount++;
-      const had = this.catalog.listAll().length > 0;
-      this.refreshFromBus();
-      if (had || this.pollCount >= 8) this.stopPolling();
-    }, 800);
-  }
-
-  private stopPolling() {
-    if (this.pollId) {
-      clearInterval(this.pollId);
-      this.pollId = undefined;
-    }
   }
 }

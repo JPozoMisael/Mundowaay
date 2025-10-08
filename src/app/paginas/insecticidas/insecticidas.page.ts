@@ -1,22 +1,20 @@
-import { Component, ViewChild, ElementRef, OnInit, OnDestroy } from '@angular/core';
+import { Component, ViewChild, ElementRef } from '@angular/core';
 import { InfiniteScrollCustomEvent, ToastController } from '@ionic/angular';
 import { CartService } from 'src/app/servicios/cart';
-import { CatalogoBus, CatalogItem } from 'src/app/servicios/catalogo-bus';
+import { ProductsService, Product } from 'src/app/servicios/products';
 
-type Product = {
-  id: string;
-  title: string;
-  image: string;
-  price: number;
+type Brand = 'QSI' | 'AVGUST' | 'OTRA';
+type Category = 'contacto' | 'sistemico' | 'cebos' | 'biologico';
+
+type LocalProduct = Product & {
   compareAt?: number;
-  rating: number;
-  reviews: number;
+  rating?: number;
+  reviews?: number;
   sold?: string;
   promo?: string;
   badge?: string;
-  brand?: 'QSI' | 'AVGUST';
-  category?: 'contacto' | 'sistemico' | 'cebos' | 'biologico';
-  tags?: string[];
+  brand?: Brand;
+  category?: Category;
 };
 
 @Component({
@@ -25,8 +23,8 @@ type Product = {
   styleUrls: ['./insecticidas.page.scss'],
   standalone: false,
 })
-export class InsecticidasPage implements OnInit, OnDestroy {
-  // Pills
+export class InsecticidasPage {
+  // ===== Pills =====
   pills = [
     { key: 'tendencia',   label: 'Más demandados' },
     { key: 'relampago',   label: 'Ofertas relámpago' },
@@ -36,119 +34,74 @@ export class InsecticidasPage implements OnInit, OnDestroy {
     { key: 'organico',    label: 'Biológicos/Orgánicos' },
     { key: 'nuevo',       label: 'Nuevos registros' },
   ];
-  activePill: string = 'tendencia';
+  activePill = 'tendencia';
 
-  // Chips
+  // ===== Chips =====
   chips = [
-    { key: 'reco',      label: 'Recomendado',         icon: 'assets/img/recoins.png' },
-    { key: 'marca_qsi', label: 'QSI',                 icon: 'assets/img/qsi.png' },
-    { key: 'marca_avg', label: 'AVGUST',              icon: 'assets/img/avgust.png'},
-    { key: 'contacto',  label: 'De contacto',         icon: 'assets/img/contact.png' },
-    { key: 'sistemico', label: 'Sistémicos',          icon: 'assets/img/systemic.png' },
-    { key: 'cebos',     label: 'Cebos',               icon: 'assets/img/bait.png' },
-    { key: 'biologico', label: 'Biológicos',          icon: 'assets/img/bio.png' },
+    { key: 'reco',      label: 'Recomendado',  icon: 'assets/img/recoins.png' },
+    { key: 'marca_qsi', label: 'QSI',          icon: 'assets/img/qsi.png' },
+    { key: 'marca_avg', label: 'AVGUST',       icon: 'assets/img/avgust.png'},
+    { key: 'contacto',  label: 'De contacto',  icon: 'assets/img/contact.png' },
+    { key: 'sistemico', label: 'Sistémicos',   icon: 'assets/img/systemic.png' },
+    { key: 'cebos',     label: 'Cebos',        icon: 'assets/img/bait.png' },
+    { key: 'biologico', label: 'Biológicos',   icon: 'assets/img/bio.png' },
   ];
   active = 'reco';
 
   @ViewChild('pillScroll', { static: false }) pillScroll?: ElementRef<HTMLDivElement>;
 
-  // Estado
-  private usingBus = false;
   private firstPage = 20;
   private pageSize  = 18;
 
-  all: Product[] = [];
-  private sorted: Product[] = [];
-  list: Product[] = [];
-
-  // Poll corto para esperar el bus
-  private pollId?: any;
-  private pollCount = 0;
+  all: LocalProduct[] = [];
+  private sorted: LocalProduct[] = [];
+  list: LocalProduct[] = [];
 
   constructor(
     private cartSvc: CartService,
     private toastCtrl: ToastController,
-    private catalog: CatalogoBus
-  ) {}
-
-  ngOnInit() {
-    // 1) mocks para render inmediato
-    this.all = this.mock(12);
-    this.rebuildSortedAndSlice();
-
-    // 2) intenta hidratar desde el índice global (Wix)
-    this.hydrateFromCatalog();
-    this.startPollingForBus();
+    private productsSvc: ProductsService
+  ) {
+    this.loadProducts();
   }
 
-  ngOnDestroy(){ this.stopPolling(); }
+  private loadProducts() {
+    this.productsSvc.listAll().subscribe(items => {
+      this.all = items
+        .filter(p => p.title.toLowerCase().includes('insecticida') || (p.tags||[]).includes('insecticida'))
+        .map(p => this.mapToLocal(p));
 
-  async ionViewWillEnter() { this.hydrateFromCatalog(); }
-
-  /** Lee del índice global y reemplaza los mocks si hay data real */
-  private hydrateFromCatalog() {
-    // por categoría de página
-    const byCat = this.catalog.search('', { cat: 'insecticidas', limit: 600 }).items;
-
-    // refuerzo por keywords (si algún item aún no tiene cat)
-    const byQuery = this.catalog.search(
-      'insecticida|cebo|cipermetrina|lambda|imidacloprid|tiametoxam|clorantraniliprol|beauveria|bacillus',
-      { limit: 600 }
-    ).items;
-
-    const map = new Map<string, CatalogItem>();
-    for (const it of [...byCat, ...byQuery]) map.set(it.id, it);
-    const items = Array.from(map.values());
-
-    if (!items.length) return;
-
-    this.usingBus = true;
-    this.all = items.map(c => this.fromCatalog(c));
-    this.rebuildSortedAndSlice();
+      if (!this.all.length) {
+        this.all = this.mock(20);
+      }
+      this.rebuildSortedAndSlice();
+    });
   }
 
-  /** Mapea CatalogItem → Product */
-  private fromCatalog(c: CatalogItem): Product {
-    const tags = (c.tags ?? []).map(t => (t ?? '').toLowerCase());
-    const tset = new Set<string>(tags);
-
-    // ✅ subcats SIN undefined
-    const subcats = ['contacto','sistemico','cebos','biologico'] as const;
-    type Subcat = typeof subcats[number];
-
-    let derived: Subcat | undefined = subcats.find((sc) => tset.has(sc));
-
-    if (!derived) {
-      const title = (c.title || '').toLowerCase();
-      if (/cebo/.test(title)) derived = 'cebos';
-      else if (/bacillus|beauveria|azadirachtin|azadiractina|bt\b/.test(title)) derived = 'biologico';
-      else if (/imidacloprid|tiametoxam|clorantraniliprol|sist[ée]mico/.test(title)) derived = 'sistemico';
-      else if (/cipermetrina|lambda|deltametrina|contacto/.test(title)) derived = 'contacto';
-    }
-    const category: Product['category'] = derived ?? 'biologico';
-
-    // brand normalizada
-    const b = (c.brand || '').toLowerCase();
-    const brand = (b === 'qsi' ? 'QSI' : b === 'avgust' ? 'AVGUST' : undefined) as Product['brand'];
-
-    // badge registro vigente
-    const hasRegistro = tags.some(t => t.includes('registro')) && tags.some(t => t.includes('vigente'));
-
+  private mapToLocal(p: Product): LocalProduct {
     return {
-      id: c.id,
-      title: c.title,
-      image: c.image || 'assets/img/placeholder.png',
-      price: c.price ?? 0,
-      compareAt: c.compareAt,
-      rating: c.rating ?? 4,
-      reviews: c.reviews ?? 0,
-      sold: undefined,
+      ...p,
+      price: p.price ?? 0,
+      compareAt: p.compareAt ?? undefined,
+      rating: 4,
+      reviews: Math.floor(Math.random()*500),
+      sold: '',
       promo: '',
-      badge: hasRegistro ? 'Registro vigente' : '',
-      brand,
-      category,
-      tags: c.tags || [],
+      badge: '',
+      brand: (p.title || '').toLowerCase().includes('qsi') ? 'QSI'
+           : (p.title || '').toLowerCase().includes('avgust') ? 'AVGUST'
+           : 'OTRA',
+      category: this.deriveCategory(p.title || ''),
     };
+  }
+
+  private deriveCategory(text: string): Category {
+    text = text.toLowerCase();
+    if (/cebo/.test(text)) return 'cebos';
+    if (/bacillus|beauveria|azadirachtin|azadiractina|bt\b/.test(text)) return 'biologico';
+    if (/imidacloprid|tiametoxam|clorantraniliprol|sist[ée]mico/.test(text)) return 'sistemico';
+    if (/cipermetrina|lambda|deltametrina|contacto/.test(text)) return 'contacto';
+    return 'biologico';
   }
 
   // ===== UI =====
@@ -167,44 +120,30 @@ export class InsecticidasPage implements OnInit, OnDestroy {
     switch (this.activePill) {
       case 'relampago':
         src = src.filter(p => !!p.compareAt || p.promo);
-        src.sort((a,b) => (this.offPct(b) - this.offPct(a)) || a.title.localeCompare(b.title) || a.id.localeCompare(b.id));
+        src.sort((a,b) => (this.offPct(b) - this.offPct(a)) || a.title.localeCompare(b.title));
         break;
       case 'favoritos':
-        src.sort((a,b) =>
-          (b.reviews - a.reviews) ||
-          (b.rating - a.rating) ||
-          a.title.localeCompare(b.title) ||
-          a.id.localeCompare(b.id)
-        );
+        src.sort((a,b) => (b.reviews! - a.reviews!) || (b.rating! - a.rating!));
         break;
       case 'tendencia':
-        src.sort((a,b) =>
-          (this.score(b) - this.score(a)) ||
-          a.title.localeCompare(b.title) ||
-          a.id.localeCompare(b.id)
-        );
+        src.sort((a,b) => this.score(b) - this.score(a));
         break;
       case 'residual':
-        src = src.filter(p => (p.tags||[]).some(t => t.toLowerCase() === 'residual'));
+        src = src.filter(p => (p.tags||[]).includes('residual'));
         break;
       case 'bajo_olor':
-        src = src.filter(p => (p.tags||[]).some(t => t.toLowerCase() === 'bajo_olor'));
+        src = src.filter(p => (p.tags||[]).includes('bajo_olor'));
         break;
       case 'organico':
-        src = src.filter(p => p.category === 'biologico' || (p.tags||[]).some(t => t.toLowerCase() === 'organico'));
+        src = src.filter(p => p.category === 'biologico' || (p.tags||[]).includes('organico'));
         break;
       case 'nuevo':
-        src = src.filter(p => (p.tags||[]).some(t => t.toLowerCase() === 'nuevo'));
+        src = src.filter(p => (p.tags||[]).includes('nuevo'));
         break;
     }
 
     if (!src.length && base.length) {
-      // fallback a “tendencia”
-      src = base.slice().sort((a,b) =>
-        (this.score(b) - this.score(a)) ||
-        a.title.localeCompare(b.title) ||
-        a.id.localeCompare(b.id)
-      );
+      src = base.slice().sort((a,b) => this.score(b) - this.score(a));
     }
 
     this.sorted = src;
@@ -212,17 +151,18 @@ export class InsecticidasPage implements OnInit, OnDestroy {
   }
 
   // ===== helpers =====
-  money(n:number){ return `$${(n||0).toFixed(2)}`; }
-  offPct(p: Product){
-    if(!p.compareAt || p.compareAt <= p.price) return 0;
-    return Math.round(((p.compareAt - p.price)/p.compareAt)*100);
+  money(n:number|undefined){ return `$${((n??0)).toFixed(2)}`; }
+  offPct(p: LocalProduct){
+    const price = p.price ?? 0;
+    if(!p.compareAt || p.compareAt <= price) return 0;
+    return Math.round(((p.compareAt - price)/p.compareAt)*100);
   }
-  discount(p: Product){ const pct = this.offPct(p); return pct ? `-${pct}%` : ''; }
-  score(p: Product){ return p.rating*100 + p.reviews + (p.promo ? 200 : 0); }
+  discount(p: LocalProduct){ const pct = this.offPct(p); return pct ? `-${pct}%` : ''; }
+  score(p: LocalProduct){ return (p.rating??0)*100 + (p.reviews??0) + (p.promo ? 200 : 0); }
 
   // Añadir al carrito
-  async addToCart(p: Product){
-    this.cartSvc.add({ id: p.id, title: p.title, price: p.price, image: p.image }, 1);
+  async addToCart(p: LocalProduct){
+    this.cartSvc.add({ id: p.id, title: p.title, price: p.price ?? 0, image: p.imageUrl || 'assets/img/placeholder.png' }, 1).subscribe();
     const t = await this.toastCtrl.create({
       message: 'Insecticida añadido al carrito',
       duration: 1200, color: 'success', position: 'top', icon: 'cart-outline'
@@ -230,31 +170,28 @@ export class InsecticidasPage implements OnInit, OnDestroy {
     await t.present();
   }
 
-  // Infinite scroll SIN reordenar cuando hay datos del bus
+  // Infinite scroll
   loadMore(ev: Event){
-    if (this.usingBus) {
-      const nextLen = Math.min(this.sorted.length, this.list.length + this.pageSize);
-      this.list = this.sorted.slice(0, nextLen);
-      const target = (ev as InfiniteScrollCustomEvent).target as any;
-      if (this.list.length >= this.sorted.length) target.disabled = true;
-      (ev as InfiniteScrollCustomEvent).target.complete();
-      return;
-    }
-
-    // Fallback mock si aún no hay data real
-    const extra = this.mock(this.pageSize);
-    this.all = [...this.all, ...extra];
-    this.sorted = [...this.sorted, ...extra];
-    this.list = this.sorted.slice(0, this.list.length + this.pageSize);
-    (ev as InfiniteScrollCustomEvent).target.complete();
+    const nextLen = Math.min(this.sorted.length, this.list.length + this.pageSize);
+    this.list = this.sorted.slice(0, nextLen);
+    const target = (ev as InfiniteScrollCustomEvent).target as any;
+    if (this.list.length >= this.sorted.length) target.disabled = true;
+    target.complete();
   }
 
   // ===== MOCK =====
-  private mock(n:number): Product[]{
-    const cats: Array<NonNullable<Product['category']>> = ['contacto','sistemico','cebos','biologico'];
-    const brands: Array<NonNullable<Product['brand']>> = ['QSI','AVGUST'];
+  private mock(n:number): LocalProduct[]{
+    const cats: Category[] = ['contacto','sistemico','cebos','biologico'];
+    const brands: Brand[] = ['QSI','AVGUST'];
     const promos = ['Tiempo limitado','Últimos 2 días',''];
     const tagsPool = ['residual','bajo_olor','organico','nuevo'];
+
+    const namesByCat: Record<Category, string[]> = {
+      contacto: ['Cipermetrina','Deltametrina','Lambda-cialotrina'],
+      sistemico:['Imidacloprid','Tiametoxam','Clorantraniliprol'],
+      cebos:    ['Cebo granular','Gel insecticida','Cebo atrayente'],
+      biologico:['Bacillus thuringiensis','Beauveria bassiana','Azadiractina'],
+    };
 
     return Array.from({length:n}).map((_, i) => {
       const id = `I-${Date.now()}-${i}`;
@@ -263,26 +200,19 @@ export class InsecticidasPage implements OnInit, OnDestroy {
       const rating = Math.floor(Math.random()*2) + 4;
       const brand = brands[i % brands.length];
       const category = cats[i % cats.length];
+      const name = namesByCat[category][i % namesByCat[category].length];
       const tagCount = Math.random()>0.6 ? 2 : 1;
       const tags = Array.from({length:tagCount}).map(() => tagsPool[Math.floor(Math.random()*tagsPool.length)]);
-
-      const namesByCat: Record<NonNullable<Product['category']>, string[]> = {
-        contacto: ['Cipermetrina', 'Deltametrina', 'Lambda-cialotrina'],
-        sistemico:['Imidacloprid', 'Tiametoxam', 'Clorantraniliprol'],
-        cebos:    ['Cebo granular', 'Gel insecticida', 'Cebo atrayente'],
-        biologico:['Bacillus thuringiensis', 'Beauveria bassiana', 'Azadiractina'],
-      };
-      const name = namesByCat[category][i % namesByCat[category].length];
 
       return {
         id,
         title: `${name} ${brand} ${100 + i}`,
-        image: `https://picsum.photos/seed/${id}/700/700`,
+        imageUrl: `https://picsum.photos/seed/${id}/700/700`,
         price: Number(base.toFixed(2)),
         compareAt: hasCompare ? Number((base + (Math.random()*15+6)).toFixed(2)) : undefined,
         rating,
-        reviews: Math.floor(Math.random()*5000),
-        sold: Math.random() > 0.5 ? `${(Math.floor(Math.random()*15)+1)}K+` : '',
+        reviews: Math.floor(Math.random()*3000),
+        sold: '',
         promo: promos[i % promos.length],
         badge: Math.random() > 0.7 ? 'Registro vigente' : '',
         brand,
@@ -290,20 +220,5 @@ export class InsecticidasPage implements OnInit, OnDestroy {
         tags,
       };
     });
-  }
-
-  // ---- polling corto para esperar datos del bus ----
-  private startPollingForBus() {
-    this.stopPolling();
-    this.pollCount = 0;
-    this.pollId = setInterval(() => {
-      this.pollCount++;
-      const had = this.catalog.listAll().length > 0;
-      this.hydrateFromCatalog();
-      if (had || this.pollCount >= 8) this.stopPolling();
-    }, 800);
-  }
-  private stopPolling() {
-    if (this.pollId) { clearInterval(this.pollId); this.pollId = undefined; }
   }
 }

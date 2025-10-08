@@ -1,8 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { MenuController, ModalController } from '@ionic/angular';  // 👈 importa ModalController
-import { CatalogBootstrapService } from './servicios/catalog-bootstrap';
-import { LoginModalComponent } from './components/login-modal/login-modal.component'; // 👈 importa tu modal
+import { MenuController, ModalController } from '@ionic/angular';  
+import { LoginModalComponent } from './components/login-modal/login-modal.component';
 
 @Component({
   selector: 'app-root',
@@ -10,20 +9,13 @@ import { LoginModalComponent } from './components/login-modal/login-modal.compon
   styleUrls: ['app.component.scss'],
   standalone: false,
 })
-export class AppComponent implements OnInit {
+export class AppComponent {
 
   constructor(
     private router: Router,
     private menu: MenuController,
-    private modalCtrl: ModalController,   // 👈 inyéctalo aquí
-    private boot: CatalogBootstrapService,
+    private modalCtrl: ModalController
   ) {}
-
-  ngOnInit(): void {
-    void this.boot.ensureLoaded().catch(err => {
-      console.warn('[CatalogBootstrap] ensureLoaded falló:', err);
-    });
-  }
 
   /** 🔹 Abre el modal de login (igual que en el header) */
   async openLogin() {
@@ -36,27 +28,50 @@ export class AppComponent implements OnInit {
   }
 
   get user() {
-    // Si tu auth ya está en el root
-    return null; // o usa this.auth.currentUser si lo tienes aquí también
+    // Aquí luego podrás conectar tu servicio de autenticación real
+    return null; 
   }
 
-  /** Otros métodos que ya tenías **/
+  /** 🔹 Navegación genérica */
   go(path: string) {
     this.router.navigateByUrl(path).finally(() => {
       try { this.menu.close(); } catch {}
     });
   }
 
+  /** 🔹 Abrir WhatsApp (coloca tu número real con prefijo +593) */
   openWhatsApp() {
     window.open('https://wa.me/593000000000', '_blank', 'noopener,noreferrer');
   }
 
+  /** 🔹 Abrir soporte técnico (ejemplo: mailto o página interna) */
+  openSupport() {
+    window.open('mailto:soporte@cultivencom.com', '_blank');
+  }
+
+  /** 🔹 Abrir ubicación sucursales con Google Maps */
+  openMap() {
+    window.open('https://maps.app.goo.gl/XXXXXXXXX', '_blank');
+  }
+
+  /** 🔹 Abrir política de privacidad (PDF o página interna) */
+  openPrivacy() {
+    this.go('/ayuda/politica-privacidad');
+  }
+
+  /** 🔹 Abrir términos y condiciones */
+  openTerms() {
+    this.go('/ayuda/terminos-condiciones');
+  }
+
+  /** 🔹 Búsqueda global */
   onGlobalSearch(event: any) {
     const query = (typeof event === 'string' ? event : event.detail?.value || '').trim();
     if (!query) return;
     this.router.navigate(['/search'], { queryParams: { q: query } });
   }
 
+  /** 🔹 Categorías globales */
   onGlobalCat(event: any) {
     const key = (typeof event === 'string' ? event : event.detail?.value || '').trim();
     if (!key) return;

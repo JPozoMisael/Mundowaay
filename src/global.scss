@@ -88,3 +88,37 @@ app-footer {
 .login-modal::part(backdrop) {
   background: rgba(0,0,0,0.25);
 }
+
+/* 🔹 Forzar full-width solo en header y slider */
+/* ==== Compensar altura del header (para que no lo corte el contenido) ==== */
+ion-content,
+ion-router-outlet {
+  display: block;
+  margin-top: var(--mw-header-offset); /* usa las variables definidas arriba */
+}
+
+/* 🔹 Evita que el header se mantenga fijo */
+ion-header.mw-header {
+  position: relative !important;
+  top: 0 !important;
+  z-index: 99;
+  transition: transform 0.35s ease, opacity 0.25s ease;
+  will-change: transform, opacity;
+}
+
+/* 🔹 Estado oculto del header cuando se hace scroll hacia abajo */
+ion-header.mw-header.hide {
+  transform: translateY(calc(-1 * var(--mw-header-offset)));
+  opacity: 0;
+  pointer-events: none;
+}
+/* 🔧 Desactivar comportamiento sticky interno del ion-header de Ionic */
+ion-header::part(container),
+ion-header::part(toolbar),
+ion-toolbar::part(container) {
+  position: relative !important;
+  top: auto !important;
+  inset: auto !important;
+  transform: none !important;
+  z-index: auto !important;
+}

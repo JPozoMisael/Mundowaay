@@ -10,27 +10,17 @@
 
     <ion-content>
 
-  <div class="menu-header">
-  <ion-menu-toggle auto-hide="true">
-    <ion-item button (click)="openLogin()" class="hello-item">
-      <ion-icon name="person-circle-outline" slot="start"></ion-icon>
-      <ion-label class="hi">Hola, identifícate</ion-label>
-    </ion-item>
-  </ion-menu-toggle>
-</div>
+      <!-- Encabezado -->
+      <div class="menu-header">
+        <ion-menu-toggle auto-hide="true">
+          <ion-item button (click)="openLogin()" class="hello-item">
+            <ion-icon name="person-circle-outline" slot="start"></ion-icon>
+            <ion-label class="hi">Hola, identifícate</ion-label>
+          </ion-item>
+        </ion-menu-toggle>
+      </div>
 
-
-<!-----<div class="menu-header">
-  <ion-item button (click)="openLoginModal()" class="hello-item">
-    <ion-icon name="person-circle-outline" slot="start"></ion-icon>
-    <ion-label class="hi">Hola, identifícate</ion-label>
-  </ion-item>
-</div>-->
-
-
-
-
-      <!-- Enlaces principales -->
+      <!-- Enlace Home -->
       <ion-list class="menu-list" lines="none">
         <ion-menu-toggle auto-hide="true">
           <ion-item button (click)="go('/home')">
@@ -49,46 +39,31 @@
             <ion-icon slot="end" name="chevron-down-outline"></ion-icon>
           </ion-item>
           <div class="submenu" slot="content">
-            <ion-menu-toggle auto-hide="true">
-              <ion-item button (click)="go('/semillas')"><ion-label>Semillas</ion-label></ion-item>
-            </ion-menu-toggle>
-            <ion-menu-toggle auto-hide="true">
-              <ion-item button (click)="go('/insecticidas')"><ion-label>Insecticidas</ion-label></ion-item>
-            </ion-menu-toggle>
-            <ion-menu-toggle auto-hide="true">
-              <ion-item button (click)="go('/herbicidas')"><ion-label>Herbicidas</ion-label></ion-item>
-            </ion-menu-toggle>
-            <ion-menu-toggle auto-hide="true">
-              <ion-item button (click)="go('/fungicidas')"><ion-label>Fungicidas</ion-label></ion-item>
-            </ion-menu-toggle>
-            <ion-menu-toggle auto-hide="true">
-              <ion-item button (click)="go('/acaricidas')"><ion-label>Acaricidas</ion-label></ion-item>
-            </ion-menu-toggle>
-            <ion-menu-toggle auto-hide="true">
-              <ion-item button (click)="go('/nutricion')"><ion-label>Nutrición Foliar</ion-label></ion-item>
-            </ion-menu-toggle>
+            <ion-menu-toggle auto-hide="true"><ion-item button (click)="go('/semillas')"><ion-label>Semillas</ion-label></ion-item></ion-menu-toggle>
+            <ion-menu-toggle auto-hide="true"><ion-item button (click)="go('/insecticidas')"><ion-label>Insecticidas</ion-label></ion-item></ion-menu-toggle>
+            <ion-menu-toggle auto-hide="true"><ion-item button (click)="go('/herbicidas')"><ion-label>Herbicidas</ion-label></ion-item></ion-menu-toggle>
+            <ion-menu-toggle auto-hide="true"><ion-item button (click)="go('/fungicidas')"><ion-label>Fungicidas</ion-label></ion-item></ion-menu-toggle>
+            <ion-menu-toggle auto-hide="true"><ion-item button (click)="go('/acaricidas')"><ion-label>Acaricidas</ion-label></ion-item></ion-menu-toggle>
+            <ion-menu-toggle auto-hide="true"><ion-item button (click)="go('/nutricion')"><ion-label>Nutrición Foliar</ion-label></ion-item></ion-menu-toggle>
+            <ion-menu-toggle auto-hide="true"><ion-item button (click)="go('/maquinaria')"><ion-label>Maquinaria y accesorios</ion-label></ion-item></ion-menu-toggle>
           </div>
         </ion-accordion>
 
-        <!-- Servicios -->
+        <!-- Información y servicios -->
         <ion-accordion value="servicios">
           <ion-item slot="header" class="section-title">
             <ion-label>Información y servicios</ion-label>
             <ion-icon slot="end" name="chevron-down-outline"></ion-icon>
           </ion-item>
           <div class="submenu" slot="content">
-            <ion-menu-toggle auto-hide="true">
-              <ion-item button (click)="go('/ayuda/como-comprar')"><ion-label>Cómo comprar</ion-label></ion-item>
-            </ion-menu-toggle>
-            <ion-menu-toggle auto-hide="true">
-              <ion-item button (click)="go('/ayuda/metodos-de-pago')"><ion-label>Métodos de pago</ion-label></ion-item>
-            </ion-menu-toggle>
-            <ion-menu-toggle auto-hide="true">
-              <ion-item button (click)="go('/ayuda/envios')"><ion-label>Envíos y entrega</ion-label></ion-item>
-            </ion-menu-toggle>
-            <ion-menu-toggle auto-hide="true">
-              <ion-item button (click)="go('/ayuda/garantia')"><ion-label>Garantía</ion-label></ion-item>
-            </ion-menu-toggle>
+            <ion-menu-toggle auto-hide="true"><ion-item button (click)="go('/como-comprar')"><ion-label>Cómo comprar</ion-label></ion-item></ion-menu-toggle>
+            <ion-menu-toggle auto-hide="true"><ion-item button (click)="go('/metodos-de-pago')"><ion-label>Métodos de pago</ion-label></ion-item></ion-menu-toggle>
+            <ion-menu-toggle auto-hide="true"><ion-item button (click)="go('/envios')"><ion-label>Envíos y entrega</ion-label></ion-item></ion-menu-toggle>
+            <ion-menu-toggle auto-hide="true"><ion-item button (click)="go('/garantia')"><ion-label>Garantía</ion-label></ion-item></ion-menu-toggle>
+            <ion-menu-toggle auto-hide="true"><ion-item button (click)="go('/politica-devoluciones')"><ion-label>Política de devoluciones</ion-label></ion-item></ion-menu-toggle>
+            <ion-menu-toggle auto-hide="true"><ion-item button (click)="go('/faq')"><ion-label>Preguntas frecuentes (FAQ)</ion-label></ion-item></ion-menu-toggle>
+            <ion-menu-toggle auto-hide="true"><ion-item button (click)="go('/terminos-condiciones')"><ion-label>Términos y condiciones</ion-label></ion-item></ion-menu-toggle>
+            <ion-menu-toggle auto-hide="true"><ion-item button (click)="go('/politica-privacidad')"><ion-label>Política de privacidad</ion-label></ion-item></ion-menu-toggle>
           </div>
         </ion-accordion>
 
@@ -99,31 +74,25 @@
             <ion-icon slot="end" name="chevron-down-outline"></ion-icon>
           </ion-item>
           <div class="submenu" slot="content">
-            <ion-menu-toggle auto-hide="true">
-              <ion-item button (click)="go('/corp/quienes-somos')"><ion-label>Quiénes somos</ion-label></ion-item>
-            </ion-menu-toggle>
-            <ion-menu-toggle auto-hide="true">
-              <ion-item button (click)="go('/corp/mision-vision')"><ion-label>Misión, Visión, Valores</ion-label></ion-item>
-            </ion-menu-toggle>
-            <ion-menu-toggle auto-hide="true">
-              <ion-item button (click)="go('/corp/iyd')"><ion-label>Investigación y Desarrollo</ion-label></ion-item>
-            </ion-menu-toggle>
+            <ion-menu-toggle auto-hide="true"><ion-item button (click)="go('/quienes-somos')"><ion-label>Quiénes somos</ion-label></ion-item></ion-menu-toggle>
+            <ion-menu-toggle auto-hide="true"><ion-item button (click)="go('/mision-vision')"><ion-label>Misión, Visión, Valores</ion-label></ion-item></ion-menu-toggle>
+            <ion-menu-toggle auto-hide="true"><ion-item button (click)="go('/iyd')"><ion-label>Investigación y Desarrollo</ion-label></ion-item></ion-menu-toggle>
+            <ion-menu-toggle auto-hide="true"><ion-item button (click)="go('/sostenibilidad')"><ion-label>Sostenibilidad</ion-label></ion-item></ion-menu-toggle>
+            <ion-menu-toggle auto-hide="true"><ion-item button (click)="go('/prensa')"><ion-label>Prensa y Noticias</ion-label></ion-item></ion-menu-toggle>
           </div>
         </ion-accordion>
 
-        <!-- Contacto -->
+        <!-- Contactos -->
         <ion-accordion value="contacto">
           <ion-item slot="header" class="section-title">
             <ion-label>Contactos</ion-label>
             <ion-icon slot="end" name="chevron-down-outline"></ion-icon>
           </ion-item>
           <div class="submenu" slot="content">
-            <ion-menu-toggle auto-hide="true">
-              <ion-item button (click)="go('/contacto')"><ion-label>Formulario de Contacto</ion-label></ion-item>
-            </ion-menu-toggle>
-            <ion-menu-toggle auto-hide="true">
-              <ion-item button (click)="openWhatsApp()"><ion-label>WhatsApp</ion-label></ion-item>
-            </ion-menu-toggle>
+            <ion-menu-toggle auto-hide="true"><ion-item button (click)="go('/formulario')"><ion-label>Formulario de Contacto</ion-label></ion-item></ion-menu-toggle>
+            <ion-menu-toggle auto-hide="true"><ion-item button (click)="openWhatsApp()"><ion-label>WhatsApp</ion-label></ion-item></ion-menu-toggle>
+            <ion-menu-toggle auto-hide="true"><ion-item button (click)="go('/sucursales')"><ion-label>Sucursales y Puntos de Venta</ion-label></ion-item></ion-menu-toggle>
+            <ion-menu-toggle auto-hide="true"><ion-item button (click)="go('/soporte')"><ion-label>Soporte Técnico</ion-label></ion-item></ion-menu-toggle>
           </div>
         </ion-accordion>
 
@@ -132,11 +101,11 @@
       <!-- Redes sociales -->
       <div class="social">
         <a aria-label="Instagram" href="#" target="_blank"><ion-icon name="logo-instagram"></ion-icon></a>
-        <a aria-label="Facebook"  href="#" target="_blank"><ion-icon name="logo-facebook"></ion-icon></a>
-        <a aria-label="Twitter"   href="#" target="_blank"><ion-icon name="logo-twitter"></ion-icon></a>
-        <a aria-label="LinkedIn"  href="#" target="_blank"><ion-icon name="logo-linkedin"></ion-icon></a>
-        <a aria-label="YouTube"   href="#" target="_blank"><ion-icon name="logo-youtube"></ion-icon></a>
-        <a aria-label="TikTok"    href="#" target="_blank"><ion-icon name="logo-tiktok"></ion-icon></a>
+        <a aria-label="Facebook" href="#" target="_blank"><ion-icon name="logo-facebook"></ion-icon></a>
+        <a aria-label="Twitter" href="#" target="_blank"><ion-icon name="logo-twitter"></ion-icon></a>
+        <a aria-label="LinkedIn" href="#" target="_blank"><ion-icon name="logo-linkedin"></ion-icon></a>
+        <a aria-label="YouTube" href="#" target="_blank"><ion-icon name="logo-youtube"></ion-icon></a>
+        <a aria-label="TikTok" href="#" target="_blank"><ion-icon name="logo-tiktok"></ion-icon></a>
       </div>
 
     </ion-content>
@@ -148,12 +117,7 @@
     (category)="onGlobalCat($event)">
   </app-header>
 
-  <!-- CONTENIDO PRINCIPAL: scroll + footer -->
-  <ion-content id="main" class="with-footer">
-    <div class="page-container">
-      <ion-router-outlet></ion-router-outlet>
-    </div>
-    
-  </ion-content>
-</ion-app>
+  <!-- CONTENIDO PRINCIPAL -->
+  <ion-router-outlet id="main"></ion-router-outlet>
 
+</ion-app>

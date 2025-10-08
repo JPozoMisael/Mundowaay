@@ -1,0 +1,96 @@
+.mw-sucursales {
+  --ion-background-color: #f9fafc;
+
+  ion-card {
+    border-radius: 16px;
+    border: none;
+    background: #fff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    padding: 18px;
+  }
+
+  ion-card-title {
+    font-size: 22px;
+    font-weight: 700;
+    text-align: center;
+    color: #222;
+    margin-bottom: 18px;
+  }
+
+  /* Lista de sucursales */
+  .branch-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .branch-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 16px;
+    border-radius: 14px;
+    background: #fff;
+    border: 1px solid #eee;
+    transition: all 0.25s ease;
+
+    &:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+    }
+
+    .icon-wrapper {
+      min-width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      color: #fff;
+    }
+
+    .info h2 {
+      font-size: 16px;
+      font-weight: 600;
+      margin: 0 0 6px;
+      color: #222;
+    }
+
+    .info p {
+      margin: 2px 0;
+      font-size: 14px;
+      color: #555;
+    }
+  }
+
+  /* Colores diferenciados */
+  .branch-card.matriz .icon-wrapper {
+    background: #ff4d2d;
+  }
+  .branch-card.sucursal .icon-wrapper {
+    background: #2f72c9;
+  }
+
+  /* Mapa */
+  .map-card {
+    margin-top: 16px;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid #eee;
+    background: #fafafa;
+    padding: 10px;
+
+    h3 {
+      font-size: 16px;
+      font-weight: 600;
+      margin: 0 0 10px;
+      color: #222;
+    }
+
+    iframe {
+      border-radius: 10px;
+    }
+  }
+}

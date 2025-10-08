@@ -1,23 +1,25 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { BehaviorSubject } from 'rxjs';
-
+import { HttpHeaders } from '@angular/common/http';
+import { BehaviorSubject, Observable, of } from 'rxjs';
+import { catchError, tap } from 'rxjs/operators';
+import { GeneralService } from './general';
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private clientId = 'TU_CLIENT_ID';  // el que ya tienes en Wix Headless
+  private clientId = 'cd1d1270-ef45-49c0-90dc-cb2bdb11d5fd';  // ✅ Tu client_id de Wix Headless
   private tokenKey = 'wix_token';
 
   private userSubject = new BehaviorSubject<any>(null);
-  user$ = this.userSubject.asObservable();
+  readonly user$ = this.userSubject.asObservable();
 
-  constructor(private http: HttpClient) {
+  constructor(private general: GeneralService) {
     this.loadUser();
   }
 
-  /** Login con email/contraseña */
-  login(email: string, password: string) {
+  // ===========================================================
+  // 🔹 Login con email/contraseña (Wix OAuth2 Password Grant)
+  // ===========================================================
+  login(email: string, password: string): Observable<any> {
     const url = 'https://www.wixapis.com/oauth/token';
-
     const body = {
       grant_type: 'password',
       client_id: this.clientId,
@@ -25,51 +27,104 @@ export class AuthService {
       password: password,
     };
 
-    return this.http.post<any>(url, body).subscribe({
-      next: (res) => {
-        localStorage.setItem(this.tokenKey, JSON.stringify(res));
-        this.fetchUser(res.access_token);
-      },
-      error: (err) => {
-        console.error('Error en login:', err);
-        alert('No se pudo iniciar sesión');
-      }
-    });
-  }
-
-  /** Obtener perfil de usuario */
-  private fetchUser(token: string) {
-    const headers = new HttpHeaders({
-      Authorization: `Bearer ${token}`
-    });
-    this.http.get<any>('https://www.wixapis.com/members/v1/members/me', { headers })
-      .subscribe({
-        next: (user) => {
-          this.userSubject.next(user);
-        },
-        error: (err) => {
-          console.error('Error al obtener perfil:', err);
+    return this.general.post<any>(url, body).pipe(
+      tap(res => {
+        if (res.access_token) {
+          localStorage.setItem(this.tokenKey, JSON.stringify(res));
+          this.fetchUser(res.access_token);
         }
-      });
+      }),
+      catchError(err => {
+        console.error('❌ Error en login:', err);
+        alert('No se pudo iniciar sesión. Verifica tus credenciales.');
+        return of(null);
+      })
+    );
   }
 
-  /** Cargar usuario al abrir app */
-  private loadUser() {
+  // ===========================================================
+  // 🔹 Obtener perfil del usuario desde Wix Members
+  // ===========================================================
+  private fetchUser(token: string): void {
+    const headers = new HttpHeaders({ Authorization: `Bearer ${token}` });
+    this.general
+      .get<any>('https://www.wixapis.com/members/v1/members/me', { headers })
+      .pipe(
+        tap(user => {
+          this.userSubject.next(user);
+        }),
+        catchError(err => {
+          console.error('❌ Error obteniendo perfil:', err);
+          this.logout();
+          return of(null);
+        })
+      )
+      .subscribe();
+  }
+
+  // ===========================================================
+  // 🔹 Cargar usuario guardado al abrir la app
+  // ===========================================================
+  private loadUser(): void {
     const saved = localStorage.getItem(this.tokenKey);
     if (saved) {
       const t = JSON.parse(saved);
-      this.fetchUser(t.access_token);
+      if (t.access_token) {
+        this.fetchUser(t.access_token);
+      }
     }
   }
 
-  /** Logout */
-  logout() {
+  // ===========================================================
+  // 🔹 Logout (borrar sesión local)
+  // ===========================================================
+  logout(): void {
     localStorage.removeItem(this.tokenKey);
     this.userSubject.next(null);
   }
 
-  /** Usuario actual */
-  get currentUser() {
+  // ===========================================================
+  // 🔹 Usuario actual (valor sincrónico)
+  // ===========================================================
+  get currentUser(): any {
     return this.userSubject.value;
+  }
+
+  // ===========================================================
+  // 🔹 Token actual
+  // ===========================================================
+  get token(): string | null {
+    const saved = localStorage.getItem(this.tokenKey);
+    if (saved) {
+      const t = JSON.parse(saved);
+      return t.access_token || null;
+    }
+    return null;
+  }
+
+  // ===========================================================
+  // 🔹 Verificar si el usuario está autenticado
+  // ===========================================================
+  isLoggedIn(): boolean {
+    return !!this.token;
+  }
+
+  // ===========================================================
+  // 🔹 (Opcional) Login alternativo mediante backend propio
+  // ===========================================================
+  loginViaBackend(email: string, password: string): Observable<any> {
+    // Esto usa tu API Node.js si decides tener autenticación local.
+    return this.general.post<any>('auth/login', { email, password }).pipe(
+      tap(res => {
+        if (res?.token) {
+          localStorage.setItem(this.tokenKey, JSON.stringify(res));
+          this.userSubject.next(res.user);
+        }
+      }),
+      catchError(err => {
+        console.error('❌ Error en login backend:', err);
+        return of(null);
+      })
+    );
   }
 }

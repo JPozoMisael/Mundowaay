@@ -1,22 +1,20 @@
 import { Component, ViewChild, ElementRef } from '@angular/core';
 import { InfiniteScrollCustomEvent, ToastController } from '@ionic/angular';
 import { CartService } from 'src/app/servicios/cart';
-import { CatalogoBus, CatalogItem } from 'src/app/servicios/catalogo-bus';
+import { ProductsService, Product } from 'src/app/servicios/products';
 
-type Product = {
-  id: string;
-  title: string;
-  image: string;
-  price: number;
+type Brand = 'QSI' | 'AVGUST' | 'OTRA';
+type Category = 'pre' | 'post' | 'no_selectivo' | 'selectivo' | 'sistemico' | 'contacto';
+
+type LocalProduct = Product & {
   compareAt?: number;
-  rating: number;
-  reviews: number;
+  rating?: number;
+  reviews?: number;
   sold?: string;
   promo?: string;
   badge?: string;
-  brand?: 'QSI' | 'AVGUST' | 'OTRA';
-  category?: 'pre' | 'post' | 'no_selectivo' | 'selectivo' | 'sistemico' | 'contacto';
-  tags?: string[];
+  brand?: Brand;
+  category?: Category;
 };
 
 @Component({
@@ -36,7 +34,7 @@ export class HerbicidasPage {
     { key: 'organico',    label: 'Biológicos/Orgánicos' },
     { key: 'nuevo',       label: 'Nuevos registros' },
   ];
-  activePill: string = 'tendencia';
+  activePill = 'tendencia';
 
   // ===== Chips =====
   chips = [
@@ -52,119 +50,76 @@ export class HerbicidasPage {
   ];
   active = 'reco';
 
-  // Refs para scroll
   @ViewChild('pillScroll', { static: false }) pillScroll?: ElementRef<HTMLDivElement>;
   @ViewChild('chipScroll', { static: false }) chipScroll?: ElementRef<HTMLDivElement>;
 
-  // ===== Estado =====
-  private usingBus = false;
   private firstPage = 20;
   private pageSize  = 18;
 
-  all: Product[] = [];
-  private sorted: Product[] = [];
-  list: Product[] = [];
-  page = 0;
+  all: LocalProduct[] = [];
+  private sorted: LocalProduct[] = [];
+  list: LocalProduct[] = [];
 
   constructor(
     private cartSvc: CartService,
     private toastCtrl: ToastController,
-    private catalog: CatalogoBus
+    private productsSvc: ProductsService
   ) {
-    // 1) Render inmediato con mocks
-    this.all = this.mock(24);
-    this.rebuildSortedAndSlice();
-
-    // 2) Rehidratar con datos reales
-    setTimeout(() => this.hydrateFromCatalog(), 0);
+    this.loadProducts();
   }
 
-  async ionViewWillEnter() {
-    this.hydrateFromCatalog();
+  private loadProducts() {
+    this.productsSvc.listAll().subscribe(items => {
+      this.all = items
+        .filter(p => p.title.toLowerCase().includes('herbicida') || (p.tags||[]).includes('herbicida'))
+        .map(p => this.mapToLocal(p));
+
+      if (!this.all.length) {
+        this.all = this.mock(24);
+      }
+      this.rebuildSortedAndSlice();
+    });
   }
 
-  // =========================
-  // 🚀 Scroll de sliders
-  // =========================
+  private mapToLocal(p: Product): LocalProduct {
+    return {
+      ...p,
+      price: p.price ?? 0,
+      compareAt: p.compareAt ?? undefined,
+      rating: 4,
+      reviews: Math.floor(Math.random()*500),
+      sold: '',
+      promo: '',
+      badge: '',
+      brand: (p.title || '').toLowerCase().includes('qsi') ? 'QSI'
+           : (p.title || '').toLowerCase().includes('avgust') ? 'AVGUST'
+           : 'OTRA',
+      category: this.deriveCategory(p.title || ''),
+    };
+  }
+
+  private deriveCategory(text: string): Category {
+    text = text.toLowerCase();
+    if (/preemerg|pre /.test(text)) return 'pre';
+    if (/postemerg|post /.test(text)) return 'post';
+    if (/selectiv/.test(text)) return 'selectivo';
+    if (/sistemic/.test(text)) return 'sistemico';
+    if (/contact/.test(text)) return 'contacto';
+    if (/glifosato|paraquat|glufosinato/.test(text)) return 'no_selectivo';
+    return 'post';
+  }
+
+  // ===== UI =====
   scrollChips(dir: number) {
-    const el = this.chipScroll?.nativeElement;
-    if (!el) return;
+    const el = this.chipScroll?.nativeElement; if (!el) return;
     el.scrollBy({ left: dir * el.clientWidth * 0.8, behavior: 'smooth' });
   }
 
   scrollPills(dir: number) {
-    const el = this.pillScroll?.nativeElement;
-    if (!el) return;
+    const el = this.pillScroll?.nativeElement; if (!el) return;
     el.scrollBy({ left: dir * el.clientWidth * 0.8, behavior: 'smooth' });
   }
 
-  // =========================
-  // 📊 Data desde CatalogoBus
-  // =========================
-  private hydrateFromCatalog() {
-    const byCat = this.catalog.search('', { cat: 'herbicidas', limit: 1200 }).items;
-
-    const byQuery = this.catalog.search(
-      'herbicida|glifosato|paraquat|dicamba|2,4-D|metsulfuron|atrazina|bentazona|oxifluorfen|diquat|nicosulfuron|imazapir|imazetapir',
-      { limit: 1200 }
-    ).items;
-
-    const map = new Map<string, CatalogItem>();
-    for (const it of [...byCat, ...byQuery]) map.set(it.id, it);
-    const items = Array.from(map.values());
-
-    if (!items.length) return;
-
-    this.usingBus = true;
-    this.all = items.map(c => this.fromCatalog(c));
-    this.rebuildSortedAndSlice();
-  }
-
-  private fromCatalog(c: CatalogItem): Product {
-    const tags = (c.tags ?? []).map(t => (t ?? '').toLowerCase());
-    const tset = new Set<string>(tags);
-    const text = (c.title + ' ' + (c.desc || '')).toLowerCase();
-
-    const subcats = ['pre','post','no_selectivo','selectivo','sistemico','contacto'] as const;
-    type Subcat = typeof subcats[number];
-    let derived: Subcat | undefined = subcats.find(sc => tset.has(sc));
-
-    if (!derived) {
-      if (/(^|\W)(pre|preemerg)/.test(text)) derived = 'pre';
-      else if (/(^|\W)(post|posemerg)/.test(text)) derived = 'post';
-      else if (/(^|\W)selectiv/.test(text)) derived = 'selectivo';
-      else if (/(^|\W)sist[ée]mic/.test(text)) derived = 'sistemico';
-      else if (/(^|\W)contact/.test(text)) derived = 'contacto';
-      else if (/(^|\W)glifosato|paraquat|glufosinato/.test(text)) derived = 'no_selectivo';
-    }
-    const category: Product['category'] = derived ?? 'post';
-
-    const b = (c.brand || '').toLowerCase();
-    const brand: Product['brand'] =
-      b === 'qsi' ? 'QSI' : b === 'avgust' ? 'AVGUST' : (b ? 'OTRA' : undefined);
-
-    const hasRegistro = tags.some(t => t.includes('registro')) && tags.some(t => t.includes('vigente'));
-
-    return {
-      id: c.id,
-      title: c.title,
-      image: c.image || 'assets/img/placeholder.png',
-      price: c.price ?? 0,
-      compareAt: c.compareAt,
-      rating: c.rating ?? 4,
-      reviews: c.reviews ?? 0,
-      sold: undefined,
-      promo: '',
-      badge: hasRegistro ? 'Registro vigente' : '',
-      brand,
-      category,
-      tags: c.tags || [],
-    };
-  }
-
-  // =========================
-  // 🔎 Filtros y orden
-  // =========================
   selectPill(key: string){ this.activePill = key; this.rebuildSortedAndSlice(); }
   filter(key: string){ this.active = key; this.rebuildSortedAndSlice(); }
 
@@ -174,72 +129,49 @@ export class HerbicidasPage {
 
     switch (this.activePill) {
       case 'relampago':
-        src = src.filter(p => !!p.compareAt || p.promo);
-        src.sort((a,b) =>
-          (this.offPct(b) - this.offPct(a)) ||
-          a.title.localeCompare(b.title) ||
-          a.id.localeCompare(b.id)
-        );
+        src = src.filter(p => !!p.compareAt || !!p.promo);
+        src.sort((a,b) => (this.offPct(b) - this.offPct(a)) || a.title.localeCompare(b.title));
         break;
       case 'favoritos':
-        src.sort((a,b) =>
-          (b.reviews - a.reviews) ||
-          (b.rating - a.rating) ||
-          a.title.localeCompare(b.title) ||
-          a.id.localeCompare(b.id)
-        );
+        src.sort((a,b) => (b.reviews! - a.reviews!) || (b.rating! - a.rating!));
         break;
       case 'tendencia':
-        src.sort((a,b) =>
-          (this.score(b) - this.score(a)) ||
-          a.title.localeCompare(b.title) ||
-          a.id.localeCompare(b.id)
-        );
+        src.sort((a,b) => this.score(b) - this.score(a));
         break;
       case 'residual':
-        src = src.filter(p => (p.tags||[]).some(t => t.toLowerCase() === 'residual'));
+        src = src.filter(p => (p.tags||[]).includes('residual'));
         break;
       case 'rapido':
-        src = src.filter(p => (p.tags||[]).some(t => t.toLowerCase() === 'rapido'));
+        src = src.filter(p => (p.tags||[]).includes('rapido'));
         break;
       case 'organico':
-        src = src.filter(p =>
-          (p.tags||[]).some(t => t.toLowerCase() === 'organico')
-        );
+        src = src.filter(p => (p.tags||[]).includes('organico'));
         break;
       case 'nuevo':
-        src = src.filter(p => (p.tags||[]).some(t => t.toLowerCase() === 'nuevo'));
+        src = src.filter(p => (p.tags||[]).includes('nuevo'));
         break;
     }
 
     if (!src.length && base.length) {
-      src = base.slice().sort((a,b) =>
-        (this.score(b) - this.score(a)) ||
-        a.title.localeCompare(b.title) ||
-        a.id.localeCompare(b.id)
-      );
+      src = base.slice().sort((a,b) => this.score(b) - this.score(a));
     }
 
     this.sorted = src;
     this.list = this.sorted.slice(0, this.firstPage);
   }
 
-  // =========================
-  // ⚙️ Helpers
-  // =========================
-  money(n:number){ return `$${(n||0).toFixed(2)}`; }
-  offPct(p: Product){
-    if(!p.compareAt || p.compareAt <= p.price) return 0;
-    return Math.round(((p.compareAt - p.price)/p.compareAt)*100);
+  // ===== Helpers =====
+  money(n:number|undefined){ return `$${((n??0)).toFixed(2)}`; }
+  offPct(p: LocalProduct){
+    const price = p.price ?? 0;
+    if(!p.compareAt || p.compareAt <= price) return 0;
+    return Math.round(((p.compareAt - price)/p.compareAt)*100);
   }
-  discount(p: Product){ const pct = this.offPct(p); return pct ? `-${pct}%` : ''; }
-  score(p: Product){ return p.rating*100 + p.reviews + (p.promo ? 200 : 0); }
+  discount(p: LocalProduct){ const pct = this.offPct(p); return pct ? `-${pct}%` : ''; }
+  score(p: LocalProduct){ return (p.rating??0)*100 + (p.reviews??0) + (p.promo ? 200 : 0); }
 
-  // =========================
-  // 🛒 Carrito
-  // =========================
-  async addToCart(p: Product){
-    this.cartSvc.add({ id: p.id, title: p.title, price: p.price, image: p.image }, 1);
+  async addToCart(p: LocalProduct){
+    this.cartSvc.add({ id: p.id, title: p.title, price: p.price ?? 0, image: p.imageUrl || 'assets/img/placeholder.png' }, 1).subscribe();
     const t = await this.toastCtrl.create({
       message: 'Herbicida añadido al carrito',
       duration: 1200, color: 'success', position: 'top', icon: 'cart-outline'
@@ -247,73 +179,42 @@ export class HerbicidasPage {
     await t.present();
   }
 
-  // =========================
-  // 🔄 Infinite scroll
-  // =========================
   loadMore(ev: Event){
-    if (this.usingBus) {
-      const nextLen = Math.min(this.sorted.length, this.list.length + this.pageSize);
-      this.list = this.sorted.slice(0, nextLen);
-      const target = (ev as InfiniteScrollCustomEvent).target as any;
-      if (this.list.length >= this.sorted.length) target.disabled = true;
-      (ev as InfiniteScrollCustomEvent).target.complete();
-      return;
-    }
-
-    const extra = this.mock(this.pageSize);
-    this.all = [...this.all, ...extra];
-    this.sorted = [...this.sorted, ...extra];
-    this.list = this.sorted.slice(0, this.list.length + this.pageSize);
-    (ev as InfiniteScrollCustomEvent).target.complete();
+    const nextLen = Math.min(this.sorted.length, this.list.length + this.pageSize);
+    this.list = this.sorted.slice(0, nextLen);
+    const target = (ev as InfiniteScrollCustomEvent).target as any;
+    if (this.list.length >= this.sorted.length) target.disabled = true;
+    target.complete();
   }
 
-  // =========================
-  // 🧪 MOCK
-  // =========================
-  private mock(n:number): Product[]{
-    type Cat = NonNullable<Product['category']>;
-    const cats: Cat[] = ['pre','post','no_selectivo','selectivo','sistemico','contacto'];
-    const brands: Array<NonNullable<Product['brand']>> = ['QSI','AVGUST'];
+  // ===== MOCK =====
+  private mock(n:number): LocalProduct[]{
+    const cats: Category[] = ['pre','post','no_selectivo','selectivo','sistemico','contacto'];
+    const brands: Brand[] = ['QSI','AVGUST'];
     const promos = ['Tiempo limitado','Últimos 2 días',''];
     const tagsPool = ['residual','rapido','organico','nuevo'];
 
-    const namesByCat: Record<Cat, string[]> = {
-      pre: ['Pendimetalin', 'S-metolacloro', 'Acetoclor'],
-      post: ['2,4-D', 'Dicamba', 'Haloxifop'],
-      no_selectivo: ['Glifosato', 'Paraquat', 'Glufosinato'],
-      selectivo: ['Metsulfuron', 'Atrazina', 'Bentazona'],
-      sistemico: ['Imazapir', 'Imazetapir', 'Nicosulfuron'],
-      contacto: ['Carfentrazona', 'Oxifluorfen', 'Diquat'],
-    };
-
     return Array.from({length:n}).map((_, i) => {
-      const id = `H-${Date.now()}-${this.page}-${i}`;
+      const id = `H-${Date.now()}-${i}`;
       const base = 6 + Math.random()*45;
       const hasCompare = Math.random() > 0.45;
-      const rating = Math.floor(Math.random()*2) + 4;
-      const sold = Math.random() > 0.5 ? `${(Math.floor(Math.random()*15)+1)}K+` : '';
-
-      const category: Cat = cats[i % cats.length];
+      const category = cats[i % cats.length];
       const brand = brands[i % brands.length];
-      const tagCount = Math.random()>0.6 ? 2 : 1;
-      const tags = Array.from({length:tagCount}).map(() => tagsPool[Math.floor(Math.random()*tagsPool.length)]);
-
-      const name = namesByCat[category][i % namesByCat[category].length];
 
       return {
         id,
-        title: `${name} ${brand} ${100 + i}`,
-        image: `https://picsum.photos/seed/${id}/720/720`,
+        title: `Herbicida demo ${i+1}`,
+        imageUrl: `https://picsum.photos/seed/${id}/720/720`,
         price: Number(base.toFixed(2)),
         compareAt: hasCompare ? Number((base + (Math.random()*15+6)).toFixed(2)) : undefined,
-        rating,
-        reviews: Math.floor(Math.random()*5000),
-        sold,
+        rating: 4,
+        reviews: Math.floor(Math.random()*3000),
+        sold: '',
         promo: promos[i % promos.length],
         badge: Math.random() > 0.7 ? 'Registro vigente' : '',
         brand,
         category,
-        tags,
+        tags: [tagsPool[i % tagsPool.length]],
       };
     });
   }

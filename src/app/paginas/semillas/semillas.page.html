@@ -1,16 +1,24 @@
 <ion-content [fullscreen]="true" class="mw-cat">
 
-  <!-- Chips circulares (subcategorías) -->
+  <!-- ===================== -->
+  <!-- 🔹 CHIPS CATEGORÍAS -->
+  <!-- ===================== -->
   <section class="chips container">
     <div class="chips-scroll">
-      <button class="chip" *ngFor="let c of chips" (click)="filter(c.key)">
-        <img [src]="c.icon" [alt]="c.label" />
+      <button
+        class="chip"
+        *ngFor="let c of chips"
+        [class.active]="active === c.key"
+        (click)="filter(c.key)">
+        <img [src]="c.icon" [alt]="c.label" loading="lazy" />
         <span>{{ c.label }}</span>
       </button>
     </div>
   </section>
 
-  <!-- PILLBAR -->
+  <!-- ===================== -->
+  <!-- 🔹 PILLBAR (Filtros) -->
+  <!-- ===================== -->
   <section class="pillbar container">
     <button class="arrow" (click)="scrollPills(-1)" aria-label="Anterior">
       <ion-icon name="chevron-back-outline"></ion-icon>
@@ -31,19 +39,46 @@
     </button>
   </section>
 
-  <!-- Grid de productos -->
+  <!-- ===================== -->
+  <!-- 🔹 INDICADOR DE CARGA -->
+  <!-- ===================== -->
+  <section class="loading container" *ngIf="!all.length">
+    <ion-spinner name="crescent" color="primary"></ion-spinner>
+    <p>Cargando semillas disponibles...</p>
+  </section>
+
+  <!-- ===================== -->
+  <!-- 🔹 ESTADO / INFORME -->
+  <!-- ===================== -->
+  <section class="status container" *ngIf="all.length > 0">
+    <div class="info-status">
+      <ion-icon name="leaf-outline" color="success"></ion-icon>
+      <span>
+        Mostrando <b>{{ list.length }}</b> de <b>{{ all.length }}</b> variedades de semilla
+      </span>
+    </div>
+  </section>
+
+  <!-- ===================== -->
+  <!-- 🔹 GRID DE PRODUCTOS -->
+  <!-- ===================== -->
   <section class="container grid">
-    <article class="prod" *ngFor="let p of list">
+    <article class="prod" *ngFor="let p of list; trackBy: trackById">
       <div class="thumb">
-        <!-- CLICK EN IMAGEN -> detalle -->
+        <!-- CLICK EN IMAGEN -> Detalle -->
         <a class="media" [routerLink]="['/producto', p.id]" aria-label="Ver producto">
-          <img [src]="p.image" [alt]="p.title" loading="lazy" />
+          <img
+            [src]="p.imageUrl || 'assets/img/placeholder.png'"
+            [alt]="p.title"
+            loading="lazy"
+            (error)="p.imageUrl='assets/img/placeholder.png'" />
           <div class="ribbon" *ngIf="p.badge">{{ p.badge }}</div>
+
           <!-- Descuento arriba de la imagen -->
           <div class="discount" *ngIf="p.compareAt">{{ discount(p) }}</div>
         </a>
 
-        <!-- CARRITO: no navega -->
+        <!-- BOTÓN MINI CARRITO -->
         <button
           class="cart-mini"
           (click)="addToCart(p); $event.stopPropagation(); $event.preventDefault()"
@@ -53,25 +88,27 @@
       </div>
 
       <div class="info">
-        <!-- Solo texto del título, sin link -->
+        <!-- Título -->
         <h3 class="title">{{ p.title }}</h3>
 
         <!-- Precios -->
         <div class="price-row">
-          <div class="price-now">{{ money(p.price) }}</div>
+          <div class="price-now">{{ money(p.price || 0) }}</div>
           <div class="price-before" *ngIf="p.compareAt">{{ money(p.compareAt) }}</div>
           <div class="discount-inline" *ngIf="p.compareAt">{{ discount(p) }}</div>
         </div>
 
-
-        <!-- Promo -->
+        <!-- Promoción -->
         <div class="promo" *ngIf="p.promo">{{ p.promo }}</div>
 
-        <!-- Meta -->
+        <!-- Metadatos -->
         <div class="meta">
           <div class="stars">
-            <ion-icon *ngFor="let s of [1,2,3,4,5]" [name]="s<=p.rating ? 'star' : 'star-outline'"></ion-icon>
-            <span class="cnt">{{ p.reviews }}</span>
+            <ion-icon
+              *ngFor="let s of [1,2,3,4,5]"
+              [name]="s <= (p.rating || 0) ? 'star' : 'star-outline'">
+            </ion-icon>
+            <span class="cnt">{{ p.reviews || 0 }}</span>
           </div>
           <div class="sold" *ngIf="p.sold">{{ p.sold }} ventas</div>
         </div>
@@ -79,9 +116,18 @@
     </article>
   </section>
 
+  <!-- ===================== -->
+  <!-- 🔹 SCROLL INFINITO -->
+  <!-- ===================== -->
   <ion-infinite-scroll (ionInfinite)="loadMore($event)">
-    <ion-infinite-scroll-content loadingSpinner="crescent" loadingText="Cargando…"></ion-infinite-scroll-content>
+    <ion-infinite-scroll-content
+      loadingSpinner="crescent"
+      loadingText="Cargando más semillas...">
+    </ion-infinite-scroll-content>
   </ion-infinite-scroll>
 
+  <!-- ===================== -->
+  <!-- 🔹 FOOTER -->
+  <!-- ===================== -->
   <app-footer></app-footer>
 </ion-content>

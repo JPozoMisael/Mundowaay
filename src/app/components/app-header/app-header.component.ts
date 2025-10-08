@@ -1,8 +1,7 @@
-import { Component, OnInit, OnDestroy, EventEmitter, Output, Input } from '@angular/core';
+import { Component, OnInit, OnDestroy, EventEmitter, Output, Input, HostListener } from '@angular/core';
 import { Router } from '@angular/router';
-import { MenuController } from '@ionic/angular';
+import { MenuController, ModalController } from '@ionic/angular';
 import { CartService } from 'src/app/servicios/cart';
-import { ModalController } from '@ionic/angular';
 import { LocationService, LocationData } from 'src/app/servicios/location';
 import { LocationModalComponent } from '../location-modal/location-modal.component';
 import { LoginModalComponent } from '../login-modal/login-modal.component';
@@ -46,6 +45,10 @@ export class AppHeaderComponent implements OnInit, OnDestroy {
 
   private destroy$ = new Subject<void>();
 
+  // ==== NUEVO: control del scroll ====
+  private lastScrollTop = 0;
+  isHidden = false;
+
   constructor(
     private router: Router,
     private menu: MenuController,
@@ -57,7 +60,7 @@ export class AppHeaderComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.cart.count$.pipe(takeUntil(this.destroy$)).subscribe(n => (this.cartCount = n));
-    this.locationSvc.current$.pipe(takeUntil(this.destroy$)).subscribe(loc => this.userLocation = loc);
+    this.locationSvc.current$.pipe(takeUntil(this.destroy$)).subscribe(loc => (this.userLocation = loc));
   }
 
   ngOnDestroy() {
@@ -65,49 +68,56 @@ export class AppHeaderComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  // ====== BUSCADOR ======
+  // ====== NUEVO: Escuchar scroll global ======
+  @HostListener('window:scroll', [])
+  onWindowScroll() {
+    const st = window.pageYOffset || document.documentElement.scrollTop;
 
-  /** Manejador de (ionInput) del searchbar */
+    if (st > this.lastScrollTop && st > 80) {
+      // Bajando
+      this.isHidden = true;
+    } else if (st < this.lastScrollTop) {
+      // Subiendo
+      this.isHidden = false;
+    }
+
+    this.lastScrollTop = st <= 0 ? 0 : st;
+  }
+
+  // ====== BUSCADOR ======
   onInput(ev: any) {
     const value = ev?.target?.value ?? ev?.detail?.value ?? '';
-    // Compatibilidad: reemplaza trimStart() para targets < ES2019
     this.query = String(value).replace(/^\s+/, '');
     this.openSuggest = !!this.query || this.getRecent().length > 0;
     this.q$.next(this.query);
   }
 
-  /** Enter o botón de buscar */
   submit() {
     const q = (this.query || '').trim();
     if (!q) return;
     this.saveRecent(q);
-    // Emitir por si el padre escucha
     this.search.emit(q);
     this.openSuggest = false;
     this.router.navigate(['/search'], { queryParams: { q } });
   }
 
-  /** Click en una sugerencia de texto */
   pick(text: string) {
     this.query = text;
     this.submit();
   }
 
-  /** Ir directo a categoría desde el panel */
   goCat(key: string) {
     this.openSuggest = false;
     this.category.emit(key);
     this.router.navigate(['/c', key]);
   }
 
-  /** Limpiar */
   clear() {
     this.query = '';
     this.q$.next('');
     this.openSuggest = false;
   }
 
-  // === compat anterior (si algo usa (ionSearch)) ===
   onSearch(ev: any) {
     const q = ev?.detail?.value?.trim();
     if (q) {
@@ -124,6 +134,7 @@ export class AppHeaderComponent implements OnInit, OnDestroy {
   goCart() {
     this.router.navigateByUrl('/cart');
   }
+
   openMenu() {
     this.menu.enable(true, 'mainMenu');
     this.menu.open('mainMenu');
@@ -132,7 +143,6 @@ export class AppHeaderComponent implements OnInit, OnDestroy {
   // ====== SUGERENCIAS ======
   private buildSuggest(q: string): Suggest {
     const recent = this.getRecent().slice(0, 6);
-
     const cats = [
       { key: 'semillas', label: 'Semillas' },
       { key: 'insecticidas', label: 'Insecticidas' },
@@ -154,9 +164,7 @@ export class AppHeaderComponent implements OnInit, OnDestroy {
 
     const hits = !q
       ? baseHits.slice(0, 5)
-      : baseHits
-          .filter(x => x.toLowerCase().includes(q.toLowerCase()))
-          .slice(0, 5);
+      : baseHits.filter(x => x.toLowerCase().includes(q.toLowerCase())).slice(0, 5);
 
     return { recent, cats, hits };
   }
@@ -175,23 +183,24 @@ export class AppHeaderComponent implements OnInit, OnDestroy {
     localStorage.setItem('mw_recent', JSON.stringify(arr.slice(0, 10)));
   }
 
-  async openLocation(){
+  // ====== MODALES ======
+  async openLocation() {
     const modal = await this.modalCtrl.create({
-      component: LocationModalComponent
+      component: LocationModalComponent,
     });
     await modal.present();
   }
 
-  async openLogin(){
+  async openLogin() {
     const modal = await this.modalCtrl.create({
       component: LoginModalComponent,
-      cssClass: 'login-modal',
-      backdropDismiss: true
+      cssClass: '/login',
+      backdropDismiss: true,
     });
     await modal.present();
   }
 
-  get user(){
+  get user() {
     return this.auth.currentUser;
   }
 }

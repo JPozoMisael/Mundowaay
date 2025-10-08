@@ -1,0 +1,64 @@
+<div class="login-modal">
+  <!-- Header -->
+  <div class="login-header">
+    <div class="title-group">
+      <h2>Iniciar sesión o Registrarse</h2>
+      <p>Accede a tu cuenta WAY para comprar con confianza</p>
+    </div>
+    <button class="close-btn" (click)="dismiss()">✕</button>
+  </div>
+
+  <!-- Contenido -->
+  <div class="login-body">
+    <!-- Columna izquierda -->
+    <div class="left">
+      <form (ngSubmit)="submit()">
+        <ion-item lines="none">
+          <ion-label position="floating">Email</ion-label>
+          <ion-input [(ngModel)]="email" name="email" type="email" required></ion-input>
+        </ion-item>
+
+        <ion-item lines="none">
+          <ion-label position="floating">Contraseña</ion-label>
+          <ion-input [(ngModel)]="password" name="password" type="password" required></ion-input>
+        </ion-item>
+
+        <ion-button expand="block" type="submit" class="btn-way">Continuar</ion-button>
+      </form>
+      <a class="link" href="#">¿Problemas al iniciar sesión?</a>
+    </div>
+
+    <!-- Separador -->
+    <div class="divider">O</div>
+
+    <!-- Columna derecha -->
+    <div class="right">
+      <ion-button expand="block" class="social-btn google">
+        <ion-icon name="logo-google" slot="start"></ion-icon>
+        Continuar con Google
+      </ion-button>
+
+      <ion-button expand="block" class="social-btn facebook">
+        <ion-icon name="logo-facebook" slot="start"></ion-icon>
+        Continuar con Facebook
+      </ion-button>
+
+      <ion-button expand="block" class="social-btn apple">
+        <ion-icon name="logo-apple" slot="start"></ion-icon>
+        Continuar con Apple
+      </ion-button>
+
+      <ion-button expand="block" class="social-btn phone">
+        <ion-icon name="call-outline" slot="start"></ion-icon>
+        Continuar con Teléfono
+      </ion-button>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="login-footer">
+    Al continuar, aceptas nuestros 
+    <a href="#">Términos de uso</a> y 
+    <a href="#">Política de privacidad</a>.
+  </div>
+</div>

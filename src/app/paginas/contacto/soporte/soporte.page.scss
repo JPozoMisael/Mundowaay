@@ -1,0 +1,96 @@
+.mw-soporte {
+  --ion-background-color: #f9fafc;
+
+  ion-card {
+    border-radius: 16px;
+    border: none;
+    background: #fff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    padding: 18px;
+  }
+
+  ion-card-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: #222;
+    text-align: center;
+    margin-bottom: 10px;
+  }
+
+  ion-card-content > p {
+    font-size: 14px;
+    color: #666;
+    text-align: center;
+    margin-bottom: 24px;
+  }
+
+  /* Contenedor de opciones */
+  .contact-options {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .contact-card {
+    border-radius: 14px;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    transition: all 0.25s ease;
+    cursor: pointer;
+    color: #222;
+    background: #fff;
+    border: 1px solid #eee;
+
+    &:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+    }
+
+    .icon-wrapper {
+      min-width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      color: #fff;
+    }
+
+    .info h2 {
+      font-size: 16px;
+      font-weight: 600;
+      margin: 0;
+    }
+
+    .info p {
+      margin: 2px 0 0;
+      font-size: 14px;
+      color: #555;
+    }
+  }
+
+  /* Colores por servicio */
+  .email {
+    background: #ffeceb;
+    .icon-wrapper {
+      background: #ff4d2d;
+    }
+  }
+
+  .phone {
+    background: #eaf4ff;
+    .icon-wrapper {
+      background: #2f72c9;
+    }
+  }
+
+  .whatsapp {
+    background: #e9fdf2;
+    .icon-wrapper {
+      background: #25d366;
+    }
+  }
+}

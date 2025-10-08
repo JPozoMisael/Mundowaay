@@ -1,0 +1,74 @@
+.mw-prensa {
+  --ion-background-color: #f9fafc;
+
+  .hero {
+    text-align: center;
+    margin-bottom: 24px;
+
+    h1 {
+      font-size: 24px;
+      font-weight: 700;
+      color: #222;
+      margin-bottom: 6px;
+    }
+
+    p {
+      font-size: 15px;
+      color: #555;
+    }
+  }
+
+  .timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+
+    .event {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      background: #fff;
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+      transition: transform 0.2s ease;
+
+      &:hover {
+        transform: translateY(-3px);
+      }
+
+      .icon {
+        background: #fef2f2;
+        color: #e11d48;
+        border-radius: 50%;
+        width: 46px;
+        height: 46px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+      }
+
+      .content {
+        flex: 1;
+
+        h2 {
+          font-size: 16px;
+          font-weight: 600;
+          color: #222;
+          margin: 0 0 4px;
+
+          span {
+            color: #e53935;
+          }
+        }
+
+        p {
+          font-size: 14px;
+          color: #555;
+          margin: 0;
+        }
+      }
+    }
+  }
+}
