@@ -26,7 +26,7 @@ type LocalProduct = Product & {
   standalone: false,
 })
 export class FungicidasPage {
-  // Pills
+  // ===== Pills =====
   pills = [
     { key: 'tendencia',   label: 'Más demandados' },
     { key: 'relampago',   label: 'Ofertas relámpago' },
@@ -39,7 +39,7 @@ export class FungicidasPage {
   ];
   activePill = 'tendencia';
 
-  // Chips
+  // ===== Chips =====
   chips = [
     { key: 'reco',           label: 'Recomendado',      icon: 'assets/img/recofung.png' },
     { key: 'marca_qsi',      label: 'QSI',              icon: 'assets/img/qsifung.png' },
@@ -73,17 +73,35 @@ export class FungicidasPage {
     this.loadProducts();
   }
 
+  // ====== CARGA de productos (solo FUNGICIDAS) ======
   private loadProducts() {
     this.productsSvc.listAll().subscribe(items => {
-      // Filtramos SOLO fungicidas
       this.all = items
-        .filter(p => p.title.toLowerCase().includes('fungicida') || (p.tags||[]).includes('fungicida'))
+        .filter(p => {
+          const title = (p.title || '').toLowerCase();
+          const category = (p.category || '').toLowerCase();
+          const tags = (p.tags || []).map(t => (t || '').toLowerCase());
+          const collections = (p.collectionSlugs || []).map(s => (s || '').toLowerCase());
+
+          // === Filtros específicos para fungicidas ===
+          const slugMatch = collections.includes('fungicidas') || collections.includes('fungicida');
+          const catMatch = category.includes('fungicida');
+          const tagMatch = tags.some(t => t.includes('fungicida'));
+          const nameMatch = /(fungicida|triazol|estrobilurina|sdhi|mancozeb|propiconazol|cobre|trichoderma|metalaxyl|fosetyl)/.test(title);
+
+          return slugMatch || catMatch || tagMatch || nameMatch;
+        })
         .map(p => this.mapToLocal(p));
 
       if (!this.all.length) {
-        this.all = this.mock(24); // fallback
+        console.warn('[Fungicidas] No se encontraron productos válidos, usando mock');
+        this.all = this.mock(24);
       }
 
+      this.rebuildSortedAndSlice();
+    }, err => {
+      console.error('[Fungicidas] Error al cargar productos:', err);
+      this.all = this.mock(24);
       this.rebuildSortedAndSlice();
     });
   }
@@ -94,7 +112,7 @@ export class FungicidasPage {
       price: p.price ?? 0,
       compareAt: p.compareAt ?? undefined,
       rating: 4,
-      reviews: Math.floor(Math.random()*500),
+      reviews: Math.floor(Math.random() * 500),
       sold: '',
       promo: '',
       badge: '',
@@ -118,19 +136,20 @@ export class FungicidasPage {
     return 'sistemico';
   }
 
-  // ====== UI ======
+  // ===== UI =====
+  scrollChips(dir: number) {
+    const el = this.chipScroll?.nativeElement; if (!el) return;
+    el.scrollBy({ left: dir * el.clientWidth * 0.8, behavior: 'smooth' });
+  }
+
+  scrollPills(dir: number) {
+    const el = this.pillScroll?.nativeElement; if (!el) return;
+    el.scrollBy({ left: dir * el.clientWidth * 0.8, behavior: 'smooth' });
+  }
+
   selectPill(key: string){ this.activePill = key; this.rebuildSortedAndSlice(); }
-  scrollPills(dir: number){
-    const el = this.pillScroll?.nativeElement; if(!el) return;
-    el.scrollBy({ left: dir * el.clientWidth * 0.8, behavior: 'smooth' });
-  }
-  scrollChips(dir: number){
-    const el = this.chipScroll?.nativeElement; if(!el) return;
-    el.scrollBy({ left: dir * el.clientWidth * 0.8, behavior: 'smooth' });
-  }
   filter(key: string){ this.active = key; this.rebuildSortedAndSlice(); }
 
-  // ====== Orden estable + slice ======
   private rebuildSortedAndSlice() {
     const base = this.active === 'reco' ? [...this.all] : this.all.filter(p => p.category === this.active);
     let src = [...base];
@@ -171,7 +190,7 @@ export class FungicidasPage {
     this.list = this.sorted.slice(0, this.firstPage);
   }
 
-  // ====== helpers ======
+  // ===== Helpers =====
   money(n:number|undefined){ return `$${((n??0)).toFixed(2)}`; }
   offPct(p: LocalProduct){
     const price = p.price ?? 0;
@@ -227,5 +246,14 @@ export class FungicidasPage {
         tags: [],
       };
     });
+  }
+
+  // ====== Eventos del header ======
+  onGlobalSearch(term: string) {
+    console.log('[Header] Buscar término:', term);
+  }
+
+  onGlobalCat(cat: string) {
+    console.log('[Header] Seleccionar categoría:', cat);
   }
 }

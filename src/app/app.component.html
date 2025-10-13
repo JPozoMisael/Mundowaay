@@ -1,6 +1,8 @@
 <ion-app>
 
-  <!-- MENÚ LATERAL -->
+  <!-- ========================================================= -->
+  <!-- 🟦 MENÚ LATERAL (visible en todas las páginas) -->
+  <!-- ========================================================= -->
   <ion-menu
     side="start"
     contentId="main"
@@ -10,7 +12,7 @@
 
     <ion-content>
 
-      <!-- Encabezado -->
+      <!-- 🔹 Encabezado del menú -->
       <div class="menu-header">
         <ion-menu-toggle auto-hide="true">
           <ion-item button (click)="openLogin()" class="hello-item">
@@ -20,7 +22,7 @@
         </ion-menu-toggle>
       </div>
 
-      <!-- Enlace Home -->
+      <!-- 🔹 Enlace Home -->
       <ion-list class="menu-list" lines="none">
         <ion-menu-toggle auto-hide="true">
           <ion-item button (click)="go('/home')">
@@ -29,10 +31,12 @@
         </ion-menu-toggle>
       </ion-list>
 
-      <!-- Secciones en acordeón -->
+      <!-- ========================================================= -->
+      <!-- 🔹 Secciones del Menú (acordeones) -->
+      <!-- ========================================================= -->
       <ion-accordion-group expand="inset">
 
-        <!-- Catálogo -->
+        <!-- 🧺 Catálogo -->
         <ion-accordion value="catalogo">
           <ion-item slot="header" class="section-title">
             <ion-label>Catálogo</ion-label>
@@ -49,7 +53,7 @@
           </div>
         </ion-accordion>
 
-        <!-- Información y servicios -->
+        <!-- 🧾 Información y servicios -->
         <ion-accordion value="servicios">
           <ion-item slot="header" class="section-title">
             <ion-label>Información y servicios</ion-label>
@@ -67,7 +71,7 @@
           </div>
         </ion-accordion>
 
-        <!-- Corporativo -->
+        <!-- 🏢 Corporativo -->
         <ion-accordion value="corporativo">
           <ion-item slot="header" class="section-title">
             <ion-label>Corporativo</ion-label>
@@ -82,7 +86,7 @@
           </div>
         </ion-accordion>
 
-        <!-- Contactos -->
+        <!-- 📞 Contactos -->
         <ion-accordion value="contacto">
           <ion-item slot="header" class="section-title">
             <ion-label>Contactos</ion-label>
@@ -98,7 +102,9 @@
 
       </ion-accordion-group>
 
-      <!-- Redes sociales -->
+      <!-- ========================================================= -->
+      <!-- 🔹 Redes Sociales -->
+      <!-- ========================================================= -->
       <div class="social">
         <a aria-label="Instagram" href="#" target="_blank"><ion-icon name="logo-instagram"></ion-icon></a>
         <a aria-label="Facebook" href="#" target="_blank"><ion-icon name="logo-facebook"></ion-icon></a>
@@ -111,13 +117,9 @@
     </ion-content>
   </ion-menu>
 
-  <!-- HEADER GLOBAL -->
-  <app-header
-    (search)="onGlobalSearch($event)"
-    (category)="onGlobalCat($event)">
-  </app-header>
-
-  <!-- CONTENIDO PRINCIPAL -->
+  <!-- ========================================================= -->
+  <!-- 🧭 CONTENIDO PRINCIPAL (sin header global) -->
+  <!-- ========================================================= -->
   <ion-router-outlet id="main"></ion-router-outlet>
 
 </ion-app>

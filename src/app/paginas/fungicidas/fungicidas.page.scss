@@ -4,7 +4,7 @@
 
   .container { width:100%; max-width:1180px; margin:0 auto; padding:0 16px; }
 
-  /* CHIPS con slider */
+  /* CHIPS */
   .chips { display:grid; grid-template-columns:44px 1fr 44px; align-items:center; gap:10px; padding:10px 0; }
   .chips-scroll { display:flex; gap:16px; overflow-x:auto; -webkit-overflow-scrolling:touch; scrollbar-width:none; }
   .chips-scroll::-webkit-scrollbar { display:none; }

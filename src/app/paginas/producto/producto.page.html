@@ -1,55 +1,125 @@
+<app-header
+  (search)="onGlobalSearch($event)"
+  (category)="onGlobalCat($event)">
+</app-header>
 <ion-header translucent="true"></ion-header>
-<ion-content class="mw-product">
+
+<ion-content class="mw-product" class="mw-product"
+  (ionScroll)="onScroll($event)"
+  scrollEvents="true">
   <div class="product-container">
-    
-    <!-- Galería de imágenes -->
+    <!-- Galería -->
     <div class="gallery">
       <div class="thumbs">
-        <img *ngFor="let g of vm?.gallery" 
-             [src]="g" 
-             (click)="setImage(g)"
-             [class.active]="g === currentImage" />
+        <img
+          *ngFor="let g of vm?.gallery"
+          [src]="g"
+          (click)="setImage(g)"
+          [class.active]="g === currentImage"
+        />
       </div>
       <div class="main-img">
         <img [src]="currentImage" [alt]="vm?.title" />
       </div>
     </div>
 
-    <!-- Info -->
-    <div class="product-info">
-      <!-- Badge / Promo -->
-      <div class="badge" *ngIf="vm?.badge">{{ vm?.badge }}</div>
-      <h1>{{ vm?.title }}</h1>
-      <p class="brand" *ngIf="vm?.brand">Marca: {{ vm?.brand }}</p>
-
-      <!-- Rating -->
-      <div class="rating">
-        <ion-icon *ngFor="let s of [1,2,3,4,5]" 
-                  [name]="s <= (vm?.rating || 0) ? 'star' : 'star-outline'">
-        </ion-icon>
-        <span>{{ vm?.reviews || 0 }} opiniones</span>
-        <span class="sold" *ngIf="vm?.sold">{{ vm?.sold }} vendidos</span>
+    <!-- Lado derecho unificado -->
+    <div class="product-side">
+      <!-- Cabecera -->
+      <div class="product-header">
+        <div class="badge" *ngIf="vm?.badge">{{ vm?.badge }}</div>
+        <h1>{{ vm?.title }}</h1>
+        <div class="rating">
+          <ion-icon
+            *ngFor="let s of [1, 2, 3, 4, 5]"
+            [name]="s <= (vm?.rating || 0) ? 'star' : 'star-outline'"
+          ></ion-icon>
+          <span>{{ vm?.reviews || 0 }} opiniones</span>
+        </div>
       </div>
 
-      <!-- Precio -->
-      <div class="pricebox">
+      <!-- Bloque de precios y descuentos -->
+      <div class="price-block">
         <div class="price">{{ money(vm?.price || 0) }}</div>
         <div class="compare" *ngIf="vm?.compareAt">
-          Antes: <span>{{ money(vm?.compareAt || 0) }}</span>
+          <span class="old">Antes: {{ money(vm?.compareAt || 0) }}</span>
         </div>
-        <div class="promo" *ngIf="vm?.promo">{{ vm?.promo }}</div>
+        <div class="discount" *ngIf="vm?.discountPercent">
+          -{{ vm?.discountPercent }}%
+        </div>
       </div>
 
-      <!-- Descripción -->
-      <p class="desc">{{ vm?.desc }}</p>
+      <!-- Beneficios y descripción -->
+      <div class="info-block">
+        <div class="info-item">
+          <ion-icon name="car-outline"></ion-icon>
+          Envío gratis desde $50
+        </div>
+        <div class="info-item">
+          <ion-icon name="shield-checkmark-outline"></ion-icon>
+          Garantía de 15 días
+        </div>
+        <div class="info-item">
+          <ion-icon name="lock-closed-outline"></ion-icon>
+          Pago seguro y cifrado
+        </div>
+        <div class="divider"></div>
+        <div class="desc-section" *ngIf="vm?.desc">
+          <div class="desc-header">
+            <ion-icon name="information-circle-outline"></ion-icon>
+            <span>Descripción del producto</span>
+          </div>
+          <div class="desc-body" [innerHTML]="vm?.desc"></div>
+        </div>
+      </div>
 
       <!-- Botones -->
       <div class="buybar">
-        <button class="add" (click)="addToCart()">Añadir al carrito</button>
-        <button class="buy">Comprar ahora</button>
+        <button class="add" (click)="addToCart()">🛒 Añadir al carrito</button>
+        <button class="buy">⚡ Comprar ahora</button>
       </div>
     </div>
   </div>
+ <!-- Productos recomendados -->
+<div class="recommended">
+  <h2>✨ También te puede interesar</h2>
+
+  <div class="product-grid">
+    <div
+      class="product-card"
+      *ngFor="let r of recommendedProducts"
+      (click)="goToProduct(r.id)"
+    >
+      <!-- Imagen -->
+      <div class="img-box">
+        <img [src]="r.imageUrl" [alt]="r.title" />
+        <span class="discount" *ngIf="r.discountPercent">
+          -{{ r.discountPercent }}%
+        </span>
+      </div>
+
+      <!-- Título -->
+      <h3 class="title">{{ r.title }}</h3>
+
+      <!-- Precio -->
+      <div class="price-section">
+        <span class="price">{{ money(r.price) }}</span>
+        <span class="compare" *ngIf="r.compareAt">{{ money(r.compareAt) }}</span>
+      </div>
+
+      <!-- Calificación -->
+      <div class="rating">
+        <ion-icon
+          *ngFor="let s of [1, 2, 3, 4, 5]"
+          [name]="s <= (r.rating || 0) ? 'star' : 'star-outline'"
+        ></ion-icon>
+        <span>{{ r.reviews }}</span>
+      </div>
+    </div>
+  </div>
+</div>
 
   <app-footer></app-footer>
+ 
+
 </ion-content>

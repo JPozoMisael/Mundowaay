@@ -68,18 +68,34 @@ export class HerbicidasPage {
     this.loadProducts();
   }
 
+  // Carga desde backend (colección herbicidas). Si no hay datos, usa mock.
   private loadProducts() {
-    this.productsSvc.listAll().subscribe(items => {
-      this.all = items
-        .filter(p => p.title.toLowerCase().includes('herbicida') || (p.tags||[]).includes('herbicida'))
-        .map(p => this.mapToLocal(p));
+  this.productsSvc.listAll().subscribe(items => {
+    this.all = items
+      .filter(p => {
+        const slugMatch =
+          (p.collectionSlugs || []).some(s =>
+            ['herbicidas', 'herbicida'].includes((s || '').toLowerCase())
+          );
+        const catMatch = (p.category || '').toLowerCase().includes('herbicida');
+        const tagMatch = (p.tags || []).some(t =>
+          (t || '').toLowerCase().includes('herbicida')
+        );
+        const nameMatch = (p.title || '').toLowerCase().match(/glifo|paraquat|herbi|weed|graminicida/);
 
-      if (!this.all.length) {
-        this.all = this.mock(24);
-      }
-      this.rebuildSortedAndSlice();
-    });
-  }
+        // ✅ Solo pasa si pertenece a la colección o coincide por nombre típico de herbicida
+        return slugMatch || catMatch || tagMatch || nameMatch;
+      })
+      .map(p => this.mapToLocal(p));
+
+    if (!this.all.length) {
+      console.warn('[Herbicidas] No se encontraron productos reales, usando mock');
+      this.all = this.mock(24);
+    }
+
+    this.rebuildSortedAndSlice();
+  });
+}
 
   private mapToLocal(p: Product): LocalProduct {
     return {
@@ -87,7 +103,7 @@ export class HerbicidasPage {
       price: p.price ?? 0,
       compareAt: p.compareAt ?? undefined,
       rating: 4,
-      reviews: Math.floor(Math.random()*500),
+      reviews: Math.floor(Math.random() * 500),
       sold: '',
       promo: '',
       badge: '',
@@ -187,7 +203,7 @@ export class HerbicidasPage {
     target.complete();
   }
 
-  // ===== MOCK =====
+  // ===== MOCK (si la API no devuelve productos) =====
   private mock(n:number): LocalProduct[]{
     const cats: Category[] = ['pre','post','no_selectivo','selectivo','sistemico','contacto'];
     const brands: Brand[] = ['QSI','AVGUST'];
@@ -217,5 +233,16 @@ export class HerbicidasPage {
         tags: [tagsPool[i % tagsPool.length]],
       };
     });
+  }
+
+  // ====== Eventos del header (búsqueda y categoría global) ======
+  onGlobalSearch(term: string) {
+    console.log('[Header] Buscar término:', term);
+    // Aquí puedes implementar una búsqueda local si quieres
+  }
+
+  onGlobalCat(cat: string) {
+    console.log('[Header] Seleccionar categoría:', cat);
+    // O navegar/filtrar por categoría si lo requieres
   }
 }

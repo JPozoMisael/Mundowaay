@@ -1,13 +1,16 @@
-<ion-content [fullscreen]="true" class="mw-cat">
+<!-- HEADER LOCAL -->
+<app-header
+  (search)="onGlobalSearch($event)"
+  (category)="onGlobalCat($event)">
+</app-header>
 
+<ion-content [fullscreen]="true" class="mw-cat">
   <!-- CHIPS redondos como slider -->
   <section class="chips-slider container">
-    <!-- Flecha izquierda -->
     <button class="arrow" (click)="scrollChips(-1)" aria-label="Anterior">
       <ion-icon name="chevron-back-outline"></ion-icon>
     </button>
 
-    <!-- Scroll horizontal -->
     <div class="chips-scroll" #chipScroll>
       <button class="chip" *ngFor="let c of chips" (click)="filter(c.key)">
         <img [src]="c.icon" [alt]="c.label" />
@@ -15,7 +18,6 @@
       </button>
     </div>
 
-    <!-- Flecha derecha -->
     <button class="arrow" (click)="scrollChips(1)" aria-label="Siguiente">
       <ion-icon name="chevron-forward-outline"></ion-icon>
     </button>
@@ -46,14 +48,12 @@
   <section class="container grid">
     <article class="prod" *ngFor="let p of list">
       <div class="thumb">
-        <!-- CLICK EN IMAGEN -> detalle -->
         <a class="media" [routerLink]="['/producto', p.id]" aria-label="Ver producto">
           <img [src]="p.imageUrl || 'assets/img/placeholder.png'" [alt]="p.title" loading="lazy" />
           <div class="ribbon" *ngIf="p.badge">{{ p.badge }}</div>
           <div class="discount" *ngIf="p.compareAt">{{ discount(p) }}</div>
         </a>
 
-        <!-- Botón carrito -->
         <button
           class="cart-mini"
           (click)="addToCart(p); $event.stopPropagation(); $event.preventDefault()"
@@ -63,7 +63,6 @@
       </div>
 
       <div class="info">
-        <!-- CLICK EN TÍTULO -> detalle -->
         <h3 class="title">{{ p.title }}</h3>
 
         <div class="price-row">

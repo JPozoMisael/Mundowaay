@@ -1,4 +1,15 @@
-import { Component, OnInit, OnDestroy, EventEmitter, Output, Input, HostListener } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  OnDestroy,
+  EventEmitter,
+  Output,
+  Input,
+  ElementRef,
+  Renderer2,
+  SimpleChanges,
+  OnChanges,
+} from '@angular/core';
 import { Router } from '@angular/router';
 import { MenuController, ModalController } from '@ionic/angular';
 import { CartService } from 'src/app/servicios/cart';
@@ -28,26 +39,30 @@ type Suggest = {
   styleUrls: ['./app-header.component.scss'],
   standalone: false,
 })
-export class AppHeaderComponent implements OnInit, OnDestroy {
+export class AppHeaderComponent implements OnInit, OnDestroy, OnChanges {
+  // ================================
+  // 🔹 Inputs & Outputs
+  // ================================
   @Input() cartCount = 0;
+  @Input() scrollTop: number = 0; // << nuevo control de scroll individual
   @Output() search = new EventEmitter<string>();
   @Output() category = new EventEmitter<string>();
-  userLocation: LocationData | null = null;
 
-  // ==== estado del buscador ====
+  // ================================
+  // 🔹 Variables internas
+  // ================================
+  userLocation: LocationData | null = null;
   query = '';
   openSuggest = false;
+  isHidden = false;
 
+  private lastScrollTop = 0;
   private q$ = new BehaviorSubject<string>('');
+  private destroy$ = new Subject<void>();
+
   suggest$ = combineLatest([
     this.q$.pipe(debounceTime(160), distinctUntilChanged()),
   ]).pipe(map(([q]) => this.buildSuggest(q)));
-
-  private destroy$ = new Subject<void>();
-
-  // ==== NUEVO: control del scroll ====
-  private lastScrollTop = 0;
-  isHidden = false;
 
   constructor(
     private router: Router,
@@ -55,12 +70,23 @@ export class AppHeaderComponent implements OnInit, OnDestroy {
     private cart: CartService,
     private modalCtrl: ModalController,
     private locationSvc: LocationService,
-    private auth: AuthService
+    private auth: AuthService,
+    private el: ElementRef,
+    private renderer: Renderer2
   ) {}
 
+  // ================================
+  // 🔹 Ciclo de vida
+  // ================================
   ngOnInit() {
-    this.cart.count$.pipe(takeUntil(this.destroy$)).subscribe(n => (this.cartCount = n));
-    this.locationSvc.current$.pipe(takeUntil(this.destroy$)).subscribe(loc => (this.userLocation = loc));
+    this.cart.count$.pipe(takeUntil(this.destroy$)).subscribe((n) => (this.cartCount = n));
+    this.locationSvc.current$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((loc) => (this.userLocation = loc));
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['scrollTop']) this.handleScroll();
   }
 
   ngOnDestroy() {
@@ -68,23 +94,30 @@ export class AppHeaderComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  // ====== NUEVO: Escuchar scroll global ======
-  @HostListener('window:scroll', [])
-  onWindowScroll() {
-    const st = window.pageYOffset || document.documentElement.scrollTop;
+  // ================================
+  // 🔹 Efecto de scroll (ocultar header)
+  // ================================
+  private handleScroll(): void {
+    const headerEl = this.el.nativeElement.querySelector('.mw-header') as HTMLElement;
+    if (!headerEl) return;
 
-    if (st > this.lastScrollTop && st > 80) {
-      // Bajando
+    const delta = this.scrollTop - this.lastScrollTop;
+    if (Math.abs(delta) < 8) return;
+
+    if (delta > 0 && this.scrollTop > 80) {
       this.isHidden = true;
-    } else if (st < this.lastScrollTop) {
-      // Subiendo
+      this.renderer.setStyle(headerEl, 'transform', 'translateY(-100%)');
+    } else if (delta < 0) {
       this.isHidden = false;
+      this.renderer.setStyle(headerEl, 'transform', 'translateY(0)');
     }
 
-    this.lastScrollTop = st <= 0 ? 0 : st;
+    this.lastScrollTop = this.scrollTop <= 0 ? 0 : this.scrollTop;
   }
 
-  // ====== BUSCADOR ======
+  // ================================
+  // 🔹 Buscador y sugerencias
+  // ================================
   onInput(ev: any) {
     const value = ev?.target?.value ?? ev?.detail?.value ?? '';
     this.query = String(value).replace(/^\s+/, '');
@@ -130,7 +163,9 @@ export class AppHeaderComponent implements OnInit, OnDestroy {
     this.category.emit(ev?.detail?.value);
   }
 
-  // ====== MENÚ / CARRITO ======
+  // ================================
+  // 🔹 Menú y carrito
+  // ================================
   goCart() {
     this.router.navigateByUrl('/cart');
   }
@@ -140,7 +175,9 @@ export class AppHeaderComponent implements OnInit, OnDestroy {
     this.menu.open('mainMenu');
   }
 
-  // ====== SUGERENCIAS ======
+  // ================================
+  // 🔹 Sugerencias recientes y categorías
+  // ================================
   private buildSuggest(q: string): Suggest {
     const recent = this.getRecent().slice(0, 6);
     const cats = [
@@ -164,7 +201,7 @@ export class AppHeaderComponent implements OnInit, OnDestroy {
 
     const hits = !q
       ? baseHits.slice(0, 5)
-      : baseHits.filter(x => x.toLowerCase().includes(q.toLowerCase())).slice(0, 5);
+      : baseHits.filter((x) => x.toLowerCase().includes(q.toLowerCase())).slice(0, 5);
 
     return { recent, cats, hits };
   }
@@ -178,12 +215,14 @@ export class AppHeaderComponent implements OnInit, OnDestroy {
   }
 
   private saveRecent(q: string) {
-    const arr = this.getRecent().filter(x => x.toLowerCase() !== q.toLowerCase());
+    const arr = this.getRecent().filter((x) => x.toLowerCase() !== q.toLowerCase());
     arr.unshift(q);
     localStorage.setItem('mw_recent', JSON.stringify(arr.slice(0, 10)));
   }
 
-  // ====== MODALES ======
+  // ================================
+  // 🔹 Modales: ubicación y login
+  // ================================
   async openLocation() {
     const modal = await this.modalCtrl.create({
       component: LocationModalComponent,
@@ -194,7 +233,7 @@ export class AppHeaderComponent implements OnInit, OnDestroy {
   async openLogin() {
     const modal = await this.modalCtrl.create({
       component: LoginModalComponent,
-      cssClass: '/login',
+      cssClass: 'login-modal',
       backdropDismiss: true,
     });
     await modal.present();
@@ -202,5 +241,13 @@ export class AppHeaderComponent implements OnInit, OnDestroy {
 
   get user() {
     return this.auth.currentUser;
+  }
+
+  hideSuggestDelayed() {
+    setTimeout(() => (this.openSuggest = false), 180);
+  }
+
+  closeSuggest() {
+    this.openSuggest = false;
   }
 }

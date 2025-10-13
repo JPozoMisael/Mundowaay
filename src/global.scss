@@ -1,124 +1,136 @@
 /*
- * App Global CSS
- * ----------------------------------------------------------------------------
- * Put style rules here that you want to apply globally. These styles are for
- * the entire app and not just one component. Additionally, this file can be
- * used as an entry point to import other CSS/Sass files to be included in the
- * output CSS.
- * For more information on global stylesheets, visit the documentation:
- * https://ionicframework.com/docs/layout/global-stylesheets
+ * ============================================================
+ * 🌎 ESTILOS GLOBALES - APLICACIÓN WAY
+ * ============================================================
+ * Este archivo define los estilos base, la estructura del layout
+ * y elimina dependencias del antiguo header global.
+ * ============================================================
  */
 
-/* Core CSS required for Ionic components to work properly */
+/* ──────────────────────────────────────────────── */
+/* 🔹 IMPORTS BÁSICOS DE IONIC                    */
+/* ──────────────────────────────────────────────── */
 @import "@ionic/angular/css/core.css";
-
-/* Basic CSS for apps built with Ionic */
 @import "@ionic/angular/css/normalize.css";
 @import "@ionic/angular/css/structure.css";
 @import "@ionic/angular/css/typography.css";
 @import "@ionic/angular/css/display.css";
 
-/* Optional CSS utils that can be commented out */
+/* Utilidades opcionales */
 @import "@ionic/angular/css/padding.css";
 @import "@ionic/angular/css/float-elements.css";
 @import "@ionic/angular/css/text-alignment.css";
 @import "@ionic/angular/css/text-transformation.css";
 @import "@ionic/angular/css/flex-utils.css";
 
-/**
- * Ionic Dark Mode
- * -----------------------------------------------------
- * For more info, please see:
- * https://ionicframework.com/docs/theming/dark-mode
- */
-
-/* @import "@ionic/angular/css/palettes/dark.always.css"; */
-/* @import "@ionic/angular/css/palettes/dark.class.css"; */
+/* Modo oscuro del sistema (opcional) */
 @import "@ionic/angular/css/palettes/dark.system.css";
 
-/* Fuerza modo claro en toda la app */
-/* Forzar modo claro y tipografía limpia */
-:root{ color-scheme: light; }
-html, body, ion-app, ion-content{ background:#fff !important; color:#111; }
+/* ──────────────────────────────────────────────── */
+/* 🔹 CONFIGURACIÓN GLOBAL DEL MODO CLARO          */
+/* ──────────────────────────────────────────────── */
+:root {
+  color-scheme: light;
 
-/* Reset suave */
-* { box-sizing: border-box; }
-img { display:block; max-width:100%; }
-
-/* Contenedor central tipo Wix */
-.container { width:100%; max-width:1180px; margin:0 auto; padding:0 16px; }
-/* Alturas del header global */
-:root{
-  --mw-top-h: 64px;   /* barra con logo + buscador */
-  --mw-cats-h: 46px;  /* barra teal de categorías */
+  /* Alturas base solo si quieres referenciarlas */
+  --mw-top-h: 64px;
+  --mw-cats-h: 46px;
   --mw-header-offset: calc(var(--mw-top-h) + var(--mw-cats-h));
 }
 
-/* Variante móvil (si tu top es más bajo en mobile) */
-@media (max-width: 768px){
-  :root{
-    --mw-top-h: 56px;
-    --mw-cats-h: 44px;
-    --mw-header-offset: calc(var(--mw-top-h) + var(--mw-cats-h));
-  }
+html,
+body,
+ion-app,
+ion-content {
+  background: #fff !important;
+  color: #111;
+  font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+  scroll-behavior: smooth;
 }
-ion-app, ion-router-outlet {
+
+/* ──────────────────────────────────────────────── */
+/* 🔹 RESET SUAVE Y CONTENEDORES                  */
+/* ──────────────────────────────────────────────── */
+* {
+  box-sizing: border-box;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+.container {
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+/* ──────────────────────────────────────────────── */
+/* 🔹 ESTRUCTURA DEL APP                          */
+/* ──────────────────────────────────────────────── */
+ion-app,
+ion-router-outlet {
   display: flex;
   flex-direction: column;
-  min-height: 100vh; /* ocupa toda la pantalla */
+  min-height: 100vh;
 }
 
 ion-router-outlet {
-  flex: 1; /* el contenido crece */
+  flex: 1;
 }
 
 app-footer {
-  flex-shrink: 0; /* el footer se mantiene abajo */
+  flex-shrink: 0;
 }
 
+/* ──────────────────────────────────────────────── */
+/* 🔹 MODAL DE LOGIN                              */
+/* ──────────────────────────────────────────────── */
 .login-modal::part(content) {
   --min-width: 900px;
   --max-width: 1000px;
   --min-height: 500px;
   background: #fff !important;
   border-radius: 10px;
-  box-shadow: 0 8px 28px rgba(0,0,0,.12);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.12);
 }
 
 .login-modal::part(backdrop) {
-  background: rgba(0,0,0,0.25);
+  background: rgba(0, 0, 0, 0.25);
 }
 
-/* 🔹 Forzar full-width solo en header y slider */
-/* ==== Compensar altura del header (para que no lo corte el contenido) ==== */
+/* ──────────────────────────────────────────────── */
+/* 🔹 OPTIMIZACIÓN POST-HEADER GLOBAL              */
+/* ──────────────────────────────────────────────── */
+/* Se eliminan las compensaciones del header fijo anterior */
 ion-content,
 ion-router-outlet {
-  display: block;
-  margin-top: var(--mw-header-offset); /* usa las variables definidas arriba */
+  margin-top: 0 !important;
+  padding-top: 0 !important;
 }
 
-/* 🔹 Evita que el header se mantenga fijo */
-ion-header.mw-header {
-  position: relative !important;
-  top: 0 !important;
-  z-index: 99;
-  transition: transform 0.35s ease, opacity 0.25s ease;
-  will-change: transform, opacity;
-}
-
-/* 🔹 Estado oculto del header cuando se hace scroll hacia abajo */
-ion-header.mw-header.hide {
-  transform: translateY(calc(-1 * var(--mw-header-offset)));
-  opacity: 0;
-  pointer-events: none;
-}
-/* 🔧 Desactivar comportamiento sticky interno del ion-header de Ionic */
+/* Desactiva comportamientos sticky de IonHeader global */
 ion-header::part(container),
-ion-header::part(toolbar),
 ion-toolbar::part(container) {
   position: relative !important;
-  top: auto !important;
   inset: auto !important;
   transform: none !important;
   z-index: auto !important;
+}
+
+/* ──────────────────────────────────────────────── */
+/* 🔹 RESPONSIVIDAD BASE                          */
+/* ──────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  :root {
+    --mw-top-h: 56px;
+    --mw-cats-h: 44px;
+    --mw-header-offset: calc(var(--mw-top-h) + var(--mw-cats-h));
+  }
+
+  .container {
+    padding: 0 12px;
+  }
 }

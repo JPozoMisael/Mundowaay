@@ -3,7 +3,6 @@ import { InfiniteScrollCustomEvent, ToastController } from '@ionic/angular';
 import { CartService } from 'src/app/servicios/cart';
 import { ProductsService, Product } from 'src/app/servicios/products';
 
-// Extiende Product con campos visuales
 type LocalProduct = Product & {
   compareAt?: number;
   rating?: number;
@@ -61,38 +60,29 @@ export class SemillasPage implements OnInit {
   ) {}
 
   ngOnInit() {
-    console.log('[SemillasPage] Iniciando carga de productos...');
     this.loadProducts();
   }
 
   // 🚀 Cargar productos desde backend
   private loadProducts() {
-    console.log('[SemillasPage] Solicitando colección "semillas" desde API...');
-
     this.productsSvc.getByCollection('semillas').subscribe({
       next: (items) => {
-        console.log(`[SemillasPage] Productos recibidos de la colección SEMILLAS: ${items.length}`);
-
         this.all = items
           .filter((p) => p.imageUrl && !p.imageUrl.includes('placeholder'))
           .map((p) => this.mapToLocal(p));
 
-        if (!this.all.length) {
-          console.warn('⚠️ No se encontraron productos en la colección SEMILLAS. Se usa mock temporal.');
-          this.all = this.mock(12);
-        }
+        if (!this.all.length) this.all = this.mock(12);
 
         this.rebuildSortedAndSlice();
       },
       error: (err) => {
-        console.error('[SemillasPage] Error cargando colección SEMILLAS:', err);
+        console.error('Error cargando semillas:', err);
         this.all = this.mock(12);
         this.rebuildSortedAndSlice();
       },
     });
   }
 
-  // 🧩 Adaptar producto al modelo local
   private mapToLocal(p: Product): LocalProduct {
     return {
       ...p,
@@ -116,7 +106,6 @@ export class SemillasPage implements OnInit {
         : this.all.filter((p) => (p.category ?? '').toLowerCase().includes(this.active));
 
     let src = [...base];
-
     switch (this.activePill) {
       case 'relampago':
         src = src.filter((p) => !!p.compareAt);
@@ -147,7 +136,6 @@ export class SemillasPage implements OnInit {
 
     this.sorted = src;
     this.list = this.sorted.slice(0, this.firstPage);
-    console.log(`[SemillasPage] Mostrando ${this.list.length}/${this.sorted.length} productos.`);
   }
 
   // ===== UI =====
@@ -165,6 +153,31 @@ export class SemillasPage implements OnInit {
     const el = this.pillScroll?.nativeElement;
     if (!el) return;
     el.scrollBy({ left: dir * el.clientWidth * 0.8, behavior: 'smooth' });
+  }
+
+  // ============================================================
+  // 🔹 Scroll - efecto Temu (ocultar header al bajar)
+  // ============================================================
+  private lastScrollTop = 0;
+  onScroll(event: any) {
+    const scrollTop = event.detail?.scrollTop || 0;
+    const header = document.querySelector('.mw-header') as HTMLElement;
+    if (!header) return;
+
+    const delta = scrollTop - this.lastScrollTop;
+    if (Math.abs(delta) < 6) return; // Evita micro-movimientos
+
+    if (delta > 0 && scrollTop > 60) {
+      // Bajando → ocultar
+      header.style.transform = 'translateY(-100%)';
+      header.style.transition = 'transform 0.25s ease';
+    } else if (delta < 0) {
+      // Subiendo → mostrar
+      header.style.transform = 'translateY(0)';
+      header.style.transition = 'transform 0.25s ease';
+    }
+
+    this.lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
   }
 
   // ===== Infinite Scroll =====
@@ -197,7 +210,6 @@ export class SemillasPage implements OnInit {
     return rr + (hasDiscount ? 150 : 0);
   }
 
-  // ===== Carrito =====
   async addToCart(p: LocalProduct) {
     this.cartSvc
       .add(
@@ -225,7 +237,6 @@ export class SemillasPage implements OnInit {
     return item?.id || index.toString();
   }
 
-  // ===== Mock temporal =====
   private mock(n: number): LocalProduct[] {
     const cats = ['maiz', 'arroz', 'trigo', 'soja', 'hort'];
     const tagsPool = ['organico', 'rendimiento', 'trazabilidad', 'nuevo'];
@@ -235,7 +246,6 @@ export class SemillasPage implements OnInit {
       const id = `S-${Date.now()}-${i}`;
       const base = 5 + Math.random() * 60;
       const hasCompare = Math.random() > 0.25;
-
       return {
         id,
         title:
@@ -256,5 +266,14 @@ export class SemillasPage implements OnInit {
         tags: [tagsPool[Math.floor(Math.random() * tagsPool.length)]],
       };
     });
+  }
+
+  // ===== Header global =====
+  onGlobalSearch(term: string) {
+    console.log('[Header] buscar:', term);
+  }
+
+  onGlobalCat(cat: string) {
+    console.log('[Header] categoría:', cat);
   }
 }

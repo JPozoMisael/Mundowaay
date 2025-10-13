@@ -1,71 +1,83 @@
-<ion-header class="mw-header" mode="md" [class.hide]="isHidden">
-  <!-- Top bar -->
+<ion-header class="mw-header" [class.hide]="isHidden">
+  <!-- 🔹 Franja blanca superior -->
   <ion-toolbar class="top">
     <div class="container top-inner">
       <!-- Logo -->
       <a class="brand" routerLink="/home">
-        <!-- Usa un asset dentro del proyecto -->
-        <img src="assets/img/Way.png" alt="" />
+        <img src="assets/img/Way.png" alt="Way" />
       </a>
 
       <!-- Buscador -->
-      <div class="search">
+      <div class="search" [class.active]="openSuggest">
         <ion-searchbar
           [value]="query"
           placeholder="Buscar semillas, productos y más"
           show-clear-button="focus"
           (ionInput)="onInput($event)"
           (keyup.enter)="submit()"
-          (ionClear)="clear()">
+          (ionClear)="clear()"
+          (ionFocus)="openSuggest = true"
+          (ionBlur)="hideSuggestDelayed()">
         </ion-searchbar>
 
-        <!-- Dropdown de sugerencias -->
-        <div class="suggest-panel" *ngIf="openSuggest && (suggest$ | async) as sug">
-          <div class="section" *ngIf="sug.recent.length">
-            <div class="title">Búsquedas recientes</div>
-            <button class="item" *ngFor="let r of sug.recent" (click)="pick(r)">
-              <ion-icon name="time-outline"></ion-icon> {{ r }}
+        <!-- Panel de sugerencias -->
+        <div class="suggest-panel" *ngIf="openSuggest">
+          <div class="section" *ngIf="(suggest$ | async)?.recent?.length">
+            <div class="title">
+              <ion-icon name="time-outline"></ion-icon> Búsquedas recientes
+            </div>
+            <button class="item" *ngFor="let r of (suggest$ | async)?.recent" (mousedown)="pick(r)">
+              {{ r }}
             </button>
           </div>
 
-          <div class="section" *ngIf="sug.cats.length">
-            <div class="title">Categorías</div>
-            <button class="item" *ngFor="let c of sug.cats" (click)="goCat(c.key)">
-              <ion-icon name="albums-outline"></ion-icon> {{ c.label }}
+          <div class="section" *ngIf="(suggest$ | async)?.cats?.length">
+            <div class="title">
+              <ion-icon name="albums-outline"></ion-icon> Categorías
+            </div>
+            <button class="item" *ngFor="let c of (suggest$ | async)?.cats" (mousedown)="goCat(c.key)">
+              {{ c.label }}
             </button>
           </div>
 
-          <div class="section" *ngIf="sug.hits.length">
-            <div class="title">Sugerencias</div>
-            <button class="item" *ngFor="let h of sug.hits" (click)="pick(h)">
-              <ion-icon name="search-outline"></ion-icon> {{ h }}
+          <div class="section" *ngIf="(suggest$ | async)?.hits?.length">
+            <div class="title">
+              <ion-icon name="search-outline"></ion-icon> Coincidencias
+            </div>
+            <button class="item" *ngFor="let h of (suggest$ | async)?.hits" (mousedown)="pick(h)">
+              {{ h }}
             </button>
           </div>
         </div>
+
+        <!-- Fondo oscuro cuando las sugerencias están abiertas -->
+        <div class="overlay" *ngIf="openSuggest" (click)="closeSuggest()"></div>
       </div>
 
       <!-- Acciones -->
       <div class="actions">
-        <ion-button class="icon" fill="clear" size="small" aria-label="Ubicación" (click)="openLocation()">
+        <ion-button fill="clear" size="small" (click)="openLocation()">
           <ion-icon name="location-outline"></ion-icon>
-          <span *ngIf="userLocation"> {{ userLocation.province || 'Ecuador' }}</span>
+          <span *ngIf="userLocation">
+            {{ userLocation.province || 'Ecuador' }}
+          </span>
         </ion-button>
 
-        <ion-button class="login" fill="clear" size="small" aria-label="Perfil" (click)="openLogin()">
+        <ion-button class="login" fill="clear" size="small" (click)="openLogin()">
           <ion-icon name="person-circle-outline"></ion-icon>
           <span *ngIf="!user">Iniciar sesión</span>
           <span *ngIf="user">Hola, {{ user?.profile?.nickname || user?.email }}</span>
         </ion-button>
 
-        <ion-button class="cart-btn" fill="clear" size="small" aria-label="Carrito" routerLink="/cart">
+        <ion-button class="cart-btn" fill="clear" size="small" routerLink="/cart">
           <ion-icon name="cart-outline"></ion-icon>
-          <ion-badge *ngIf="cartCount>0" class="cart-badge">{{ cartCount }}</ion-badge>
+          <ion-badge *ngIf="cartCount > 0" class="cart-badge">{{ cartCount }}</ion-badge>
         </ion-button>
       </div>
     </div>
   </ion-toolbar>
 
-  <!-- Categorías -->
+  <!-- 🔹 Franja azul inferior (categorías principales) -->
   <ion-toolbar class="cats">
     <div class="container cat-inner">
       <button class="hamb" type="button" (click)="openMenu()">

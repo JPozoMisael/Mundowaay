@@ -1,60 +1,45 @@
-/* Paleta WAY */
-$blue: #004aad;   // Azul corporativo
-$yellow: #ffd200; // Amarillo corporativo
-$gray: #6b7280;
-$offwhite: #f7fbf9;
+/* ============================================================
+   WAY HEADER - ESTILO TEMU / SHOPEE
+   ============================================================ */
 
+/* ===== CONTENEDOR PRINCIPAL ===== */
 .mw-header {
-  position: relative;
+  position: sticky;
   top: 0;
-  z-index: 100;
-  transition: transform 0.3s ease;
+  left: 0;
+  right: 0;
+  z-index: 3000; /* 🔺 Subido para asegurar que todo el header esté sobre el resto */
+  background: #fff;
+  transition: transform 0.25s cubic-bezier(0.33, 1, 0.68, 1);
   will-change: transform;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
+
+/* 🔽 Ocultar al bajar */
 .mw-header.hide {
-  transform: translateY(-120px);
-  opacity: 0;
-  pointer-events: none;
-}
-@media (max-width: 768px) {
-  .mw-header.hide { transform: translateY(-110px); }
+  transform: translateY(-100%);
+  opacity: 1; /* sin desvanecimiento */
 }
 
-
-/* 🔹 Hola, identifícate */
-.menu-header ion-item.hello-item::part(native) {
-  background: #004aad !important;   /* azul marino */
-  color: #fff !important;
-  font-weight: 600;
-  font-size: 16px;
-  cursor: pointer;
+/* 🔼 Rebote natural al reaparecer */
+.mw-header:not(.hide) {
+  animation: bounceIn 0.35s cubic-bezier(0.25, 1, 0.5, 1.3);
 }
 
-.menu-header ion-item.hello-item::part(native):hover {
-  background: #00337a !important;   /* azul más oscuro en hover */
+@keyframes bounceIn {
+  0%   { transform: translateY(-10px); }
+  60%  { transform: translateY(2px); }
+  100% { transform: translateY(0); }
 }
 
-.menu-header ion-item.hello-item ion-icon {
-  font-size: 28px;
-  color: #ffd200; /* amarillo corporativo */
-}
-
-/* 🔹 Home */
-.menu-list ion-item::part(native) {
-  background: #004aad !important;   /* azul marino */
-  color: #fff !important;
-  font-weight: 600;
-}
-
-.menu-list ion-item::part(native):hover {
-  background: #00337a !important;   /* azul más oscuro en hover */
-}
-
-/* ===== Top bar ===== */
+/* ============================================================
+   BARRA SUPERIOR (LOGO + BUSCADOR + ACCIONES)
+   ============================================================ */
 .top {
-  --background: #fff !important;
-  background: #fff !important;
+  background: #fff;
   border-bottom: 1px solid #e9eef1;
+  position: relative;
+  z-index: 10; /* 🔺 para mantener la barra superior sobre el menú azul */
 }
 
 .top-inner {
@@ -62,7 +47,7 @@ $offwhite: #f7fbf9;
   grid-template-columns: 140px 1fr 280px;
   align-items: center;
   gap: 16px;
-  min-height: 70px;
+  min-height: var(--mw-top-h, 72px);
 }
 
 .brand img {
@@ -70,82 +55,143 @@ $offwhite: #f7fbf9;
   display: block;
 }
 
-/* ===== Buscador ===== */
-.search ion-searchbar {
-  --background: $offwhite;
-  --border-radius: 8px;
-  --box-shadow: inset 0 0 0 1.5px #d6d6d6;
-  --color: #111;
-  --placeholder-color: $gray;
-  width: 100%;
-  transition: all 0.2s ease;
+/* ============================================================
+   BUSCADOR
+   ============================================================ */
+.search {
+  position: relative;
+  flex: 1;
+  max-width: 620px;
+  z-index: 20; /* 🔺 eleva el buscador sobre la barra azul y demás elementos */
+
+  ion-searchbar {
+    --background: #fff;
+    --border-radius: 20px;
+    --placeholder-color: #777;
+    --color: #111;
+    --box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    transition: all 0.2s ease;
+    height: 44px;
+  }
+
+  ion-searchbar:focus-within {
+    --box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+    transform: scale(1.02);
+  }
+
+  /* 🔹 Panel de sugerencias */
+  .suggest-panel {
+    position: absolute;
+    top: 50px;
+    left: 0;
+    right: 0;
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    z-index: 4000; /* 🔺 Máxima prioridad para que se muestre encima de las categorías */
+    padding: 12px 16px;
+    animation: fadeIn 0.2s ease forwards;
+    max-height: 400px;
+    overflow-y: auto;
+  }
+
+  .suggest-panel .section {
+    margin-bottom: 10px;
+
+    .title {
+      font-weight: 600;
+      font-size: 14px;
+      color: #444;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+
+    .item {
+      display: block;
+      width: 100%;
+      text-align: left;
+      border: 0;
+      background: transparent;
+      color: #333;
+      font-size: 15px;
+      padding: 6px 10px;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: background 0.2s ease;
+
+      &:hover {
+        background: #f5f6f8;
+      }
+    }
+  }
+
+  /* 🔹 Fondo oscuro detrás de las sugerencias */
+  .overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.25);
+    z-index: 3500;
+    animation: fadeIn 0.2s ease forwards;
+  }
 }
 
-.search ion-searchbar:focus-within {
-  --box-shadow: inset 0 0 0 2px $blue;
-  --background: #fff;
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-3px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-/* ===== Acciones ===== */
+/* ============================================================
+   ACCIONES DERECHA (UBICACIÓN / LOGIN / CARRITO)
+   ============================================================ */
 .actions {
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  gap: 20px; /* más espacio */
-
-  ion-button {
-    --background: transparent;
-    --box-shadow: none;
-    --padding-start: 4px;
-    --padding-end: 4px;
-  }
+  gap: 20px;
 
   ion-icon {
     font-size: 24px;
-    color: $blue;
-    transition: color 0.2s ease;
-  }
-
-  ion-button:hover ion-icon {
-    color: darken($blue, 10%);
+    color: #004aad;
   }
 
   .login span {
     margin-left: 6px;
     font-weight: 600;
     font-size: 15px;
-    color: $blue;
+    color: #004aad;
   }
 
-  /* Badge carrito */
   .cart-badge {
     position: absolute;
     top: -6px;
     right: -6px;
-    background: $yellow;
-    color: $blue;
+    background: #ffd200;
+    color: #004aad;
     font-weight: 700;
     font-size: 12px;
     padding: 2px 6px;
     border-radius: 12px;
-    border: 1px solid $blue;
+    border: 1px solid #004aad;
   }
 }
 
-/* ===== Categorías ===== */
+/* ============================================================
+   MENÚ AZUL DE CATEGORÍAS
+   ============================================================ */
 .cats {
-  --background: #004AAD; 
-  background: #004AAD !important; 
+  background: #004aad !important;
   color: #fff;
-  padding: 0;
-  box-shadow: 0 1px 0 rgba(0,0,0,.04);
+  position: relative;
+  z-index: 5; /* ⬇️ debajo del buscador y overlay */
 }
 
 .cat-inner {
   display: flex;
   align-items: center;
   gap: 20px;
-  min-height: 48px;
+  min-height: var(--mw-cats-h, 48px);
 }
 
 .hamb {
@@ -156,6 +202,7 @@ $offwhite: #f7fbf9;
   align-items: center;
   gap: 6px;
   font-weight: 700;
+
   ion-icon { font-size: 22px; }
 }
 
@@ -164,6 +211,10 @@ $offwhite: #f7fbf9;
   gap: 22px;
   overflow: auto;
   scrollbar-width: none;
+}
+
+.cat-nav::-webkit-scrollbar {
+  display: none;
 }
 
 .cat-nav a {
@@ -177,7 +228,7 @@ $offwhite: #f7fbf9;
 
 .cat-nav a:hover,
 .cat-nav a.active {
-  color: $yellow;
+  color: #ffd200;
 }
 
 .cat-nav a::after {
@@ -187,7 +238,7 @@ $offwhite: #f7fbf9;
   bottom: -4px;
   width: 100%;
   height: 2px;
-  background: $yellow;
+  background: #ffd200;
   transform: scaleX(0);
   transition: transform 0.3s ease;
 }
@@ -197,19 +248,19 @@ $offwhite: #f7fbf9;
   transform: scaleX(1);
 }
 
-
-/* 📱 Responsivo */
-@media (max-width: 1024px) {
-  .mw-header .top-inner {
-    grid-template-columns: 110px 1fr 200px;
-  }
-}
-
+/* ============================================================
+   RESPONSIVO
+   ============================================================ */
 @media (max-width: 768px) {
-  .mw-header .top-inner {
+  .top-inner {
     grid-template-columns: 90px 1fr auto;
   }
-  .mw-header .actions .login span {
+
+  .search {
+    max-width: 100%;
+  }
+
+  .login span {
     display: none;
   }
 }

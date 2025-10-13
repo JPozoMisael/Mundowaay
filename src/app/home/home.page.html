@@ -1,6 +1,11 @@
-<ion-header collapse="condense"></ion-header>
+<!-- HEADER LOCAL DE LA HOME -->
+<app-header
+  (search)="onGlobalSearch($event)"
+  (category)="onGlobalCat($event)">
+</app-header>
 
-<ion-content [fullscreen]="true" class="mw-home">
+<!-- CONTENIDO PRINCIPAL -->
+<ion-content [fullscreen]="true" class="mw-home" (ionScroll)="onScroll($event)" scrollEvents="true">
 
   <!-- ========================= -->
   <!-- 🌀 ESTADOS DE CARGA / ERROR -->
@@ -22,7 +27,6 @@
   <!-- ========================= -->
   <!-- 🖼️ CONTENIDO PRINCIPAL -->
   <!-- ========================= -->
-
   <ng-container *ngIf="!loading && !error">
     
     <!-- Caso sin productos -->
@@ -122,4 +126,5 @@
 
     <app-footer></app-footer>
   </ng-container>
+
 </ion-content>

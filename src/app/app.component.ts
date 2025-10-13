@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { MenuController, ModalController } from '@ionic/angular';  
+import { MenuController, ModalController } from '@ionic/angular';
 import { LoginModalComponent } from './components/login-modal/login-modal.component';
 
 @Component({
@@ -17,64 +17,52 @@ export class AppComponent {
     private modalCtrl: ModalController
   ) {}
 
-  /** 🔹 Abre el modal de login (igual que en el header) */
+  /** 🔹 Abrir modal de login */
   async openLogin() {
     const modal = await this.modalCtrl.create({
       component: LoginModalComponent,
       cssClass: 'login-modal',
-      backdropDismiss: true
+      backdropDismiss: true,
     });
     await modal.present();
   }
 
+  /** 🔹 Obtener usuario autenticado (placeholder) */
   get user() {
-    // Aquí luego podrás conectar tu servicio de autenticación real
-    return null; 
+    return null; // aquí conectarás tu servicio de autenticación real
   }
 
   /** 🔹 Navegación genérica */
   go(path: string) {
     this.router.navigateByUrl(path).finally(() => {
-      try { this.menu.close(); } catch {}
+      try {
+        this.menu.close();
+      } catch {}
     });
   }
 
-  /** 🔹 Abrir WhatsApp (coloca tu número real con prefijo +593) */
+  /** 🔹 Enlace a WhatsApp (actualiza con tu número real) */
   openWhatsApp() {
     window.open('https://wa.me/593000000000', '_blank', 'noopener,noreferrer');
   }
 
-  /** 🔹 Abrir soporte técnico (ejemplo: mailto o página interna) */
+  /** 🔹 Soporte técnico */
   openSupport() {
     window.open('mailto:soporte@cultivencom.com', '_blank');
   }
 
-  /** 🔹 Abrir ubicación sucursales con Google Maps */
+  /** 🔹 Ubicación (Google Maps) */
   openMap() {
     window.open('https://maps.app.goo.gl/XXXXXXXXX', '_blank');
   }
 
-  /** 🔹 Abrir política de privacidad (PDF o página interna) */
+  /** 🔹 Política de privacidad */
   openPrivacy() {
     this.go('/ayuda/politica-privacidad');
   }
 
-  /** 🔹 Abrir términos y condiciones */
+  /** 🔹 Términos y condiciones */
   openTerms() {
     this.go('/ayuda/terminos-condiciones');
-  }
-
-  /** 🔹 Búsqueda global */
-  onGlobalSearch(event: any) {
-    const query = (typeof event === 'string' ? event : event.detail?.value || '').trim();
-    if (!query) return;
-    this.router.navigate(['/search'], { queryParams: { q: query } });
-  }
-
-  /** 🔹 Categorías globales */
-  onGlobalCat(event: any) {
-    const key = (typeof event === 'string' ? event : event.detail?.value || '').trim();
-    if (!key) return;
-    this.router.navigate(['/category', key]);
   }
 }

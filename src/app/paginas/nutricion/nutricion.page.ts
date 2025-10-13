@@ -276,4 +276,15 @@ export class NutricionPage implements OnInit {
       };
     });
   }
+  // ====== Eventos del header (búsqueda y categoría global) ======
+onGlobalSearch(term: string) {
+  console.log('[Header] Buscar término:', term);
+  // Puedes implementar lógica de búsqueda si deseas
+}
+
+onGlobalCat(cat: string) {
+  console.log('[Header] Seleccionar categoría:', cat);
+  // O navegar según categoría si lo requieres
+}
+
 }
